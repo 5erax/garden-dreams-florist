@@ -202,3 +202,10 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Bước tiếp theo: Gmail App Password và Custom SMTP chỉ trên staging, sau đó URL callback/template/đăng ký-khôi phục và ca thử. Không yêu cầu gửi secret qua chat. Production không được nâng cấp hoặc mở nhận đơn bởi thao tác staging này.
 - Chủ project báo “đã lưu smtp” trên staging. Ghi nhận cấu hình đã lưu theo báo cáo của chủ project; chưa nghiệm thu gửi/nhận, callback, khôi phục hoặc email tới hai tài khoản. Bước tiếp theo là URL Configuration và email templates, rồi gửi thử qua luồng đăng ký của website.
 - Chủ project tiếp tục báo “đã lưu url” cho Site URL/Redirect URL staging đã hướng dẫn. Chưa quan sát cấu hình dashboard trực tiếp hoặc nghiệm thu callback. Đang hướng dẫn lưu confirmation/recovery templates và thử đăng ký/xác nhận/đăng nhập bằng email chủ project kiểm soát.
+
+### Nghiệm thu Auth staging — lỗi gửi email xác nhận
+
+- Chủ project báo signup HTTP 500; Response là unexpected_failure / Error sending confirmation email. Các request gd_environment/catalog/shipping/product_variants trong log chủ project gửi trả 200 trên đúng endpoint staging. Chưa có nguyên nhân SMTP/template cụ thể: log đang gửi là HTTP request summary, cần server Auth error/gomail. Không tắt xác nhận email hoặc bỏ RLS để xử lý.
+- Sửa AuthPanel dùng thông báo tĩnh theo code/status, phân biệt lỗi gửi email/server/throttle/credentials/network và không in provider message/secret/account-existence. Bỏ preload hero trong HTML chung vì account/admin không render hero; hero vẫn giữ fetchPriority khi storefront hiện.
+- 3 tests mới gồm privacy/unknown-code; 140 staging tests/build và 74 production tests/build qua. LOC canonical 14.617 (+3.830), còn 11.170 tới mục tiêu thêm 15.000. Đây là sửa UX/diagnostics, không sửa hoặc nghiệm thu SMTP hosted.
+- PR #9 merge head d16910df999168dec68a414ff0713dc4fc050d49, main 01db5cc48100aa547720ff160892958985583017. Vercel dpl_iyEhvTTgR1bro5d3EWNFZGySEzr4 READY đúng production/SHA. Source staging 72a2076; tiếp tục hướng dẫn truy vấn nguồn Logs để lấy lỗi gửi email cụ thể.
