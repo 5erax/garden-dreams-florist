@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { backend, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import { AuthPanel } from "./PortalShell.jsx";
+import { authErrorMessage } from "./auth-error.js";
 import OrderDetail from "./OrderDetail.jsx";
 import { money } from "./catalog.js";
 import { beforeCursor } from "./cursor.js";
@@ -162,13 +163,13 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
     try {
       const response = await backend.auth.updateUser({ password: value, data: { gd_needs_password: false } });
       if (!mounted.current || request !== passwordRequest.current) return;
-      if (response.error) setPasswordError("Chưa thay đổi được mật khẩu. Hãy thử lại.");
+      if (response.error) setPasswordError(authErrorMessage(response.error));
       else {
         setRecovery(false);
         setNotice("Mật khẩu đã cập nhật.");
       }
-    } catch {
-      if (mounted.current && request === passwordRequest.current) setPasswordError("Chưa thay đổi được mật khẩu. Kiểm tra kết nối rồi thử lại.");
+    } catch (failure) {
+      if (mounted.current && request === passwordRequest.current) setPasswordError(authErrorMessage(failure));
     } finally {
       if (mounted.current && request === passwordRequest.current) setPasswordBusy(false);
     }
@@ -196,8 +197,11 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
       {(recovery || (!session.user.is_anonymous && session.user.user_metadata?.gd_needs_password)) && (
         <form className="auth-card" onSubmit={password} aria-busy={passwordBusy}>
           <h2>Đặt mật khẩu mới</h2>
-          <label>Mật khẩu mới<input name="password" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /></label>
-          <button className="button primary" disabled={passwordBusy}>{passwordBusy ? "Đang lưu…" : "Lưu mật khẩu"}</button>
+          <p>Chọn mật khẩu từ 12 ký tự, khác mật khẩu hiện tại.</p>
+          <fieldset disabled={passwordBusy}>
+            <label>Mật khẩu mới<input name="password" type="password" autoComplete="new-password" minLength={12} maxLength={128} required /></label>
+            <button className="button primary">{passwordBusy ? "Đang lưu…" : "Lưu mật khẩu"}</button>
+          </fieldset>
           {passwordError && <p className="form-error" role="alert">{passwordError}</p>}
         </form>
       )}

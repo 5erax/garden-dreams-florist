@@ -88,6 +88,7 @@ export function AuthPanel() {
   if (!connected) return <BackendNotice />;
   async function submit(event) {
     event.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -127,14 +128,14 @@ export function AuthPanel() {
     }
   }
   return (
-    <section className="auth-card">
+    <section className="auth-card" aria-busy={busy}>
       <span className="eyebrow">YOUR LITTLE CORNER</span>
       <h1>
-        {mode === "signup" ? "Bắt đầu một" : "Trở về"}
+        {mode === "reset" ? "Khôi phục" : mode === "signup" ? "Bắt đầu một" : "Trở về"}
         <br />
         <em>góc của bạn.</em>
       </h1>
-      <p>Lịch sử những bó hoa. Những lời thương bạn đã gửi.</p>
+      <p>{mode === "reset" ? "Nhập email của tài khoản để nhận liên kết đặt mật khẩu mới. Kiểm tra cả hộp thư và mục Spam." : "Lịch sử những bó hoa. Những lời thương bạn đã gửi."}</p>
       <form onSubmit={submit}>
         <fieldset disabled={busy}>
           <label>
@@ -188,6 +189,7 @@ export function AuthPanel() {
         {mode !== "signup" && (
           <button
             className="text-button"
+            disabled={busy}
             onClick={() => {
               setMode("signup");
               setError("");
@@ -198,12 +200,12 @@ export function AuthPanel() {
           </button>
         )}
         {mode !== "login" && (
-          <button className="text-button" onClick={() => setMode("login")}>
+          <button className="text-button" disabled={busy} onClick={() => { setMode("login"); setError(""); setNotice(""); }}>
             Đăng nhập
           </button>
         )}
         {mode === "login" && (
-          <button className="text-button" onClick={() => setMode("reset")}>
+          <button className="text-button" disabled={busy} onClick={() => { setMode("reset"); setError(""); setNotice(""); }}>
             Quên mật khẩu
           </button>
         )}

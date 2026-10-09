@@ -28,3 +28,12 @@ test("network and unknown failures remain safe including account-existence error
     assert.doesNotMatch(message, /private@|đã tồn tại|sensitive/);
   }
 });
+
+test("password recovery failures give a safe next action without provider text", () => {
+  assert.match(authErrorMessage({ code: "same_password", message: "private@example.com" }), /khác mật khẩu hiện tại/);
+  for (const code of ["session_not_found", "session_expired", "otp_expired"]) {
+    const message = authErrorMessage({ code, message: "private@example.com token=secret" });
+    assert.match(message, /email khôi phục mới/);
+    assert.doesNotMatch(message, /private@|secret|token=/);
+  }
+});
