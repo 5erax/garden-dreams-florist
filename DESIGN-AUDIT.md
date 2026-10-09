@@ -33,3 +33,18 @@ No new JS branch, money logic or security boundary is introduced; no new test ha
 Pending: real browser at 320/375/768/1440 px, keyboard/touch and long catalog content, image loading/hover states, actual rendered contrast, Lighthouse and dark-theme design. Existing hero copy and page-wide tiny typography need their own content/design slices. Admin, checkout and account remain outside this marketing skill's scope.
 
 BU-26 remains unaccepted until its dependencies and browser checks pass. Preview build/READY alone cannot establish layout quality or accessibility.
+
+## Product detail slice
+
+The screen's job is to select an available size/quantity and understand the item subtotal before adding. Reuse the native size select, Quantity, Modal and `subtotal` helper. Derive the displayed total directly from the current catalog/choice; do not keep a second price state or assume shipping is included.
+
+Keep the select visible when a selected size disappears, including the last additional size. Show its unavailable state and allow return to Standard; hide the unit price/subtotal while the choice is invalid, keep Add disabled. Keep the native dialog and existing focus return. Increase copy/control readability, allow actions to wrap on narrow screens, and contain scrolling in dialogs.
+
+Review source: [Vercel Web Interface Guidelines](https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md), fetched 09/10/2026. Applied relevant rules to this slice with native control semantics:
+
+- `src/ShopDialogs.jsx`: size label/name/invalid state; derived subtotal with polite live status; no fallback unit price for an invalid choice.
+- `src/styles.css`: native select font 16 px, product quantity buttons 44 px, wrapping actions, long-content wrapping and dialog overscroll containment.
+- `src/ProductGallery.jsx`: explicit image dimensions remain follow-up debt; the gallery frame already reserves space. No image assets or gallery state changed in this slice.
+- Whole-page autoplay pause control, browser focus/keyboard verification and Lighthouse remain pending; reduced motion remains supported in source.
+
+Three new SSR markup tests pass: Standard/subtotal display, additional-size options and unavailable choice without a fallback price/enabled Add. They compile React without listening on an HTTP port or accessing hosted services. The existing cart tests check multi-size totals and unavailable variants. These tests do not simulate changing quantity/select or a live catalog refresh; those browser interactions remain pending. A mutation restoring the invalid fallback price failed the regression test; source was restored. Full suite: 39 passing; staging build passes with the existing approximately 684 kB JS chunk warning.

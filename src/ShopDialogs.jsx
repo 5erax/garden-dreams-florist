@@ -59,12 +59,13 @@ export function ProductDialog({
           Một món quà cho {product.occasion.toLocaleLowerCase("vi")}
         </span>
         <h2>{product.name}</h2>
-        <p className="detail-price">{money(choice?.price || product.price)}</p>
-        {product.variants?.length > 0 && <label className="variant-choice">
+        {choice && <p className="detail-price">{money(choice.price)} <span>/ bó</span></p>}
+        {(product.variants?.length > 0 || variantId !== null) && <label className="variant-choice">
           Cỡ bó hoa
-          <select value={variantId ?? ""} onChange={(e) => setVariantId(e.target.value ? Number(e.target.value) : null)}>
+          <select name="variantId" aria-invalid={!choice} value={variantId ?? ""} onChange={(e) => setVariantId(e.target.value ? Number(e.target.value) : null)}>
+            {!choice && variantId !== null && <option value={variantId} disabled>Cỡ đã ngừng nhận đặt</option>}
             <option value="">Tiêu chuẩn · {money(product.price)}</option>
-            {product.variants.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
+            {product.variants?.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
           </select>
         </label>}
         {!choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
@@ -79,6 +80,12 @@ export function ProductDialog({
           Ảnh và giá đang dùng cho bản giới thiệu. Màu sắc hoa theo mùa sẽ được
           xác nhận trước khi giao.
         </p>
+        {choice && <div className="detail-summary" aria-live="polite" aria-atomic="true">
+          <span>Tạm tính</span>
+          <strong>{money(subtotal([{ id: product.id, quantity, variantId }], [product]))}</strong>
+          <span>{quantity} bó · {choice.sizeName || "Tiêu chuẩn"}</span>
+          <small>Chưa gồm phí giao hoa</small>
+        </div>}
         <div className="detail-actions">
           <Quantity
             value={quantity}

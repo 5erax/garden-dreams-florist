@@ -102,3 +102,19 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Chỉ thay markup tĩnh/CSS, không thêm dependency hoặc logic JS; không cần tests mới. Diff check và build staging qua. Tính tương phản màu đặc thấp nhất 4.76:1; chưa chứng minh contrast khi render thực tế. Cảnh báo JS chunk khoảng 683 kB vẫn còn.
 - Chưa tick BU-26 và không đổi cổng phát hành hay thứ tự nghiệm thu. Browser/mobile/keyboard/Lighthouse, hosted migrations 006–008 và các cổng bản A/B vẫn còn mở. Tiến độ task lớn **1/32**, production tiếp tục đóng nhận đơn.
 - Code commit `7f05e7318106493bcf3a86c4f75f466dfb42365d` đã push; Vercel xác nhận `dpl_DHs6uxhLQsAMjRKnyeRsyR2ARRSx` READY đúng project/branch/SHA, target preview và alias staging cố định. [Preview của thay đổi](https://garden-dreams-florist-jq6a0x0eo-dhas-projects-901181f4.vercel.app); PR #1 vẫn draft.
+
+### Skills — Cài đặt và đánh giá kiến trúc theo tài liệu chủ shop
+
+- Đã cài 4 skill upstream Vercel vào user skills qua installer có sẵn của Codex, pinned commit `063bee94c3f4df8453406c830b0a7df0f2860278`. Đã đọc entrypoints/rules cần dùng; không chạy script deploy bên thứ ba. Các hướng dẫn React/deploy có chồng lấp với plugin hiện tại; không xóa hoặc ghi đè plugin, không áp dụng máy móc quy tắc chỉ dành Next/RSC vào Vite.
+- Tạo 10 skill nghiệp vụ trong `.agents/skills/`, cài junction vào user skills để chỉ duy trì một bản nguồn. Toàn bộ **14 SKILL.md qua validator**. Validator cần PyYAML; dependency này chỉ nằm trong tooling ngoài repo, không thêm vào ứng dụng. Tự nhận diện từ lượt tiếp theo; lượt này đã đọc và áp dụng trực tiếp các skill phù hợp.
+- [FLOWER-COMMERCE-ROADMAP.md](../FLOWER-COMMERCE-ROADMAP.md) có đánh giá stack/capabilities, inventory skill, proposal schema, milestones, dependencies và test strategy. Tồn kho/công thức/loyalty/chi nhánh/lợi nhuận mới là proposal, chưa xây hoặc nghiệm thu.
+- Không cài `ce-*`: tài liệu nêu chỉ dùng khi chọn Commerce Engine; dự án đang dùng Supabase/PostgreSQL. Không đổi backend/framework, đăng ký gói trả phí hoặc kết nối dịch vụ mới.
+- Hoàn thành việc cài/tạo skill, không cộng vào 32 task nghiệp vụ. Giữ thứ tự và các cổng nghiệm thu đã được chốt.
+
+### BU-26b / BU-09 — Chi tiết hoa, tạm tính và cỡ ngừng bán
+
+- Màn chi tiết có đơn giá mỗi bó, tổng tạm tính từ helper giỏ hiện có, số lượng/cỡ và ghi rõ chưa gồm phí giao. Tổng dẫn xuất từ catalog/state hiện tại, không thêm price state hay đổi logic server.
+- Không hiển thị giá Tiêu chuẩn thay cho cỡ đã ngừng bán. Select còn hiện khi cỡ đang chọn biến mất, kể cả cỡ bổ sung cuối cùng; có option báo trạng thái và cho chọn lại Tiêu chuẩn. Nút thêm vẫn bị khóa khi lựa chọn không hợp lệ.
+- Chữ mô tả 14 px, select 16 px, nút số lượng 44 px, action wrap ở vùng hẹp; native dialog có scroll containment. Review theo guideline Vercel mới, giữ native semantics/focus và theme gốc.
+- **39 tests qua**, gồm 3 tests render SSR mới, không listen HTTP hoặc truy cập backend hosted; build staging và diff check qua. Mutation phục hồi fallback giá sai làm test fail đúng kỳ vọng, đã khôi phục và chạy xanh. Diễn tập backup/retention với dữ liệu giả cũng qua trong full suite.
+- Chưa kiểm chứng đổi cỡ/số lượng/refresh catalog hoặc layout trong browser. Không tick BU-09/26, hosted migrations vẫn chưa cài; bundle khoảng 684 kB vẫn cần tối ưu. Tiến độ nghiệm thu task lớn **1/32**.
