@@ -17,7 +17,7 @@ const alice = client(),
 assert.deepEqual(await ok(anonymous.rpc("gd_environment")), {
   environment: "local",
   projectRef: null,
-  features: { productAlbum: true, productImageUpload: false },
+  features: { productAlbum: true, productImageUpload: false, productVariants: true },
 });
 for (const [c, email] of [
   [alice, "alice@example.test"],

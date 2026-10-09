@@ -28,7 +28,7 @@ test("product albums restrict URLs and writers; Storage permits immutable admin 
     await db.query("insert into auth.users values($1),($2)", [admin, customer]);
     await db.query("insert into gd_admins values($1)", [admin]);
     assert.deepEqual((await as(null, () => db.query("select gd_environment() value"))).rows[0].value.features,
-      { productAlbum: true, productImageUpload: true });
+      { productAlbum: true, productImageUpload: true, productVariants: true });
     assert.deepEqual((await db.query("select file_size_limit,allowed_mime_types,public from storage.buckets")).rows[0],
       { file_size_limit: 2097152, allowed_mime_types: ["image/webp"], public: true });
     const original = (await db.query("select image from gd_products where id=1")).rows[0].image;

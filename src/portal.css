@@ -526,6 +526,9 @@
   line-height: 1.8;
 }
 .product-photos-editor { margin: 24px 0; }
+.variant-list { list-style: none; padding: 0; margin: 24px 0; }
+.variant-list li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.variant-list p { overflow-wrap: anywhere; margin: 8px 0; font-size: 13px; }
 .product-photo-list {
   list-style: none;
   padding: 0;

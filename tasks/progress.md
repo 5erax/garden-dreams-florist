@@ -8,7 +8,8 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - **BU-02: chưa cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; Supabase vẫn bị công cụ từ chối trong phiên mới. Việc tạo credential Google cần chủ tài khoản thao tác; không yêu cầu gửi secret trong chat.
 - **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
 - **BU-07: mã nguồn album đã kiểm chứng local, chưa nghiệm thu Storage/UI thật.** Chuẩn bị trên branch staging trong lúc dashboard bị chặn; BU-06 vẫn là điều kiện nghiệm thu/phát hành.
-- **BU-03–04, BU-06 và BU-08–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
+- **BU-08: mã nguồn quản lý cỡ bó đã kiểm chứng local, chưa nghiệm thu UI/backend thật.** BU-09 tiếp tục phần chọn cỡ và snapshot đơn.
+- **BU-03–04, BU-06 và BU-10–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
 - Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
 
 ## Nhật ký
@@ -76,3 +77,10 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Review giữ ảnh cũ bên ngoài khi album trống, khóa thay bản nháp trong lúc upload, không bật upload với fixture thiếu Storage. Canvas unit test dùng stub; chưa chứng minh codec thật.
 - [PRODUCT-ALBUMS.md](../PRODUCT-ALBUMS.md) ghi phạm vi và nghiệm thu còn mở. Storage file API/policy thật, UI/mobile/keyboard và BU-06 chưa qua; không tick BU-07. Upload chưa lưu được giữ lại, chưa có cleanup orphan tự động. Tiến độ task lớn vẫn **1/32**.
 - Đã push code commit `abf29c04ce472d14b4ba7200343259a320d44dfe`; Vercel xác nhận deployment `dpl_2hLjQjfxds2W5FxbFbjibNvR2P3B` READY, đúng project/branch/SHA, target preview và alias staging cố định. PR #1 vẫn draft, Vercel check SUCCESS. Backend hosted chưa có 006 nên màn upload được ẩn đúng kế hoạch; không coi deployment READY là đã nghiệm thu album.
+
+### BU-08 — Quản lý cỡ bó trên mã nguồn staging
+
+- Migration 007 thêm cỡ bổ sung: SKU duy nhất, tên/giá/trạng thái, parent bất biến, version và audit. Chỉ admin tạo/sửa; không xóa cỡ để giữ tham chiếu lịch sử. Khách chỉ đọc cỡ đang bật của sản phẩm đang bật.
+- Màn hình admin nằm ngoài form sửa sản phẩm, có thêm/sửa/tắt, báo conflict version, khóa thao tác khi upload/lưu ở phần khác đang chạy. Giá sản phẩm cũ là cỡ Tiêu chuẩn; không tự tạo cỡ/giá giả hay đổi đơn cũ.
+- 34 tests và build staging qua; tests kiểm tra SKU/giá/parent/quyền/ẩn cỡ tắt/version/audit. Backend chưa có 007 ẩn màn quản lý cỡ.
+- Chưa tick BU-08: chưa áp dụng hosted migration, phiên admin/UI thật và cổng BU-06–07 còn mở. Tiến độ nghiệm thu vẫn 1/32. Tiếp tục BU-09 để lựa chọn cỡ có luồng đặt và snapshot hoàn chỉnh.

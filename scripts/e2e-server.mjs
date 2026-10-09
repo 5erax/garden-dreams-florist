@@ -83,6 +83,7 @@ let queue = Promise.resolve();
 const tables = new Set([
   "gd_shop",
   "gd_products",
+  "gd_product_variants",
   "gd_shipping",
   "gd_admins",
   "gd_orders",

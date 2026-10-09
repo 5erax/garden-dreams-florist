@@ -6,6 +6,7 @@ import { beforeCursor } from "./cursor.js";
 import OrderDetail from "./OrderDetail.jsx";
 import { money, occasions } from "./catalog.js";
 import ProductPhotosEditor from "./ProductPhotosEditor.jsx";
+import AdminVariants from "./AdminVariants.jsx";
 
 const newProduct = {
   name: "",
@@ -613,6 +614,9 @@ export default function AdminPortal() {
           </fieldset>
         </form>
       )}
+      {tab === "products" && edit?.id && store.features.productVariants && <AdminVariants
+        key={edit.id} productId={edit.id} disabled={busy} onBusyChange={setBusy} onSaved={store.refresh}
+      />}
       <p className="fineprint">
         Quyền được kiểm tra trong database cho mọi thao tác. Giá và phí mới chỉ
         áp dụng cho đơn đặt sau khi lưu.
