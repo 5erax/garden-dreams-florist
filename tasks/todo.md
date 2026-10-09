@@ -36,7 +36,7 @@ Trạng thái: hoàn thành theo tiêu chí SQL/SDK/Build/Ops của task. Previe
 
 ### BU-02 — Email xác thực và callback — M
 
-Trạng thái: đã chuẩn bị hướng dẫn SMTP/callback và template tại [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md). Chưa chọn/cấu hình người gửi và chưa nghiệm thu email thật; chưa tick task.
+Trạng thái: chủ shop chọn Gmail cho staging và sẽ tự cấu hình secret. Đã chuẩn bị hướng dẫn/template tại [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md), sửa callback về Góc của tôi và thông báo link hết hạn. Chưa nghiệm thu email thật; chưa tick task.
 
 - [ ] Đăng ký/xác nhận/khôi phục chạy được với email khách được phép; link trả về đúng trang, lỗi rõ và không tiết lộ tài khoản người khác.
 - [ ] Secret SMTP chỉ ở server; phiên giữ theo quyết định hiện tại, đăng xuất không còn quyền đọc đơn.

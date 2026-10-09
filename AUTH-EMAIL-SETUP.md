@@ -1,6 +1,6 @@
 # BU-02 — Email xác thực và callback
 
-Chuẩn bị ngày 09/10/2026. Chưa cấu hình SMTP hay gửi email nghiệm thu. Chủ shop chưa có domain; ưu tiên thử miễn phí và không tự bật gói trả phí.
+Chuẩn bị ngày 09/10/2026. Chủ shop đã chọn **Gmail riêng cho staging** và sẽ tự điền App Password trong dashboard. Chưa nhận xác nhận cấu hình SMTP hay gửi email nghiệm thu. Chủ shop chưa có domain; ưu tiên thử miễn phí và không tự bật gói trả phí.
 
 ## Phương án đề xuất
 
@@ -38,7 +38,7 @@ Giữ email confirmation bật và mật khẩu tối thiểu 12 ký tự. Khôn
 - Nếu cần hỗ trợ các preview mới, chỉ thêm pattern của project/team staging: `https://garden-dreams-florist-*-dhas-projects-901181f4.vercel.app/**`. Không thêm pattern rộng cho mọi `vercel.app`.
 - Production giữ Site URL `https://garden-dreams-florist.vercel.app` và redirect chính xác `https://garden-dreams-florist.vercel.app/#account`. Project production không nhận callback staging/local.
 
-AuthPanel lấy callback từ origin đang mở; signup và reset gửi về `/#account`. SDK nhận session từ URL, handler `PASSWORD_RECOVERY` mở form đổi mật khẩu. Phiên giữ trong bộ nhớ; reload phải đăng nhập lại. [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
+AuthPanel lấy callback từ origin đang mở; signup và reset gửi về `/#account`. SDK nhận session từ URL; ứng dụng đưa callback về Góc của tôi sau khi SDK đọc URL, xóa token/tham số lỗi và báo lỗi chung với link hết hạn/đã dùng. Handler `PASSWORD_RECOVERY` mở form đổi mật khẩu. Phiên giữ trong bộ nhớ; reload phải đăng nhập lại. [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 
 ## Template email
 
@@ -57,4 +57,4 @@ Staging thêm `[THỬ NGHIỆM]` trước subject. Link dùng `{{ .ConfirmationU
 - [ ] SMTP secret chỉ nằm tại backend/dashboard, quota phù hợp và link tracking tắt.
 - [ ] Ghi giờ thử, môi trường, kết quả inbox/spam, callback và lỗi vào progress.md; không lưu mật khẩu/link xác nhận.
 
-Hiện chưa có Gmail App Password hoặc provider/domain được cấu hình. Vì vậy chỉ hoàn tất phần chuẩn bị; BU-02 chưa đạt nghiệm thu gửi/nhận thật.
+Gmail đã được chọn; chờ chủ shop xác nhận đã cấu hình SMTP, URL và template ở staging. Không gửi App Password hoặc link xác nhận qua chat. BU-02 chưa đạt nghiệm thu gửi/nhận thật.

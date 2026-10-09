@@ -1,10 +1,14 @@
 import { createClient } from "@supabase/supabase-js";
 import { checkEnvironment, checkBackendEnvironment } from "./environment.js";
+import { isAuthCallback } from "./auth-callback.js";
 
 const config = checkEnvironment(import.meta.env);
 const { url, key } = config;
 export const appEnvironment = config.environment;
 export const backendReady = Boolean(url && key);
+// Capture the callback marker before the SDK consumes and clears its fragment.
+export const authCallbackPending =
+  typeof window !== "undefined" && isAuthCallback(window.location);
 export const backend = backendReady
   ? createClient(url, key, {
       // Keep bearer tokens in memory; refreshing the page requires signing in again.
