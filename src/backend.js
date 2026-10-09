@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { guestStorage } from "./guest-session.js";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -13,16 +14,30 @@ if (key?.startsWith("eyJ")) {
     throw new Error("Supabase key chưa đúng loại public/anon.");
   }
 }
+let deviceStorage;
+try { deviceStorage = globalThis.localStorage; } catch {}
+const storageKey = backendReady ? `sb-${new URL(url).hostname.split(".")[0]}-auth-token` : "gd-demo-session";
+export const guestSessionStorage = guestStorage(storageKey, deviceStorage);
 export const backend = backendReady
   ? createClient(url, key, {
-      // Keep bearer tokens in memory; refreshing the page requires signing in again.
+      // Only explicitly remembered guest sessions persist; regular accounts stay in memory.
       auth: {
-        persistSession: false,
+        persistSession: true,
+        storageKey,
+        storage: guestSessionStorage,
         autoRefreshToken: true,
         detectSessionInUrl: true,
       },
     })
   : null;
+
+export async function guestCheckoutEnabled() {
+  if (!backendReady) return false;
+  try {
+    const response = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key }, signal: AbortSignal.timeout(8000) });
+    return response.ok && (await response.json()).external?.anonymous_users === true;
+  } catch { return false; }
+}
 
 const messages = {
   AUTH_REQUIRED: "Vui lòng đăng nhập trước.",

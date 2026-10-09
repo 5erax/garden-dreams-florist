@@ -48,6 +48,7 @@ export function ProductDialog({
   product,
   onClose,
   onAdd,
+  onBuy,
   favorite,
   onFavorite,
 }) {
@@ -80,8 +81,7 @@ export function ProductDialog({
           <dd>Thêm lời nhắn của bạn khi đặt hoa</dd>
         </dl>
         <p className="fineprint">
-          Ảnh và giá đang dùng cho bản giới thiệu. Màu sắc hoa theo mùa sẽ được
-          xác nhận trước khi giao.
+          Hoa được chọn theo mùa. Nếu cần thay hoa hoặc màu sắc, shop sẽ trao đổi trước khi thực hiện.
         </p>
         {choice && <div className="detail-summary" aria-live="polite" aria-atomic="true">
           <span>Tạm tính</span>
@@ -96,7 +96,7 @@ export function ProductDialog({
             name={product.name}
           />
           <button
-            className="button primary"
+            className="button outline"
             disabled={!choice}
             onClick={() => {
               onAdd(product.id, quantity, variantId);
@@ -104,6 +104,9 @@ export function ProductDialog({
             }}
           >
             Thêm vào giỏ <Icon name="bag" />
+          </button>
+          <button className="button primary" disabled={!choice} onClick={() => onBuy(product.id, quantity, variantId)}>
+            Thêm & đặt ngay <Icon name="arrow" />
           </button>
         </div>
         <button
@@ -195,13 +198,13 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
             <strong>{money(subtotal(cart, products))}</strong>
           </div>
           <p className="fineprint">
-            Phí giao và thời gian nhận hoa sẽ được xác nhận riêng.
+            Chọn ngày và khu vực giao ở bước tiếp theo. Tổng tiền được hiển thị trước khi đặt.
           </p>
           <button
             className="button primary checkout-button"
             onClick={onCheckout}
           >
-            Chuẩn bị đơn hoa <Icon name="arrow" />
+            Chọn ngày & đặt hoa <Icon name="arrow" />
           </button>
           <button className="text-button continue-shopping" onClick={onClose}>
             Tiếp tục chọn hoa

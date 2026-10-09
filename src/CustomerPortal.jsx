@@ -11,6 +11,7 @@ import { AuthPanel } from "./PortalShell.jsx";
 import OrderDetail from "./OrderDetail.jsx";
 import { money } from "./catalog.js";
 import { beforeCursor } from "./cursor.js";
+import GuestAccount from "./GuestAccount.jsx";
 export default function CustomerPortal() {
   const { session, recovery, setRecovery } = useStore();
   const [orders, setOrders] = useState([]),
@@ -52,7 +53,7 @@ export default function CustomerPortal() {
     setBusy(true);
     setError("");
     const value = new FormData(event.currentTarget).get("password");
-    const { error } = await backend.auth.updateUser({ password: value });
+    const { error } = await backend.auth.updateUser({ password: value, data: { gd_needs_password: false } });
     if (error) setError("Chưa thay đổi được mật khẩu. Hãy thử lại.");
     else {
       setRecovery(false);
@@ -74,7 +75,8 @@ export default function CustomerPortal() {
           chia sẻ.
         </p>
       </div>
-      {recovery && (
+      {session.user.is_anonymous && <GuestAccount />}
+      {(recovery || (!session.user.is_anonymous && session.user.user_metadata?.gd_needs_password)) && (
         <form className="auth-card" onSubmit={password}>
           <h2>Đặt mật khẩu mới</h2>
           <label>

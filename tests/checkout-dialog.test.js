@@ -7,7 +7,7 @@ import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { products } from "../src/catalog.js";
 
-let server, Checkout;
+let server, Checkout, BankPayment;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../",import.meta.url)),configFile:false,envDir:false,
@@ -19,6 +19,7 @@ before(async () => {
     server:{middlewareMode:true,hmr:false,ws:false,watch:null},
   });
   ({default:Checkout}=await server.ssrLoadModule('/src/LiveCheckout.jsx'));
+  ({BankPayment}=await server.ssrLoadModule('/src/OrderDetail.jsx'));
 });
 after(async () => { delete globalThis.checkoutTestStore; await server?.close(); });
 function render(store, pending = {current:null}) {
@@ -51,4 +52,30 @@ test("another customer's pending contact is not rendered into the form", () => {
   assert.doesNotMatch(html,/SECRET/);
   assert.doesNotMatch(html,/Thử lại yêu cầu vừa gửi/);
   assert.doesNotMatch(html,/<form hidden=""/);
+});
+test("checkout puts delivery before recipient and shows the final total in one form", () => {
+  const html=render({});
+  assert.ok(html.indexOf('name="deliveryDate"') < html.indexOf('name="name"'));
+  assert.match(html,/checkout-layout/);
+  assert.match(html,/aria-label="Kiểm tra đơn hoa"/);
+  assert.match(html,/Đặt hoa ·/);
+  assert.match(html,/<input(?=[^>]*name="consent")(?=[^>]*required)[^>]*>/);
+  assert.equal((html.match(/name="deliveryDate"/g) || []).length,1);
+});
+test("guest checkout is available only when the provider actually enables it", () => {
+  const available=render({session:null,guestEnabled:true});
+  assert.match(available,/Không cần tạo tài khoản/);
+  assert.doesNotMatch(available,/name="email"/);
+  const unavailable=render({session:null,connected:true,guestEnabled:false});
+  assert.match(unavailable,/name="email"/);
+  assert.doesNotMatch(unavailable,/Không cần tạo tài khoản/);
+});
+test("VietQR provides account/reference copy actions only for unpaid active bank orders", () => {
+  const order = {payment_method:"VIETQR",payment_status:"UNPAID",status:"PENDING",total:390000,reference:"GD-FIXTURE",bank:{bankName:"MB Bank",account:"0832345780",accountName:"Hà Văn Phước"}};
+  const renderBank = changes => renderToStaticMarkup(createElement(BankPayment,{order:{...order,...changes}}));
+  assert.match(renderBank({}),/Sao chép số tài khoản/);
+  assert.match(renderBank({}),/Sao chép nội dung/);
+  assert.equal(renderBank({status:"CANCELLED"}), "");
+  assert.equal(renderBank({payment_status:"PAID"}), "");
+  assert.equal(renderBank({payment_method:"COD"}), "");
 });

@@ -4,10 +4,11 @@ import { call } from "./backend.js";
 import { money } from "./catalog.js";
 import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
 import { Modal } from "./ShopDialogs.jsx";
-import { AuthPanel } from "./PortalShell.jsx";
+import GuestCheckout, { RememberGuest } from "./GuestCheckout.jsx";
 import { BankPayment } from "./OrderDetail.jsx";
 import { sendCheckout } from "./checkout-request.js";
 import { shopAddress } from "./shop-contact.js";
+import { AuthPanel } from "./PortalShell.jsx";
 
 export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
   const {
@@ -18,6 +19,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
     error: storeError,
     loading,
     refresh,
+    guestEnabled,
   } = useStore();
   const [draft] = useState(() => pending.current && pending.current.ownerId === session?.user.id ? pending.current.request : null);
   const [shippingId, setShippingId] = useState(draft?.shippingId || shipping[0]?.id || ""),
@@ -99,7 +101,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
           <a className="button outline" href={`https://zalo.me/${shop.phone}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
         </div>
       ) : !session ? (
-        <AuthPanel />
+        loading || storeError || !shipping.length ? <p role="status">{storeError || "Đang tải dịch vụ giao hoa…"}</p> : guestEnabled ? <GuestCheckout /> : <AuthPanel />
       ) : receipt ? (
         <div className="receipt">
           <span className="eyebrow">ĐÃ LƯU VÀO LỊCH SỬ CỦA BẠN</span>
@@ -124,12 +126,8 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
         </div>
       ) : (
         <>
-          <span className="eyebrow">MỘT CHÚT CHĂM CHÚT CUỐI CÙNG</span>
-          <h2>
-            Gửi hoa,
-            <br />
-            <em>gửi thương.</em>
-          </h2>
+          <span className="eyebrow">NGÀY GIAO · NGƯỜI NHẬN · THANH TOÁN</span>
+          <h2>Hoàn tất <em>bó hoa của bạn.</em></h2>
           {!shop.accepting_orders && (
             <p className="demo-note">
               Cửa hàng chưa mở nhận đơn thật. Bạn có thể tiếp tục xem hoa; thông
@@ -154,7 +152,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
             </div>
           )}
           <form onSubmit={submit} hidden={pending.current?.ownerId === session.user.id}>
-            <fieldset
+            <fieldset className="checkout-layout"
               disabled={
                 busy ||
                 loading ||
@@ -163,6 +161,25 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                 !shipping.length
               }
             >
+              <div className="checkout-fields">
+              <h3>Giao hoa khi nào?</h3>
+              <div className="form-grid">
+                <label>Ngày mong muốn
+                  <input name="deliveryDate" defaultValue={draft?.deliveryDate || ""} type="date" min={vietnamDate()} max={vietnamDate(new Date(Date.now() + 90 * 86400000))} required />
+                </label>
+                <label>Khung giờ
+                  <select name="deliveryTime" defaultValue={draft?.deliveryTime || "Chiều · 13–17h"}>
+                    <option>Sáng · 9–12h</option><option>Chiều · 13–17h</option><option>Tối · 18–20h</option>
+                  </select>
+                </label>
+              </div>
+              <label>Khu vực giao hoa
+                <select value={shippingId} onChange={event => setShippingId(event.target.value)} required>
+                  {shipping.map(s => <option key={s.id} value={s.id}>{s.name} · {money(s.fee)}</option>)}
+                </select>
+              </label>
+              {service && <p className="fineprint">{service.area}. Shop xác nhận địa chỉ và lịch giao trước khi nhận đơn.</p>}
+              <h3>Hoa gửi đến ai?</h3>
               <div className="form-grid">
                 <label>
                   Tên người nhận
@@ -199,27 +216,6 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                   rows={2}
                 />
               </label>
-              <div className="form-grid">
-                <label>
-                  Ngày mong muốn
-                  <input
-                    name="deliveryDate"
-                    defaultValue={draft?.deliveryDate || ""}
-                    type="date"
-                    min={vietnamDate()}
-                    max={vietnamDate(new Date(Date.now() + 90 * 86400000))}
-                    required
-                  />
-                </label>
-                <label>
-                  Khung giờ
-                  <select name="deliveryTime" defaultValue={draft?.deliveryTime || "Chiều · 13–17h"}>
-                    <option>Sáng · 9–12h</option>
-                    <option>Chiều · 13–17h</option>
-                    <option>Tối · 18–20h</option>
-                  </select>
-                </label>
-              </div>
               <label>
                 Lời nhắn trên thiệp (giữ riêng)
                 <textarea
@@ -234,21 +230,9 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                 Sau khi đơn hoàn tất và đã thanh toán, bạn có thể chủ động chia
                 sẻ chính lời nhắn này. Cửa hàng không tự công khai.
               </p>
-              <label>
-                Dịch vụ giao hoa
-                <select
-                  value={shippingId}
-                  onChange={(e) => setShippingId(e.target.value)}
-                  required
-                >
-                  {shipping.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {money(s.fee)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {service && <p className="fineprint">Áp dụng: {service.area}</p>}
+              </div>
+              <aside className="checkout-review" aria-label="Kiểm tra đơn hoa">
+              <h3>Bó hoa của bạn</h3>
               <label>
                 Phương thức thanh toán
                 <select
@@ -265,7 +249,8 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               </label>
               <div className="checkout-summary">
                 {cart.map((line) => (
-                  <p key={cartKey(line)}>
+                  <div className="checkout-item" key={cartKey(line)}>
+                    <img src={products.find(p => p.id === line.id)?.image} alt="" width="52" height="64" />
                     <span>
                       {products.find((p) => p.id === line.id)?.name} ×{" "}
                       {line.quantity}
@@ -277,7 +262,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                           line.quantity,
                       )}
                     </span>
-                  </p>
+                  </div>
                 ))}
                 <p>
                   <span>Phí giao</span>
@@ -295,6 +280,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                   hoa.
                 </span>
               </label>
+              {session.user.is_anonymous && <RememberGuest />}
               <label className="honeypot" aria-hidden="true">
                 Website
                 <input name="website" tabIndex={-1} autoComplete="off" />
@@ -305,12 +291,12 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                 </p>
               )}
               <button className="button primary" type="submit">
-                {busy ? "Đang lưu yêu cầu…" : "Gửi yêu cầu đặt hoa"}
+                {busy ? "Đang lưu yêu cầu…" : `Đặt hoa · ${money(total)}`}
               </button>
               <p className="fineprint">
-                Chuyển khoản chưa được tự xác nhận. Giỏ hàng chỉ xóa sau khi
-                database lưu đơn thành công.
+                Đơn được lưu trên web. Cửa hàng xác nhận lịch giao và tiền chuyển khoản; bạn theo dõi tiến trình trong Góc của tôi.
               </p>
+              </aside>
             </fieldset>
           </form>
           {error && !pending.current && (

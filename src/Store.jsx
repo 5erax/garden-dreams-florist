@@ -5,7 +5,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { backend, backendReady, result } from "./backend.js";
+import { backend, backendReady, result, guestCheckoutEnabled } from "./backend.js";
 import { products as demoProducts } from "./catalog.js";
 
 const Store = createContext(null);
@@ -26,10 +26,12 @@ export function StoreProvider({ children }) {
     [loading, setLoading] = useState(backendReady),
     [error, setError] = useState("");
   const [recovery, setRecovery] = useState(false);
+  const [guestEnabled, setGuestEnabled] = useState(false);
   const refresh = useCallback(async () => {
     if (!backend) return;
     setLoading(true);
     setError("");
+    guestCheckoutEnabled().then(setGuestEnabled);
     try {
       const [cfg, catalog, services] = await Promise.all([
         result(backend.from("gd_shop").select("*").eq("id", 1).single()),
@@ -100,6 +102,7 @@ export function StoreProvider({ children }) {
         refresh,
         connected: backendReady,
         recovery,
+        guestEnabled,
         setRecovery,
       }}
     >
