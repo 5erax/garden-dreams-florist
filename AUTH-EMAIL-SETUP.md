@@ -2,6 +2,42 @@
 
 Chuẩn bị ngày 09/10/2026. Chủ shop đã chọn **Gmail riêng cho staging** và sẽ tự điền App Password trong dashboard. Chưa nhận xác nhận cấu hình SMTP hay gửi email nghiệm thu. Chủ shop chưa có domain; ưu tiên thử miễn phí và không tự bật gói trả phí.
 
+## Làm lần đầu: đi theo 4 bước
+
+### 1. Tạo mật khẩu ứng dụng trong Google
+
+1. Đăng nhập Gmail muốn dùng gửi email thử cho shop.
+2. Mở [Xác minh 2 bước](https://myaccount.google.com/signinoptions/two-step-verification), bật và hoàn tất xác minh nếu chưa bật.
+3. Mở [Mật khẩu ứng dụng](https://myaccount.google.com/apppasswords). Nếu Google yêu cầu, tự nhập lại mật khẩu Google.
+4. Đặt tên ứng dụng `Garden Dreams staging`, chọn tạo. Google sẽ hiện mật khẩu ứng dụng 16 ký tự. Giữ riêng để điền ở bước 2; không gửi qua chat hoặc chụp màn hình chứa mật khẩu.
+
+Nếu không có mục Mật khẩu ứng dụng, báo lại đúng tình trạng. Một số tài khoản cơ quan/trường học, chỉ dùng security key hoặc Advanced Protection không hỗ trợ mục này; không tắt bảo vệ tài khoản để tìm cách vượt hạn chế. [Hướng dẫn Google](https://support.google.com/accounts/answer/185833).
+
+### 2. Dán cấu hình vào Supabase staging
+
+1. Mở [project staging](https://supabase.com/dashboard/project/tgvozhrkolcpszyyrgth). Kiểm tra project ref là `tgvozhrkolcpszyyrgth`.
+2. Vào **Authentication**, tìm **Email/SMTP Settings**, bật **Custom SMTP**. Tên/tab có thể thay đổi theo phiên bản dashboard; nếu chưa thấy, báo tên những mục đang hiện.
+3. Điền đúng các trường trong cột **Gmail staging** ở bảng dưới. `Sender email` và `Username` cùng là địa chỉ Gmail vừa tạo App Password. `Password` là App Password, không phải mật khẩu đăng nhập Gmail.
+4. Nhấn **Save**. Giữ hạn mức gửi hiện có trong lúc thử. [Supabase Custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp).
+
+### 3. Đặt địa chỉ quay về ứng dụng
+
+Trong **Authentication → URL Configuration**, điền và lưu:
+
+- **Site URL**: `https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app`
+- **Redirect URLs → Add URL**: `https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app/#account`
+
+Hai giá trị khác nhau ở phần `/#account`; copy nguyên giá trị tương ứng. [Supabase Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
+
+### 4. Thêm template, rồi thử tài khoản
+
+1. Trong **Authentication → Email Templates**, mở **Confirm signup**. Điền subject `[THỬ NGHIỆM] Xác nhận tài khoản Garden Dreams`; copy toàn bộ mã trong [confirmation.html](supabase/templates/confirmation.html) vào phần body/source và lưu.
+2. Mở **Reset password**, điền subject `[THỬ NGHIỆM] Khôi phục tài khoản Garden Dreams`; copy toàn bộ mã trong [recovery.html](supabase/templates/recovery.html) vào body/source và lưu.
+3. Mở [Góc của tôi trên staging](https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app/#account), chọn **Tạo tài khoản**, dùng địa chỉ email thử bạn kiểm soát và mật khẩu mới tối thiểu 12 ký tự. Tài khoản production không tự xuất hiện ở staging.
+4. Kiểm tra Inbox và Spam, mở email xác nhận, rồi thử đăng nhập. Nếu lỗi, chỉ báo nội dung lỗi và bước gặp lỗi; không gửi mật khẩu hoặc link xác nhận.
+
+Đây là bước thử ban đầu. Checklist cuối tài liệu còn yêu cầu khôi phục mật khẩu, link đã dùng/hết hạn, đăng xuất và hai tài khoản thử trước khi nghiệm thu BU-02.
+
 ## Phương án đề xuất
 
 | Cách                                        | Phạm vi phù hợp                                 | Điều kiện/giới hạn                                                                                                                                                                                                                                                                                                                                                  |

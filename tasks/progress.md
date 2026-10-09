@@ -48,3 +48,9 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Kiểm chứng: 27 tests qua, gồm 2 tests nhận diện callback/làm sạch URL; build staging qua. Chưa kiểm chứng callback trực tiếp trong trình duyệt hoặc gửi/nhận email thật.
 - Đã push commit `c969382df3ae39ebe6cb2e87e197465375526a5a`; Vercel xác nhận `dpl_G6tgnuDBwABzjCrD97vYYaEkffFu` READY, đúng project/branch/commit, Vercel check trên PR SUCCESS. [Alias staging cố định](https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app) được trả về từ metadata deployment; hướng dẫn SMTP đã cập nhật Site URL/redirect tương ứng.
 - Tiến độ vẫn **1/32 task**. BU-02 chưa tick; BU-03 chờ Auth/SMTP thật và dữ liệu kiểm thử của chủ shop.
+
+### BU-02c — Hướng dẫn thao tác Gmail cho lần cấu hình đầu
+
+- Chủ shop báo chưa biết cấu hình; chưa coi câu trả lời là đã cấu hình SMTP.
+- Bổ sung 4 bước cụ thể vào AUTH-EMAIL-SETUP.md: bật xác minh 2 bước/tạo App Password, điền SMTP staging, Site URL/redirect, template và đăng ký thử. Dẫn link Google/project staging chính xác và giải thích tài khoản staging tách production.
+- Đối chiếu tài liệu chính thức Google/Supabase; chỉ thay đổi hướng dẫn, không chạy lại tests cho nội dung này. Chưa thao tác dashboard hoặc gửi email thật; tiến độ vẫn 1/32.
