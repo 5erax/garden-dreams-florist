@@ -13,6 +13,7 @@ import { vietqrPayload } from "./vietqr.js";
 export function BankPayment({ order }) {
   const [qr, setQr] = useState(""),
     [error, setError] = useState("");
+  const [copyNotice, setCopyNotice] = useState("");
   useEffect(() => {
     let active = true;
     setQr("");
@@ -74,6 +75,14 @@ export function BankPayment({ order }) {
         <p>
           Nội dung: <strong>{order.reference}</strong>
         </p>
+        <div className="payment-tools">
+          {[['Sao chép số tài khoản', order.bank.account], ['Sao chép nội dung', order.reference]].map(([label, value]) => <button type="button" className="button outline" key={label} onClick={async () => {
+            try { await navigator.clipboard.writeText(value); setCopyNotice(`${label}: đã chép.`); }
+            catch { setCopyNotice("Chưa sao chép được. Bạn có thể chọn thông tin ở trên để chép thủ công."); }
+          }}>{label}</button>)}
+          {qr && <a className="text-link" href={qr} download={`${order.reference}-vietqr.png`}>Tải mã QR</a>}
+        </div>
+        {copyNotice && <p role="status">{copyNotice}</p>}
         <small>
           Kiểm tra đúng tên người nhận và số tiền trong ứng dụng ngân hàng.
           Trạng thái chỉ đổi khi admin kiểm tra đã nhận tiền.
