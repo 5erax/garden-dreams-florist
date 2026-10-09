@@ -12,7 +12,7 @@
 - [ ] real backend launch: kiểm chứng đăng nhập/admin và luồng đơn thật bằng dữ liệu thử, cấu hình SMTP cho khách, theo dõi Cron, kiểm tra QR ngân hàng.
 - [ ] browser QA: kiểm tra UI desktop/mobile sau khi quyền truy cập được mở lại.
 
-## Big update — backlog đề xuất, chưa triển khai
+## Big update — đã được yêu cầu triển khai ngày 09/10/2026
 
 Ưu tiên: vận hành → vườn kỉ niệm → toàn bộ trải nghiệm. `S`: khoảng 1–2 file chính; `M`: khoảng 3–5 file chính. File mới được nêu theo trách nhiệm, tên chính thức chốt khi triển khai. Nếu một task vượt phạm vi M, tách tiếp trước khi code; mỗi task phải có API/UI nối được và kiểm tra thích hợp. Mọi quyền/tiền được kiểm tra trên backend.
 
@@ -27,6 +27,8 @@ Quy ước kiểm chứng:
 ### Giai đoạn 0
 
 ### BU-01 — Môi trường thử và dữ liệu thử — M
+
+Trạng thái: đang thực hiện; BU-01a (validator cấu hình) đã kiểm chứng local. Theo dõi bằng chứng tại [progress.md](progress.md). Còn cờ test/database và staging thật trước khi tick cả task.
 
 - [ ] Preview/staging dùng cấu hình riêng; có cờ test không tính vào doanh thu/kỉ niệm mua thật.
 - [ ] Fixture và script không thể vô tình đổ dữ liệu giả vào production.
