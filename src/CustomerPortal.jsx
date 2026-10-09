@@ -6,6 +6,7 @@ import OrderDetail from "./OrderDetail.jsx";
 import { money } from "./catalog.js";
 import { beforeCursor } from "./cursor.js";
 import GuestAccount from "./GuestAccount.jsx";
+import ReorderFlowers from "./ReorderFlowers.jsx";
 import {
   historyPageSize, historyLimit, historyViews, historySummary,
   filterHistory, mergeHistoryPage, historyDate, historyItemTitle, historyNextStep,
@@ -44,7 +45,7 @@ function HistoryCard({ order, onOpen, buttonRef }) {
   );
 }
 
-function CustomerHistory({ session, recovery, setRecovery }) {
+function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
   const ownerId = session.user.id;
   const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -214,6 +215,7 @@ function CustomerHistory({ session, recovery, setRecovery }) {
             setSelected(fresh);
             setOrders(previous => previous.map(row => row.id === fresh.id ? fresh : row));
           }} />
+          <ReorderFlowers key={`reorder-${selected.id}`} order={selected} cart={cart} onReorder={onReorder} />
         </section>
       ) : (
         <section className="customer-history" aria-labelledby="customer-history-title" aria-busy={busy}>
@@ -270,8 +272,8 @@ function CustomerHistory({ session, recovery, setRecovery }) {
   );
 }
 
-export default function CustomerPortal() {
+export default function CustomerPortal({ cart = [], onReorder }) {
   const { session, recovery, setRecovery } = useStore();
   if (!session) return <AuthPanel />;
-  return <CustomerHistory key={session.user.id} session={session} recovery={recovery} setRecovery={setRecovery} />;
+  return <CustomerHistory key={session.user.id} session={session} recovery={recovery} setRecovery={setRecovery} cart={cart} onReorder={onReorder} />;
 }

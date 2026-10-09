@@ -1,0 +1,37 @@
+.reorder-flowers { margin: 32px 0; padding: 28px; border: 1px solid var(--line); background: var(--paper); }
+.reorder-heading h3 { margin: 12px 0; font: 500 30px/1.25 var(--serif); }
+.reorder-heading > p { max-width: 75ch; font-size: 13px; color: var(--muted); line-height: 1.8; }
+.reorder-lines { list-style: none; padding: 0; margin: 24px 0; }
+.reorder-lines > li { display: flex; align-items: start; gap: 20px; padding: 20px 0; border-top: 1px solid var(--line); }
+.reorder-lines img { width: 64px; height: 80px; object-fit: contain; mix-blend-mode: multiply; flex-shrink: 0; }
+.reorder-lines > li > div { min-width: 0; overflow-wrap: anywhere; }
+.reorder-lines > li > div:not(.reorder-line-amount) { flex: 1; }
+.reorder-lines strong { font-size: 15px; }
+.reorder-lines p { margin: 8px 0 0; font-size: 12px; line-height: 1.7; color: var(--muted); }
+.reorder-lines .reorder-line-warning { color: var(--rose); }
+.reorder-line-amount { display: grid; gap: 8px; text-align: right; }
+.reorder-line-amount span { font-size: 12px; }
+.reorder-notice { padding: 16px 20px; border-left: 2px solid var(--rose); background: var(--cream); font-size: 13px; line-height: 1.8; margin: 20px 0; }
+.reorder-unavailable { border-top: 1px solid var(--line); padding-top: 20px; margin: 24px 0; }
+.reorder-unavailable h4 { margin: 0 0 16px; font: 500 18px var(--sans); }
+.reorder-unavailable ul { margin: 0; padding-left: 20px; }
+.reorder-unavailable li { margin-bottom: 16px; }
+.reorder-unavailable strong { font-size: 14px; }
+.reorder-unavailable p { font-size: 13px; color: var(--muted); margin: 8px 0; line-height: 1.8; }
+.reorder-unavailable > a { display: inline-block; min-height: 44px; padding-block: 12px; font-size: 13px; }
+.reorder-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; padding-top: 24px; border-top: 1px solid var(--line); }
+.reorder-summary > div { display: grid; gap: 8px; }
+.reorder-summary span { color: var(--muted); font-size: 13px; }
+.reorder-summary strong { font: 500 28px/1.2 var(--serif); }
+.reorder-summary small { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.reorder-quiet { color: var(--muted); font-size: 12px; line-height: 1.8; margin-bottom: 0; }
+@media (max-width: 600px) {
+  .reorder-flowers { padding: 20px 16px; }
+  .reorder-lines > li { flex-wrap: wrap; gap: 16px; }
+  .reorder-line-amount { width: 100%; grid-template-columns: 1fr auto; text-align: left; padding-left: 80px; }
+  .reorder-summary > button { width: 100%; }
+  .reorder-heading h3 { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reorder-flowers .button { transition: none; }
+}

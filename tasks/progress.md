@@ -150,3 +150,9 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Chủ shop tự chạy `supabase/launch-shop.sql`; API public production kiểm chứng độc lập địa chỉ, MB Bank/chủ tài khoản và phí giao **0 / 30.000 / 50.000 VNĐ**, COD/VietQR bật, `accepting_orders=false`. Không sửa catalog hoặc đơn cũ, không tạo dữ liệu thử hosted. Khu vực xa cần admin xác nhận địa chỉ/phí trước khi nhận giao.
 - **35 tests qua**, build production qua; mutation đổi owner guard làm 2 tests fail rồi khôi phục. Test SQL mới gồm guard owner/runtime, rerun không nhân dịch vụ, giữ nguyên catalog/shop đóng, anon không sửa shop và ba đơn giả dùng đúng bank/fee/UNPAID. Hai SSR fixtures tắt cả WebSocket Vite 8 để không xung đột cổng.
 - Browser thử truy cập đúng production bị saved preference từ chối. Không đổi surface/cổng/CDP hoặc dùng private API để vượt chặn. Auth public cho thấy signup bật nhưng bắt xác nhận email; cấu hình SMTP/email thật và browser/payment acceptance vẫn chưa hoàn tất. Đây chưa phải tuyên bố cửa hàng nhận được đơn online thật.
+
+### Production — Mua lại từ lịch sử
+
+- Port frontend BU-19a / ACC-F03 từ staging a23e990; giữ backend/Store/orderColumns/migrations 001–004. Preview giá/cỡ hiện tại và thêm vào giỏ; không khôi phục dữ liệu người nhận/thiệp/lịch cũ, không tạo đơn từ nút mua lại.
+- 68 production tests/build qua; bundle xác nhận endpoint production, không có ref staging. 12 helper và 3 SSR cases mới kiểm quyền lựa chọn, giỏ/limit, giá, PII và connection gate; availability mutation được bắt trên cùng nguồn staging.
+- Staging BU-14 có sổ COD/VietQR và guarded upgrade 005→012, 134 tests/build qua tới BU-19a. LOC staging 14.515 (+3.728), còn 11.272; backend hosted chưa nâng cấp, browser/email/backup acceptance và mở nhận đơn còn chờ.
