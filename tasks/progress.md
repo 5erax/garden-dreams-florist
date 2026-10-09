@@ -4,6 +4,8 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Ưu tiên mới: bản bán hàng đầu tiên để đưa vào dùng sớm.** Chủ shop đã xác nhận bán các mẫu/giá hiện có, địa chỉ, MB Bank/chủ tài khoản và ba mức phí giao. Các phần mở rộng big update để sau; không tự coi các gate còn thiếu là đã nghiệm thu. Xem [LAUNCH-STATUS.md](../LAUNCH-STATUS.md).
+
 - **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
 - **BU-02: chưa cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; Supabase vẫn bị công cụ từ chối trong phiên mới. Việc tạo credential Google cần chủ tài khoản thao tác; không yêu cầu gửi secret trong chat.
 - **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
@@ -128,3 +130,13 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - [PRODUCTION-UI-RELEASE.md](../PRODUCTION-UI-RELEASE.md) ghi phạm vi và rollback. Cửa hàng tiếp tục đóng; nghiệm thu toàn bộ BU-09/26/backend/email/browser vẫn còn mở. Đây là phát hành UI theo yêu cầu, không phải mở bán hoặc nghiệm thu toàn bộ big update.
 - PR #2 đã merge đúng head đã kiểm tra; main commit `7c7ab4aa1402b87a03567ca9245ce6538169d85a`. Vercel xác nhận production `dpl_9Hxegoxa4MfJkw1ZeLgUc9RwazgM` READY đúng project/branch/SHA/target và alias [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app). Project giữ Standard Protection và không có password protection; không đổi cấu hình bảo vệ preview. Không dùng fetch website/bypass để thay kiểm thử browser.
 - Đồng bộ main về branch staging: chỉ thêm biên bản phát hành/progress, không đổi source staging đã kiểm tra. Full update PR #1 vẫn draft; không phát hành backend hoặc đánh dấu các task QA còn mở là hoàn tất.
+
+### Production — Chuẩn bị nhận đơn và phục hồi lỗi đặt hoa
+
+- Đã hoàn tất UI đặt đơn thử lại nguyên request khi mất xác nhận; giữ request qua đóng/mở modal trong cùng tab, khóa sửa nội dung lúc kết quả còn chưa rõ, có lối kiểm tra lại kể cả giỏ trống. SQL rejection chắc chắn cho sửa/refresh giá; IDEMPOTENCY_CONFLICT hướng khách về lịch sử. Logout/đổi tài khoản xóa request riêng; chỉ trừ số lượng của request đã lưu, giữ hoa vừa thêm vào giỏ. Không lưu PII vào localStorage. Escape không tự đóng native dialog khi thao tác đang bận.
+- Địa chỉ thật, liên hệ điện thoại/Zalo và hướng dẫn giao hoa hiện ở checkout đóng cửa, thay cho yêu cầu đăng ký vào một luồng chưa nhận đơn. Admin có trường địa chỉ khi schema hỗ trợ; client cũ vẫn tương thích. Không ghi cuộc trao đổi thành đơn trong hệ thống.
+- Chủ shop tự chạy `supabase/launch-shop.sql`; API public production kiểm chứng độc lập địa chỉ, MB Bank/chủ tài khoản và phí giao **0 / 30.000 / 50.000 VNĐ**, COD/VietQR bật, `accepting_orders=false`. Không sửa catalog hoặc đơn cũ, không tạo dữ liệu thử hosted. Khu vực xa cần admin xác nhận địa chỉ/phí trước khi nhận giao.
+- **35 tests qua**, build production qua; mutation đổi owner guard làm 2 tests fail rồi khôi phục. Test SQL mới gồm guard owner/runtime, rerun không nhân dịch vụ, giữ nguyên catalog/shop đóng, anon không sửa shop và ba đơn giả dùng đúng bank/fee/UNPAID. Hai SSR fixtures tắt cả WebSocket Vite 8 để không xung đột cổng.
+- Browser thử truy cập đúng production bị saved preference từ chối. Không đổi surface/cổng/CDP hoặc dùng private API để vượt chặn. Auth public cho thấy signup bật nhưng bắt xác nhận email; cấu hình SMTP/email thật và browser/payment acceptance vẫn chưa hoàn tất. Đây chưa phải tuyên bố cửa hàng nhận được đơn online thật.
+- PR #3 đã merge đúng head đã kiểm tra; main commit `5aa7ab4098df4c00d429c90ef8fb479abbd261d3`. Vercel production `dpl_AsntM9NEjZ4JUdK2DizsaBprpTcY` **READY**, đúng project/target/branch/SHA và alias [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app). Không thay bảo vệ preview hoặc mở nhận đơn. Giữ hướng dùng web để chọn hoa và liên hệ shop trong lúc hoàn tất email/QA.
+- Đồng bộ release về staging, giữ đủ runtime/capability/auth guards và quản trị album/cỡ. **48 tests staging qua** sau merge, gồm backup/restore/retention dữ liệu giả; build staging qua, bundle khoảng 688 kB. Không coi backup local hoặc SSR là nghiệm thu môi trường hosted/browser. PR #1 vẫn draft.

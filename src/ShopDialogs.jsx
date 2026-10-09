@@ -22,7 +22,10 @@ export function Modal({ title, children, onClose, className = "" }) {
       ref={dialog}
       className={className}
       aria-label={title}
-      onCancel={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
       onClick={(e) => {
         if (e.target === dialog.current) onClose();
       }}

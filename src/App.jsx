@@ -6,7 +6,7 @@ import {
   useTransform,
 } from "motion/react";
 import { occasions, money } from "./catalog.js";
-import { normalizeCart, cartKey } from "./order.js";
+import { normalizeCart, cartKey, removeOrderedItems } from "./order.js";
 import {
   CartDialog,
   CheckoutDialog,
@@ -20,6 +20,7 @@ import CustomerPortal from "./CustomerPortal.jsx";
 import AdminPortal from "./AdminPortal.jsx";
 import Garden, { SharedMemory } from "./Garden.jsx";
 import LiveCheckout from "./LiveCheckout.jsx";
+import { shopAddress } from "./shop-contact.js";
 import "./portal.css";
 
 function readStored(key, fallback) {
@@ -174,6 +175,11 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const selectedProduct = products.find(p => p.id === selected?.id);
   const [panel, setPanel] = useState(null);
+  const pendingCheckout = useRef(null);
+  useEffect(() => {
+    if (pendingCheckout.current?.ownerId !== session?.user.id)
+      pendingCheckout.current = null;
+  }, [session?.user.id]);
   const [notice, setNotice] = useState("");
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -253,6 +259,11 @@ export default function App() {
     filtered = [...filtered].sort((a, b) => b.price - a.price);
   const shown = showAll ? filtered : filtered.slice(0, 8);
   const count = cart.reduce((sum, line) => sum + line.quantity, 0);
+  const pendingNotice = pendingCheckout.current?.ownerId === session?.user.id && pendingCheckout.current && (
+    <p className="store-status" role="status">
+      Bạn có một yêu cầu đặt hoa cần kiểm tra. <button className="text-button" onClick={() => { location.hash = "#collection"; setPanel("checkout"); }}>Tiếp tục kiểm tra đơn</button>
+    </p>
+  );
   if (
     route === "#account" ||
     route === "#admin" ||
@@ -261,6 +272,7 @@ export default function App() {
   )
     return (
       <PortalShell>
+        {pendingNotice}
         {route === "#account" ? (
           <CustomerPortal />
         ) : route === "#admin" ? (
@@ -329,6 +341,7 @@ export default function App() {
       </header>
       <main>
         <Hero />
+        {panel !== "checkout" && pendingNotice}
         {(loading || storeError) && (
           <p className="store-status" role={storeError ? "alert" : "status"}>
             {storeError || "Đang tải bộ sưu tập của cửa hàng…"}
@@ -653,6 +666,7 @@ export default function App() {
           </a>
         </div>
         <div className="footer-bottom">
+          <address>{shop.address || shopAddress}</address>
           <span>
             © {new Date().getFullYear()} {shop.name}
           </span>
@@ -713,9 +727,11 @@ export default function App() {
       {panel === "checkout" &&
         (connected ? (
           <LiveCheckout
+            key={session?.user.id || "guest"}
             cart={cart}
+            pending={pendingCheckout}
             onClose={() => setPanel(null)}
-            onComplete={() => setCart([])}
+            onComplete={(request) => setCart(current => removeOrderedItems(current, request.items, products))}
           />
         ) : (
           <CheckoutDialog
