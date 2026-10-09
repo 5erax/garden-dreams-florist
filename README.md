@@ -33,6 +33,10 @@ Mặc định là **bản trải nghiệm**, với bộ sưu tập và giá mẫ
 GitHub repository: `5erax/garden-dreams-florist` (private).
 Vercel project: `garden-dreams-florist`.
 
+URL: https://garden-dreams-florist.vercel.app/ (deploy trực tiếp đã thành công).
+
+Kết nối GitHub để tự deploy mỗi lần push chưa bật: bộ duyệt tự động yêu cầu xác nhận quyền tích hợp lâu dài với repo riêng tư. Có thể deploy thủ công bằng Vercel CLI từ thư mục này.
+
 Tài khoản Vercel hiện là Hobby; gói này chỉ cho mục đích phi thương mại. Cần gói phù hợp trước khi dùng website để bán thật: https://vercel.com/docs/plans/hobby.
 
 Kho Blob riêng tư `garden-dreams-orders` đã tạo ở Singapore. Kết nối OIDC vào production/preview chưa được thực hiện vì bộ duyệt tự động yêu cầu người dùng xác nhận quyền truy cập này. Không có thông tin khách hàng trong kho.
