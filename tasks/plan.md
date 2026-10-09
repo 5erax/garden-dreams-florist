@@ -42,3 +42,5 @@ Mở rộng kế hoạch BU/FC đã có, không tạo backlog cạnh tranh hoặ
 - Kiểm: PostgreSQL/RLS, timezone/cutoff, retry, capacity và xác nhận/hủy; JSX rendering và build. Hosted UI/SDK acceptance tách khỏi local.
 
 Giao diện tiếp tục thương hiệu kem/hồng với font/ảnh hiện có; mật độ và cỡ chữ ưu tiên đặt nhanh. Admin được chia màn hình theo công việc, query có giới hạn và backend quyền; không đổi stack hoặc cài thư viện UI mới chỉ để tăng số dòng. Mỗi lát cắt xong cập nhật progress.md với LOC, kiểm chứng và việc còn chờ.
+
+BU-19a mua lại từ lịch sử là lát cắt frontend độc lập được chuẩn bị trong lúc migration/SMTP/browser hosted còn chờ. Tái sử dụng catalog/cart/checkout, không đổi thứ tự nghiệm thu bản A/B hoặc tuyên bố BU-19 hoàn tất. Chỉ phát hành phần tương thích production hiện tại.

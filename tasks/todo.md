@@ -181,6 +181,8 @@ Mã/local hoàn thành: migration 012, Reconciliation/Desk, thu-hoàn toàn ph�
 
 ### BU-19 — Dòng thời gian và đặt lại trong góc cá nhân — M
 
+Mã/local BU-19a: preview mua lại theo catalog/giá hiện tại, chỉ thêm mẫu-cỡ còn bán, giữ giỏ và không khôi phục PII/thiệp/lịch cũ. 12 helper + 3 SSR tests qua; không thay cổng bản A/B, chưa nghiệm thu task tổng. Xem REORDER-FLOW.md.
+
 - [ ] Khách lọc kỉ niệm/lịch sử của mình, xem trạng thái chia sẻ và liên kết đúng đơn/thiệp.
 - [ ] Đặt lại dùng giá/tình trạng hiện tại; không phục hồi địa chỉ đã xóa hoặc lấy lịch sử người khác.
       Phụ thuộc: bản A. File: CustomerPortal tách trang, RPC/cursor, Store/giỏ và test. Kiểm: SQL, SDK, UI, Build.

@@ -14,6 +14,7 @@ import { PortalShell } from "./PortalShell.jsx";
 import RouteBoundary from "./RouteBoundary.jsx";
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
+import { prepareReorder } from "./reorder.js";
 import "./portal.css";
 
 const loadCustomer = () => import("./CustomerPortal.jsx");
@@ -220,6 +221,16 @@ export default function App() {
     setPanel("checkout");
     setNotice("");
   }
+  function reorder(items) {
+    if (!connected || loading || storeError) return;
+    const plan = prepareReorder(items, cart, products);
+    if (!plan.addedQuantity) return;
+    setCart(current => prepareReorder(items, current, products).cart);
+    setSelected(null);
+    setNotice("Đã thêm hoa theo giá hiện tại. Chọn ngày và người nhận mới trước khi đặt.");
+    location.hash = "#collection";
+    setPanel("cart");
+  }
   function selectOccasion(value) {
     setOccasion(value);
     setShowAll(false);
@@ -257,7 +268,7 @@ export default function App() {
           key={`${route}:${session?.user.id || "signed-out"}`}
           load={route === "#account" ? loadCustomer : route === "#admin" ? loadAdmin : route === "#garden" ? loadGarden : loadMemory}
           title={route === "#account" ? "Góc của bạn" : route === "#admin" ? "Quản trị cửa hàng" : "Vườn kỉ niệm"}
-          pageProps={route.startsWith("#memory/") ? { token: route.slice(8) } : {}}
+          pageProps={route.startsWith("#memory/") ? { token: route.slice(8) } : route === "#account" ? { cart, onReorder: reorder } : {}}
         />
       </PortalShell>
     );

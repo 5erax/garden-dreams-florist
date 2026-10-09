@@ -7,7 +7,7 @@ import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { products } from "../src/catalog.js";
 
-let server, Checkout, BankPayment, DeliveryPicker, selectedDelivery;
+let server, Checkout, BankPayment, DeliveryPicker, selectedDelivery, ReorderFlowers;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../",import.meta.url)),configFile:false,envDir:false,
@@ -22,6 +22,7 @@ before(async () => {
   ({default:Checkout}=await server.ssrLoadModule('/src/LiveCheckout.jsx'));
   ({BankPayment}=await server.ssrLoadModule('/src/OrderDetail.jsx'));
   ({default:DeliveryPicker,selectedDelivery}=await server.ssrLoadModule('/src/DeliveryPicker.jsx'));
+  ({default:ReorderFlowers}=await server.ssrLoadModule('/src/ReorderFlowers.jsx'));
 });
 after(async () => { delete globalThis.checkoutTestStore; await server?.close(); });
 function render(store, pending = {current:null}) {
@@ -91,4 +92,34 @@ test("calendar checkout waits for a server choice; old backends retain their exi
   assert.doesNotMatch(legacy,/<select[^>]*disabled/);
   assert.equal(selectedDelivery([{time:"morning",available:false},{time:"afternoon",available:true}],"morning"), "");
   assert.equal(selectedDelivery([{time:"afternoon",available:true}],"afternoon"), "afternoon");
+});
+
+function renderReorder(changes = {}, onReorder = () => {}) {
+  globalThis.checkoutTestStore = { products, connected: true, loading: false, error: "", shop: { accepting_orders: true }, ...changes };
+  return renderToStaticMarkup(createElement(ReorderFlowers, { cart: [], onReorder, order: {
+    id: "history-order", recipient_name: "PRIVATE RECIPIENT", recipient_phone: "PRIVATE PHONE", address: "PRIVATE ADDRESS", card_message: "PRIVATE CARD",
+    items: [{ id: 1, name: "OLD FLOWER", quantity: 1, price: 1 }],
+  } }));
+}
+test("reorder preview uses current flowers and price without recovering contacts or private cards", () => {
+  const html = renderReorder();
+  assert.match(html, /Giá hiện tại/);
+  assert.match(html, /Thêm hoa &amp; mở giỏ/);
+  assert.doesNotMatch(html, /PRIVATE RECIPIENT|PRIVATE PHONE|PRIVATE ADDRESS|PRIVATE CARD|OLD FLOWER/);
+  assert.doesNotMatch(html, /<button[^>]*disabled/);
+});
+test("reorder never enables additions with a stale catalog, disconnected backend or missing cart callback", () => {
+  for (const changes of [{ connected: false }, { loading: true }, { error: "catalog failure" }]) {
+    const html = renderReorder(changes);
+    assert.doesNotMatch(html, /Thêm hoa &amp; mở giỏ/);
+    assert.doesNotMatch(html, /Giá hiện tại/);
+  }
+  assert.match(renderReorder({}, null), /<button[^>]*disabled/);
+  assert.match(renderReorder({ products: [] }), /<button[^>]*disabled/);
+});
+test("closed shop can prepare a reorder cart while clearly showing that online orders remain closed", () => {
+  const html = renderReorder({ shop: { accepting_orders: false } });
+  assert.match(html, /Cửa hàng hiện chưa mở nhận đơn/);
+  assert.doesNotMatch(html, /<button[^>]*disabled/);
+  assert.match(html, /Chưa gồm phí giao; chưa tạo đơn hoặc thu tiền/);
 });

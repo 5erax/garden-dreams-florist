@@ -4,7 +4,8 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
-- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Đến BU-14 đạt **14.160** (+3.373, còn 11.627). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Đến BU-19a đạt **14.515** (+3.728, còn 11.272). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **BU-19a: mua lại từ lịch sử đã có mã/local**, dùng mẫu/cỡ/giá hiện tại, giữ giỏ, báo phần không còn bán hoặc vượt giới hạn; không chép PII/thiệp/lịch cũ. 12 helper + 3 SSR tests qua, toàn bộ staging 134 tests/build qua. Chưa kiểm browser/hosted, cổng BU-19 tổng vẫn mở.
 - **BU-14: mã nguồn/local sổ đối soát đã xong.** Thu/hoàn toàn phần, số dư owner, chứng từ admin, retry/version/reference, báo cáo ngày Việt Nam và LEGACY riêng. 10 SQL + 8 helper tests, kiểm upgrade/rollback qua; staging build qua. Xem [PAYMENT-LEDGER.md](../PAYMENT-LEDGER.md). Migration 012 chưa cài hosted; không tick nghiệm thu toàn task.
 - **Production UI đã phát hành qua PR #5**, main d7de806514f3c9cbd93c4f11b8e227070c6b64dc. Vercel dpl_CmTbr4o3fNQGGmngfUhj3DhqU5o8 READY đúng SHA/target/alias garden-dreams-florist.vercel.app. 53 production tests/build qua; chỉ history/lazy routes tương thích 001–004, chưa phát hành backend mới hay mở nhận đơn.
 - **Đã nhận và đối chiếu tài liệu Word nghiệp vụ v1**: lưu nguyên bản/SHA-256 và traceability đủ 95 chức năng tại docs/product. Nguồn điều chỉnh backlog BU/FC, không tự chốt các DEC còn mở hoặc thay quyết định COD/VietQR/kỉ niệm của chủ shop.
@@ -168,3 +169,9 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - 117 tests và staging build qua; review độc lập không có blocker. Mutation amount=1 và đảo guard tham chiếu bị bắt; đã khôi phục. Ranh giới 00:00 giờ Việt Nam được kiểm thu/hoàn tại trước/đúng/sau cutoff ngày.
 - Bundle staging 005→012 giữ transaction/guard, thử lỗi cuối rollback cả schema trung gian; backfill không giả ngày thu. Production vẫn ở release UI PR #5, không phát hành backend mới.
 - LOC canonical 14.160 (+3.373), còn 11.627 để đạt thêm 15.000; chưa hosted/browser/concurrency đa connection. Tiến độ nghiệm thu toàn task vẫn 1/32.
+
+### BU-14 — Preview và BU-19a mua lại từ lịch sử
+
+- BU-14 commit e50e9870607b5d49370a998cc173340e1e49f75d đã push; Vercel dpl_9RewQtKtiubi5z4L16wAUWxihCQ8 READY đúng project/SHA và alias staging. Migration 012 chưa chạy hosted.
+- BU-19a tái sử dụng cartChoice/cartKey/normalizeCart và checkout; kiểm preview mua lại/giá/quantity/giỏ/PII, mutation availability guard bắt lỗi. Không thêm dependency hoặc đổi backend. Full staging 134 tests/build qua.
+- BU-14b report validation chặn số tiền mất độ chính xác/khác kỳ/net không khớp trước hiển thị; không đổi định nghĩa thu-hoàn hoặc payload SQL. Không dùng tổng thu làm lợi nhuận.
