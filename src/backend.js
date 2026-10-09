@@ -78,6 +78,8 @@ const messages = {
   CAPACITY_BELOW_RESERVATIONS: "Không thể giảm sức chứa dưới số đơn đã giữ chỗ. Xử lý các đơn trước khi đổi năng lực.",
   DAY_HAS_RESERVATIONS: "Ngày này có đơn đã giữ chỗ. Xử lý lịch giao của các đơn trước khi đóng ngày.",
   CALENDAR_SNAPSHOT_IMMUTABLE: "Lịch đã lưu trên đơn không thể sửa trực tiếp.",
+  INVALID_QUEUE_FILTER: "Kiểm tra bộ lọc và mã đơn bắt đầu bằng GD-. Tải lại danh sách nếu mốc phân trang không còn hợp lệ.",
+  INVALID_NOTE: "Ghi chú cần từ 1 đến 1.000 ký tự.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
   PRICE_CHANGED:
     "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",

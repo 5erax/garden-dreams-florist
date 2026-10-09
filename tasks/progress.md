@@ -4,7 +4,8 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
-- **Đợt mở rộng 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng không rỗng; sau lát cắt lịch giao đạt **11.482** (+695). `npm run loc` loại thư viện, docs/build và SQL setup trùng. Đang chờ cách tính 15.000 tổng hay tăng mới; chưa tuyên bố đạt mốc.
+- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Chủ shop xác nhận thêm mới; baseline staging 10.787 dòng, mục tiêu tổng 25.787 dòng không rỗng. Sau lịch giao và bàn xử lý đơn đạt **11.801** (+1.014, còn 13.986). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **BU-12: bàn xử lý đơn đã có mã nguồn/local**, hàng đợi theo ngày/trạng thái, tìm mã, cursor, tổng tiền cần thu/đã đối soát và ghi chú nội bộ append-only/idempotent. RLS ngăn khách xem ghi chú; queue không trả thiệp, địa chỉ, số điện thoại hoặc ngân hàng. 69 tests và build staging qua; migration 010 chưa cài hosted.
 - **BU-10 và phần giữ chỗ BU-11: mã nguồn/local đã xong**, chưa nghiệm thu hosted/browser. Admin có ca/ngày nghỉ/cutoff/sức chứa, checkout dùng lịch server theo capability. Xác nhận kiểm tra chỗ trong transaction; hủy nhả chỗ theo trạng thái, tính cả đơn cũ đã xác nhận. Migration 009 mặc định lịch tự động tắt, giữ luồng manual tương thích backend cũ.
 - Kiểm chứng lát cắt mới: **65 tests** và build staging qua. Mutation bỏ kiểm tra ca đầy bị 3 test bắt, đã khôi phục. Chưa thử hai connection PostgreSQL thật chạy đồng thời; PGlite đã thử hai intent tranh chỗ và rollback/version/retry, không thay nghiệm thu concurrency hosted.
 
