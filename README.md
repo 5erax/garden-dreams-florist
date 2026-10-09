@@ -33,7 +33,7 @@ Chạy benchmark bằng `node scripts/benchmark-memories.mjs`. [Kết quả mộ
 
 ## Trạng thái và giới hạn
 
-Đã viết backend/frontend và kiểm thử local; **chưa tạo/nối project Supabase thật** vì quyền dashboard đang chờ được mở lại. UI mới chưa kiểm thử bằng trình duyệt do quyền truy cập bị từ chối. Cần kiểm tra luồng thật, SMTP/xác nhận email, QR bằng app ngân hàng và Cron xóa thông tin giao hàng sau 90 ngày. Phiên đăng nhập giữ trong bộ nhớ tab; tải lại cần đăng nhập lại. Thiệp chưa có preview mạng xã hội riêng.
+Đã nối project Supabase thật `ztzpipgptticvliotbsc` và redeploy Vercel production ngày 09/10/2026. Chủ project tự chạy SQL setup; kiểm tra API thật xác nhận 20 sản phẩm, vườn trống và các bảng riêng/RPC đặt đơn từ chối anon. Chủ shop xác nhận đã tạo/xác nhận tài khoản, chạy SQL cấp admin và cài Cron retention với active=true; chưa kiểm chứng phiên admin hoặc lịch sử chạy Cron qua công cụ. UI mới chưa kiểm thử bằng trình duyệt do quyền truy cập bị từ chối. Cần kiểm tra luồng đơn thật bằng dữ liệu thử, SMTP cho khách, QR bằng app ngân hàng và lịch sử chạy Cron xóa thông tin giao hàng sau 90 ngày. Phiên đăng nhập giữ trong bộ nhớ tab; tải lại cần đăng nhập lại. Thiệp chưa có preview mạng xã hội riêng.
 
 Website hiện vẫn là bản trải nghiệm. Vercel Hobby dành cho mục đích phi thương mại; chọn hosting phù hợp trước khi bán. Không bật gói trả phí hoặc gửi tiền/tin nhắn tự động. Phone/Zalo `0832345780` do chủ shop cung cấp.
 

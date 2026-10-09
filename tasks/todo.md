@@ -6,6 +6,8 @@
 - [x] memories: một dấu mỗi đơn đã giao/paid, link, opt-in, revoke; đã thử một triệu dấu giả.
 - [x] portals: đã viết quản trị, lịch sử/tracking, vườn và thiệp; CSS responsive/accessibility.
 - [x] release checks: SQL/shared helpers tests, SDK local integration, build, dependency audit; hướng dẫn Supabase và SQL setup.
-- [ ] release external: push/deploy bản mới và xác nhận commit trên GitHub/Vercel.
-- [ ] real backend: tạo/nối project Supabase, cấp admin, cấu hình SMTP/Cron và kiểm tra luồng thật.
+- [x] release external: đã push và deploy production READY; cấu hình URL/publishable key production đã lưu.
+- [x] real backend connection: chủ project chạy SQL; API thật xác nhận catalog/vườn và chặn anon khỏi bảng riêng. Chủ shop xác nhận đã chạy SQL cấp admin.
+- [x] retention scheduling: chủ shop xác nhận đã chạy retention.sql, job active=true; chưa kiểm chứng lịch sử job chạy.
+- [ ] real backend launch: kiểm chứng đăng nhập/admin và luồng đơn thật bằng dữ liệu thử, cấu hình SMTP cho khách, theo dõi Cron, kiểm tra QR ngân hàng.
 - [ ] browser QA: kiểm tra UI desktop/mobile sau khi quyền truy cập được mở lại.

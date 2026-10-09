@@ -1,6 +1,6 @@
 # Garden Dreams — sơ đồ hệ thống để duyệt
 
-Ngày: 09/10/2026. Trạng thái: chủ cửa hàng đã xác nhận; đã viết và kiểm thử local; chờ nối project Supabase và kiểm thử trình duyệt. Hướng dẫn: [SUPABASE-SETUP.md](SUPABASE-SETUP.md).
+Ngày: 09/10/2026. Trạng thái: chủ cửa hàng đã xác nhận; đã viết và kiểm thử local; đã nối Supabase thật, kiểm tra quyền anon qua API và deploy production; chờ kiểm thử UI/luồng đơn, SMTP, Cron và QR ngân hàng. Hướng dẫn: [SUPABASE-SETUP.md](SUPABASE-SETUP.md).
 
 | Module id   | Trách nhiệm                                                                                           | Phụ thuộc                                                     |
 | ----------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |

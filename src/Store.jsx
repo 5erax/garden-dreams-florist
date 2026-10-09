@@ -55,7 +55,10 @@ export function StoreProvider({ children }) {
     } = backend.auth.onAuthStateChange((event, next) => {
       setSession(next);
       setAdmin(false);
-      if (event === "PASSWORD_RECOVERY") setRecovery(true);
+      if (event === "PASSWORD_RECOVERY") {
+        setRecovery(true);
+        window.location.hash = "#account";
+      }
       if (!next) setRecovery(false);
     });
     backend.auth.getSession().then(({ data }) => setSession(data.session));

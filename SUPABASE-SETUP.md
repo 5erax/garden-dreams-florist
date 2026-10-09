@@ -54,7 +54,9 @@ Mặc định cửa hàng đóng nhận đơn, dịch vụ ship chưa hoạt đ�
 
 VietQR được sinh tại thiết bị khách từ snapshot đơn. COD/chuyển khoản chỉ được ghi nhận đã trả sau khi admin đối soát và nhập ghi chú. Nút ghi nhận hoàn tiền chỉ lưu trạng thái, không chuyển tiền ra ngân hàng. Ship được quản lý theo dịch vụ và khu vực mô tả; admin kiểm tra địa chỉ thực tế, chưa tự gọi hãng vận chuyển.
 
-Bật Supabase Cron/pg_cron và tạo tác vụ xóa thông tin giao hàng của đơn hoàn tất/hủy sau 90 ngày kể từ cập nhật cuối:
+Bật Supabase Cron/pg_cron bằng cách chạy [supabase/retention.sql](supabase/retention.sql) trong SQL Editor. File tạo/cập nhật cùng một tác vụ có tên, xóa thông tin giao hàng của đơn hoàn tất/hủy sau 90 ngày kể từ cập nhật cuối; lời nhắn và lịch sử vẫn được giữ. [Cài Cron](https://supabase.com/docs/guides/cron/install), [lập lịch](https://supabase.com/docs/guides/cron/quickstart).
+
+Nếu extension đã bật, câu lệnh lập lịch là:
 
 ```sql
 select cron.schedule(
@@ -72,6 +74,6 @@ Tạo hai khách thử: đặt đơn, retry cùng mã không tạo bản sao, kh
 
 ## Giới hạn hiện tại
 
-Chưa tạo/nối project Supabase thật trong phiên này do quyền trình duyệt chưa mở. UI mới chưa được kiểm tra bằng trình duyệt; SQL và tích hợp SDK được kiểm thử local. Chưa kiểm thử SMTP hoặc QR bằng ứng dụng ngân hàng thật. Phiên đăng nhập giữ trong bộ nhớ; tải lại trang cần đăng nhập lại. Thiệp dùng hash URL, chưa có ảnh preview mạng xã hội riêng cho từng thiệp.
+Đã nối project Supabase thật `ztzpipgptticvliotbsc` ngày 09/10/2026. Chủ project đã chạy setup.sql; API công khai đọc được catalog, vườn trống và không đọc được bảng riêng. Chủ shop xác nhận đã tạo/xác nhận tài khoản, chạy SQL cấp admin và cài Cron retention với active=true. Phiên admin và lịch sử Cron chưa kiểm chứng trực tiếp qua công cụ. Các biến Vercel chỉ gồm URL/publishable key, chỉ áp dụng production; không lưu password database. UI mới chưa được kiểm tra bằng trình duyệt; SQL và tích hợp SDK được kiểm thử local. Chưa kiểm thử SMTP hoặc QR bằng ứng dụng ngân hàng thật. Phiên đăng nhập giữ trong bộ nhớ; tải lại trang cần đăng nhập lại. Thiệp dùng hash URL, chưa có ảnh preview mạng xã hội riêng cho từng thiệp.
 
 Supabase Free phù hợp bắt đầu thử, không có cam kết đủ dung lượng cho một triệu đơn/kỉ niệm. Thiết kế dùng index/cursor và mỗi đơn một dấu; dung lượng đơn, thông điệp, index, backup và tải thực tế vẫn phải đo trên hosting thật. Vercel Hobby hiện dành cho mục đích phi thương mại; chọn hosting phù hợp và xác minh quyền ảnh/video trước khi bán. Không có gói trả phí nào được bật trong thay đổi này.

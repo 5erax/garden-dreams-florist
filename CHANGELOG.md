@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-09
+
+- Nối Supabase production và kiểm tra catalog, vườn, quyền truy cập anon trên backend thật.
+- Giữ cửa hàng đóng nhận đơn; cấu hình ngân hàng và dịch vụ ship vẫn do admin xác nhận.
+- Đưa callback khôi phục mật khẩu về trang tài khoản sau khi Supabase xóa fragment chứa token.
+
 ## 0.2.0 — 2026-10-09
 
 - Thêm backend Supabase độc lập: RLS, Auth, đặt đơn idempotent, giá/phí máy chủ và tiến trình đơn.
