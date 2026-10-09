@@ -4,6 +4,7 @@ import { useStore } from "./Store.jsx";
 import { money } from "./catalog.js";
 import { vietnamDate } from "./order.js";
 import OrderDetail from "./OrderDetail.jsx";
+import { validateReconciliationReport } from "./reconciliation.js";
 import "./reconciliation-desk.css";
 
 const paymentFilters = [
@@ -112,8 +113,7 @@ function ReconciliationWorkspace() {
     call("gd_reconciliation_totals", { p_from: period.from, p_to: period.to })
       .then(report => {
         if (!mounted.current || reportSequence.current !== request || currentReport.current !== key) return;
-        if (report.basis !== "SETTLEMENT_DATE" || report.from !== period.from || report.to !== period.to) throw new Error("Chưa xác nhận được kỳ đối soát. Tải lại báo cáo trước khi sử dụng số liệu.");
-        setTotals(report);
+        setTotals(validateReconciliationReport(report, period));
         setLoadedPeriod(periodFilter);
         setReportTime(new Date());
       })

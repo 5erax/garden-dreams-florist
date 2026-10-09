@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { allowedReconciliationActions, prepareReconciliation, validatePaymentBalance } from "../src/reconciliation.js";
+import { allowedReconciliationActions, prepareReconciliation, validatePaymentBalance, validateReconciliationReport } from "../src/reconciliation.js";
 import { sendCheckout } from "../src/checkout-request.js";
 
 const id = "a60363c7-130b-4306-af3d-b27a0b3cc6e6";
@@ -9,6 +9,21 @@ const unpaid = { orderId: order.id, total: order.total, received: 0, refunded: 0
 const paid = { ...unpaid, received: order.total, heldCash: order.total, receivable: 0, refundable: order.total };
 const refunded = { ...paid, refunded: order.total, heldCash: 0, refundable: 0 };
 const fields = { action: "RECEIPT", checked: true, evidence: "  Đã kiểm tra tiền COD nhận đủ  ", reference: "  COD/CA_1-02.03  " };
+
+test("collection reports accept negative net cash without calling refunds negative or changing period", () => {
+  const period = { from: "2026-10-01", to: "2026-10-10" };
+  const report = { ...period, basis: "SETTLEMENT_DATE", received: 100, refunded: 200, netCollected: -100, eventCount: 2, legacyReceiptBalance: 0, legacyRefundBalance: 0 };
+  assert.equal(validateReconciliationReport(report, period), report);
+  for (const fields of [{ from: "2026-10-02" }, { netCollected: 0 }, { refunded: -1 }, { basis: "ORDER_DATE" }, { eventCount: 1.5 }])
+    assert.throws(() => validateReconciliationReport({ ...report, ...fields }, period));
+});
+test("financial report rejects rounded unsafe integers, missing amounts or nonnumeric cash instead of displaying them", () => {
+  const period = { from: "2026-10-01", to: "2026-10-10" };
+  const report = { ...period, basis: "SETTLEMENT_DATE", received: 100, refunded: 0, netCollected: 100, eventCount: 1, legacyReceiptBalance: 0, legacyRefundBalance: 0 };
+  for (const fields of [{ received: Number.MAX_SAFE_INTEGER + 1, netCollected: Number.MAX_SAFE_INTEGER + 1 }, { legacyReceiptBalance: Infinity }, { legacyRefundBalance: undefined }, { refunded: "0" }])
+    assert.throws(() => validateReconciliationReport({ ...report, ...fields }, period));
+  assert.throws(() => validateReconciliationReport(null, period));
+});
 
 test("delivered COD remains receivable until a checked receipt is recorded", () => {
   assert.deepEqual(allowedReconciliationActions(order, unpaid), ["RECEIPT"]);

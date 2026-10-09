@@ -1,5 +1,14 @@
 export const reconciliationActions = { RECEIPT: "Ghi nhận đã thu đủ", REFUND: "Ghi nhận đã hoàn đủ" };
 
+export function validateReconciliationReport(value, period) {
+  const unsigned = ["received", "refunded", "eventCount", "legacyReceiptBalance", "legacyRefundBalance"];
+  if (!value || value.basis !== "SETTLEMENT_DATE" || value.from !== period.from || value.to !== period.to ||
+      unsigned.some(key => !Number.isSafeInteger(value[key]) || value[key] < 0) ||
+      !Number.isSafeInteger(value.netCollected) || value.netCollected !== value.received - value.refunded)
+    throw new Error("Số liệu hoặc kỳ đối soát chưa hợp lệ để hiển thị chính xác. Tải lại báo cáo trước khi sử dụng.");
+  return value;
+}
+
 export function validatePaymentBalance(value, orderId) {
   const amounts = ["total", "received", "refunded", "heldCash", "receivable", "refundable"];
   if (!value || value.orderId !== orderId || typeof value.legacyBalance !== "boolean" || typeof value.fullOnly !== "boolean" ||
