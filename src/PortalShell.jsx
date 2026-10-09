@@ -4,6 +4,7 @@ import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
 import { shopAddress } from "./shop-contact.js";
 import { Modal } from "./ShopDialogs.jsx";
+import { authErrorMessage } from "./auth-error.js";
 
 export function PortalShell({ children }) {
   const { shop, session, isAdmin } = useStore();
@@ -119,10 +120,8 @@ export function AuthPanel() {
         });
         if (error) throw error;
       }
-    } catch {
-      setError(
-        "Chưa thực hiện được. Kiểm tra email, mật khẩu và kết nối rồi thử lại.",
-      );
+    } catch (failure) {
+      setError(authErrorMessage(failure));
     } finally {
       setBusy(false);
     }
