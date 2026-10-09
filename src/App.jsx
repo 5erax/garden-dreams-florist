@@ -47,11 +47,7 @@ function Reveal({ children, className = "" }) {
 function Hero() {
   const { shop } = useStore();
   const [first, ...rest] = shop.name.split(/\s+/);
-  const video = useRef(null);
   const reduced = useReducedMotion();
-  useEffect(() => {
-    if (reduced) video.current?.pause();
-  }, [reduced]);
   return (
     <section
       className="hero"
@@ -59,18 +55,13 @@ function Hero() {
       aria-label="Garden Dreams — Hoa mang lời thương"
     >
       <div className="hero-video">
-        <video
-          ref={video}
-          autoPlay={!reduced}
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          poster="/flowers/bouquet_5.webp"
-          aria-hidden="true"
-        >
-          <source src="/hero_bg.mp4" type="video/mp4" />
-        </video>
+        <img
+          src="/flowers/garden-dreams-hero.webp"
+          alt=""
+          width="1536"
+          height="1024"
+          fetchPriority="high"
+        />
       </div>
       <div className="hero-shade" />
       <img
