@@ -36,7 +36,7 @@ Trạng thái: hoàn thành theo tiêu chí SQL/SDK/Build/Ops của task. Previe
 
 ### BU-02 — Email xác thực và callback — M
 
-Trạng thái: chủ shop chọn Gmail cho staging và sẽ tự cấu hình secret. Đã chuẩn bị hướng dẫn/template tại [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md), sửa callback về Góc của tôi và thông báo link hết hạn. Chưa nghiệm thu email thật; chưa tick task.
+Trạng thái: chủ shop chọn Gmail cho staging, sau đó yêu cầu agent tự xử lý toàn bộ. Đã chuẩn bị hướng dẫn/template tại [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md), sửa callback về Góc của tôi và thông báo link hết hạn. Quyền dashboard Supabase vẫn bị trình duyệt chặn; chưa cấu hình/ nghiệm thu email thật, chưa tick task.
 
 - [ ] Đăng ký/xác nhận/khôi phục chạy được với email khách được phép; link trả về đúng trang, lỗi rõ và không tiết lộ tài khoản người khác.
 - [ ] Secret SMTP chỉ ở server; phiên giữ theo quyết định hiện tại, đăng xuất không còn quyền đọc đơn.
@@ -59,6 +59,8 @@ Trạng thái: chủ shop chọn Gmail cho staging và sẽ tự cấu hình sec
       Phụ thuộc: BU-03, quyền trình duyệt. File: các phần UI có lỗi và biên bản; giới hạn mỗi lần sửa 3–5 file. Kiểm: UI, Build, focused regression.
 
 ### BU-05 — Backup và retention — S
+
+Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU-01). Diễn tập backup đĩa → database local mới và retention đã qua; [BACKUP-RESTORE.md](../BACKUP-RESTORE.md) ghi phạm vi. Chưa có backup/restore backend thật và lịch sử Cron, chưa tick task.
 
 - [ ] Có backup ngoài database và khôi phục được vào môi trường thử; không lộ secret/PII trong repo hoặc log.
 - [ ] Cron có lịch sử chạy, xóa đúng thông tin giao hàng đủ hạn, giữ lịch sử/lời nhắn và không cho khách gọi job.

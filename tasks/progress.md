@@ -5,8 +5,9 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 ## Hiện tại
 
 - **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
-- **BU-02: đang làm, chờ chủ shop cấu hình Gmail SMTP cho staging.** Đã chọn Gmail, chuẩn bị template/hướng dẫn và sửa callback; chưa nghiệm thu email thật.
-- **BU-03 tới BU-32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
+- **BU-02: chờ quyền dashboard/phiên Google để cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; chưa nghiệm thu email thật.
+- **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
+- **BU-03–04 và BU-06–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
 - Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
 
 ## Nhật ký
@@ -54,3 +55,12 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Chủ shop báo chưa biết cấu hình; chưa coi câu trả lời là đã cấu hình SMTP.
 - Bổ sung 4 bước cụ thể vào AUTH-EMAIL-SETUP.md: bật xác minh 2 bước/tạo App Password, điền SMTP staging, Site URL/redirect, template và đăng ký thử. Dẫn link Google/project staging chính xác và giải thích tài khoản staging tách production.
 - Đối chiếu tài liệu chính thức Google/Supabase; chỉ thay đổi hướng dẫn, không chạy lại tests cho nội dung này. Chưa thao tác dashboard hoặc gửi email thật; tiến độ vẫn 1/32.
+
+### BU-05a — Diễn tập phục hồi và retention độc lập
+
+- Chủ shop yêu cầu agent tự làm, không giao lại thao tác cấu hình thường lệ. Kiểm tra phiên trình duyệt hiện không có tab; mở project staging bằng công cụ trình duyệt bị từ chối do saved user permission chặn supabase.com. Không thử browser/API/credential khác để vượt hạn chế này.
+- Tiếp tục BU-05 vì chỉ phụ thuộc BU-01. Test mới xuất archive database giả xuống đĩa, đóng nguồn và nạp vào database local mới; kiểm tra checksum, đơn/giá snapshot, kỉ niệm, RLS, quyền thanh toán và quyền retention sau phục hồi.
+- Kiểm tra mốc 89/90/91 ngày, đơn đang xử lý dù cũ, đơn đã xóa và chạy job lần hai; giữ thiệp/lịch sử. Test focused qua với 6 đơn/3 kỉ niệm; archive chỉ gồm dữ liệu giả và nằm trong thư mục gitignored.
+- Toàn bộ **28 tests qua** sau thay đổi; [báo cáo diễn tập](../benchmarks/backup-restore.json) ghi môi trường local, migrations, checksum, phạm vi đã qua/chưa kiểm. Không chạy lại frontend build vì chỉ thay test và tài liệu/SQL health; frontend không đổi.
+- Thêm SQL kiểm tra sức khỏe Cron chỉ đọc số liệu vận hành, không xuất PII; tài liệu backup thật ghi rõ Auth/Storage/runtime cần xử lý riêng. SQL health chưa chạy trên backend thật.
+- Chưa tick BU-05: còn backup ngoài hệ thống, restore backend thật và Cron history. Không thay đổi Gmail/SMTP, không tạo phiên khách hoặc đơn trên Supabase. Tiến độ task lớn vẫn 1/32.

@@ -1,6 +1,6 @@
 # BU-02 — Email xác thực và callback
 
-Chuẩn bị ngày 09/10/2026. Chủ shop đã chọn **Gmail riêng cho staging** và sẽ tự điền App Password trong dashboard. Chưa nhận xác nhận cấu hình SMTP hay gửi email nghiệm thu. Chủ shop chưa có domain; ưu tiên thử miễn phí và không tự bật gói trả phí.
+Chuẩn bị ngày 09/10/2026. Chủ shop đã chọn **Gmail riêng cho staging**, sau đó yêu cầu agent tự cấu hình và triển khai. Quyền truy cập dashboard Supabase vẫn bị trình duyệt chặn; chưa cấu hình SMTP hay gửi email nghiệm thu. Các bước bên dưới giữ làm tài liệu thao tác, không yêu cầu chủ shop tự thực hiện toàn bộ. Chủ shop chưa có domain; ưu tiên thử miễn phí và không tự bật gói trả phí.
 
 ## Làm lần đầu: đi theo 4 bước
 

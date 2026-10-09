@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-10-09T12:13:06.830Z",
+  "environment": "local",
+  "data": "synthetic-only",
+  "engine": "PGlite 0.5.8",
+  "migrationFiles": [
+    "202610090001_shop.sql",
+    "202610090002_orders.sql",
+    "202610090003_catalog.sql",
+    "202610090004_audit.sql",
+    "202610090005_environment.sql"
+  ],
+  "counts": {
+    "orders": 6,
+    "memories": 3,
+    "events": 20,
+    "audit": 2,
+    "products": 20
+  },
+  "archiveBytes": 4764081,
+  "sha256": "7e6b19efdd0e75cd48ebb46d903e890d02ef5772ebb6a6042b077f36132b3049",
+  "elapsedMs": 3272,
+  "passed": [
+    "disk-checksum",
+    "new-database-restore",
+    "order-snapshots",
+    "memory-sharing",
+    "rls-owner-isolation",
+    "payment-permissions",
+    "retention-permissions",
+    "retention-90-day-boundary",
+    "retention-active-order-protection",
+    "retention-idempotency",
+    "card-and-history-preservation"
+  ],
+  "notChecked": [
+    "hosted-backup-and-restore",
+    "supabase-auth-sessions",
+    "storage-objects",
+    "live-cron-history"
+  ]
+}

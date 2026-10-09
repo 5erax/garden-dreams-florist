@@ -6,6 +6,7 @@ Web bán hoa React + Vite, tiếng Việt, video nền, hoa rơi, parallax và c
 - Website: [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app/). Push `main` tự deploy qua GitHub.
 - **Cài backend:** [SUPABASE-SETUP.md](SUPABASE-SETUP.md). SQL chạy một lần trên project mới: [supabase/setup.sql](supabase/setup.sql).
 - **Big update:** [kế hoạch](BIG-UPDATE-PLAN.md), [checklist](tasks/todo.md) và [tiến độ sau từng task](tasks/progress.md). BU-01 tách staging đã hoàn thành; chuẩn bị email Auth ở BU-02.
+- **Backup/retention:** [quy trình và phạm vi đã kiểm chứng](BACKUP-RESTORE.md). Diễn tập local dùng dữ liệu giả; backup/restore Supabase thật và Cron history còn chờ quyền vận hành.
 
 ## Chạy local
 
