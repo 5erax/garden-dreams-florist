@@ -8,7 +8,7 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - **BU-02: chưa cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; Supabase vẫn bị công cụ từ chối trong phiên mới. Việc tạo credential Google cần chủ tài khoản thao tác; không yêu cầu gửi secret trong chat.
 - **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
 - **BU-07: mã nguồn album đã kiểm chứng local, chưa nghiệm thu Storage/UI thật.** Chuẩn bị trên branch staging trong lúc dashboard bị chặn; BU-06 vẫn là điều kiện nghiệm thu/phát hành.
-- **BU-08: mã nguồn quản lý cỡ bó đã kiểm chứng local, chưa nghiệm thu UI/backend thật.** BU-09 tiếp tục phần chọn cỡ và snapshot đơn.
+- **BU-08–09: mã nguồn quản lý/chọn cỡ và snapshot đơn đã kiểm chứng local.** 36 tests, SDK local và build qua; chưa nghiệm thu UI/backend thật.
 - **BU-03–04, BU-06 và BU-10–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
 - Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
 
@@ -84,3 +84,12 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Màn hình admin nằm ngoài form sửa sản phẩm, có thêm/sửa/tắt, báo conflict version, khóa thao tác khi upload/lưu ở phần khác đang chạy. Giá sản phẩm cũ là cỡ Tiêu chuẩn; không tự tạo cỡ/giá giả hay đổi đơn cũ.
 - 34 tests và build staging qua; tests kiểm tra SKU/giá/parent/quyền/ẩn cỡ tắt/version/audit. Backend chưa có 007 ẩn màn quản lý cỡ.
 - Chưa tick BU-08: chưa áp dụng hosted migration, phiên admin/UI thật và cổng BU-06–07 còn mở. Tiến độ nghiệm thu vẫn 1/32. Tiếp tục BU-09 để lựa chọn cỡ có luồng đặt và snapshot hoàn chỉnh.
+
+### BU-09 — Khách chọn cỡ và snapshot trên mã nguồn staging
+
+- Migration 008 tính giá cỡ tại máy chủ, kiểm tra parent/trạng thái, chống dòng trùng, khóa đọc catalog; giữ idempotency/rate limit/quyền/quote của luồng cũ. Giỏ phân biệt product+cỡ, loại cỡ không còn bán mà không thay bằng Tiêu chuẩn. Cỡ cũ/null vẫn dùng giá sản phẩm.
+- Nối lựa chọn trong chi tiết/giỏ/checkout/lịch sử; nút thêm nhanh mở chọn cỡ. Chi tiết dùng catalog hiện tại sau refresh, không giữ lựa chọn sản phẩm cũ để thêm cỡ đã tắt.
+- Đơn snapshot tên/ảnh/dịp/cỡ/SKU/giá; kỉ niệm mới lưu metadata bất biến từ snapshot đầu đơn. Kỉ niệm cũ để trống metadata; public RPC không thêm nội dung ngoài lựa chọn chia sẻ cũ.
+- **36 tests qua**, SDK local qua cả tạo/tắt cỡ, giá server và retry giữ snapshot; build staging qua. Test snapshot đổi tên/giá/dịp sau đặt, cỡ sai parent/tắt/ID sai kiểu, payload giá giả và metadata đều qua. Mutation gộp key các cỡ làm test fail; khôi phục rồi focused tests xanh. Backup/retention qua tới migration 008.
+- Review sửa form SKU tương thích HTML pattern hiện tại, khóa form quản lý cỡ khi phần sản phẩm đang lưu/upload; chưa có UI thật để nghiệm thu.
+- [PRODUCT-VARIANTS.md](../PRODUCT-VARIANTS.md) ghi contract/rollout. Chưa cài migrations 006–008 trên hosting trong bước này; backend báo capability để frontend mới không truy vấn bảng chưa có. BU-08/09 chưa tick, tiến độ nghiệm thu **1/32**.

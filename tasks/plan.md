@@ -22,4 +22,4 @@ Backlog `BU-01` tới `BU-32` được bổ sung trong todo.md. Các việc chư
 
 Mốc phát hành: nền tảng/QA → A vận hành → B thiệp/khu vườn → C storefront/content/SEO/mobile. Giữ các quyết định về COD/VietQR thủ công, opt-in và một kỉ niệm/đơn đã giao/paid. Migration mới nối tiếp lịch sử hiện tại, không chạy lại setup.sql.
 
-Khi dashboard/SMTP chưa thao tác được, tiếp tục chuẩn bị mã nguồn BU-07 trên branch staging. BU-06 vẫn là điều kiện nghiệm thu/phát hành; không tick album chỉ dựa vào SQL local hoặc build. Backend báo khả năng album/upload để frontend mới tương thích với backend 005 đang chạy. Production tiếp tục đóng nhận đơn.
+Khi dashboard/SMTP chưa thao tác được, tiếp tục chuẩn bị mã nguồn BU-07–09 trên branch staging. BU-06 và các task phụ thuộc vẫn là điều kiện nghiệm thu/phát hành; không tick chỉ dựa vào SQL local hoặc build. Backend báo khả năng album/upload/quản lý cỡ/đặt cỡ để frontend mới tương thích với backend đang chạy. Production tiếp tục đóng nhận đơn.

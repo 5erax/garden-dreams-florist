@@ -45,13 +45,14 @@ export function StoreProvider({ children }) {
       const runtime = await verifyEnvironment();
       setFeatures(runtime.features || {});
       setEnvironmentVerified(true);
-      const [cfg, catalog, services] = await Promise.all([
+      const [cfg, catalog, services, variants] = await Promise.all([
         result(backend.from("gd_shop").select("*").eq("id", 1).single()),
         result(backend.from("gd_products").select("*").order("id")),
         result(backend.from("gd_shipping").select("*").order("name")),
+        runtime.features?.variantOrders ? result(backend.from("gd_product_variants").select("*").eq("active", true).order("id")) : [],
       ]);
       setShop(cfg);
-      setProducts(catalog.filter((p) => p.active));
+      setProducts(catalog.filter((p) => p.active).map(p => ({ ...p, variants: variants.filter(v => v.product_id === p.id) })));
       setShipping(services.filter((s) => s.active));
     } catch (e) {
       setEnvironmentVerified(false);

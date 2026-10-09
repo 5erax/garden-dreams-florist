@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useStore } from "./Store.jsx";
 import { call } from "./backend.js";
 import { money } from "./catalog.js";
-import { subtotal, validateOrder, vietnamDate } from "./order.js";
+import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
 import { Modal } from "./ShopDialogs.jsx";
 import { AuthPanel } from "./PortalShell.jsx";
 import { BankPayment } from "./OrderDetail.jsx";
@@ -55,7 +55,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
         p_request: {
           ...raw,
           requestId,
-          items: cart.map(({ id, quantity }) => ({ id, quantity })),
+          items: cart.map(({ id, quantity, variantId }) => ({ id, quantity, ...(variantId == null ? {} : { variantId }) })),
           consent: raw.consent === "on",
           shippingId,
           paymentMethod: payment,
@@ -228,14 +228,15 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
               </label>
               <div className="checkout-summary">
                 {cart.map((line) => (
-                  <p key={line.id}>
+                  <p key={cartKey(line)}>
                     <span>
                       {products.find((p) => p.id === line.id)?.name} ×{" "}
                       {line.quantity}
+                      {cartChoice(line, products)?.sizeName && ` · ${cartChoice(line, products).sizeName}`}
                     </span>
                     <span>
                       {money(
-                        (products.find((p) => p.id === line.id)?.price || 0) *
+                        (cartChoice(line, products)?.price || 0) *
                           line.quantity,
                       )}
                     </span>

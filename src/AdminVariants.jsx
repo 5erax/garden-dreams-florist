@@ -64,7 +64,8 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
     {edit && <form key={`${edit.id || "new"}-${edit.version || 0}`} onSubmit={save}>
       <fieldset disabled={busy || disabled}>
         <div className="form-grid">
-          <label>Mã cỡ bó (SKU)<input name="sku" defaultValue={edit.sku} minLength={2} maxLength={40} pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,39}" required /></label>
+          <label>Mã cỡ bó (2–40 chữ/số, _ hoặc -)<input name="sku" defaultValue={edit.sku} minLength={2} maxLength={40}
+            pattern={"[A-Za-z0-9][A-Za-z0-9_\\-]{1,39}"} title="Mã bắt đầu bằng chữ hoặc số; chỉ dùng chữ, số, dấu gạch dưới hoặc gạch ngang." required /></label>
           <label>Tên cỡ<input name="size_name" defaultValue={edit.size_name} minLength={2} maxLength={60} required /></label>
           <label>Giá (VNĐ)<input name="price" type="number" min={1000} max={100000000} step={1} defaultValue={edit.price} required /></label>
         </div>

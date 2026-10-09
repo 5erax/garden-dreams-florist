@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { money } from "./catalog.js";
-import { subtotal, validateOrder, vietnamDate } from "./order.js";
+import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import ProductGallery from "./ProductGallery.jsx";
@@ -49,6 +49,8 @@ export function ProductDialog({
   onFavorite,
 }) {
   const [quantity, setQuantity] = useState(1);
+  const [variantId, setVariantId] = useState(null);
+  const choice = cartChoice({ id: product.id, variantId }, [product]);
   return (
     <Modal title={product.name} onClose={onClose} className="product-dialog">
       <ProductGallery key={product.id} product={product} />
@@ -57,7 +59,15 @@ export function ProductDialog({
           Một món quà cho {product.occasion.toLocaleLowerCase("vi")}
         </span>
         <h2>{product.name}</h2>
-        <p className="detail-price">{money(product.price)}</p>
+        <p className="detail-price">{money(choice?.price || product.price)}</p>
+        {product.variants?.length > 0 && <label className="variant-choice">
+          Cỡ bó hoa
+          <select value={variantId ?? ""} onChange={(e) => setVariantId(e.target.value ? Number(e.target.value) : null)}>
+            <option value="">Tiêu chuẩn · {money(product.price)}</option>
+            {product.variants.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
+          </select>
+        </label>}
+        {!choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
         <p>{product.description}</p>
         <dl>
           <dt>Trong bó hoa</dt>
@@ -77,8 +87,9 @@ export function ProductDialog({
           />
           <button
             className="button primary"
+            disabled={!choice}
             onClick={() => {
-              onAdd(product.id, quantity);
+              onAdd(product.id, quantity, variantId);
               onClose();
             }}
           >
@@ -143,24 +154,25 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
         <>
           <div className="cart-lines">
             {cart.map((line) => {
-              const product = products.find((p) => p.id === line.id);
+              const product = cartChoice(line, products);
               return (
-                <article className="cart-line" key={line.id}>
+                <article className="cart-line" key={cartKey(line)}>
                   <img src={product.image} alt={product.name} />
                   <div>
                     <span className="eyebrow">{product.occasion}</span>
                     <h3>{product.name}</h3>
+                    {product.sizeName && <p>Cỡ {product.sizeName}</p>}
                     <p>{money(product.price)}</p>
                     <Quantity
                       value={line.quantity}
-                      onChange={(quantity) => onChange(line.id, quantity)}
-                      name={product.name}
+                      onChange={(quantity) => onChange(line.id, quantity, line.variantId)}
+                      name={`${product.name}${product.sizeName ? ` · ${product.sizeName}` : ""}`}
                     />
                   </div>
                   <button
                     className="text-button remove"
-                    onClick={() => onChange(line.id, 0)}
-                    aria-label={`Xóa ${product.name}`}
+                    onClick={() => onChange(line.id, 0, line.variantId)}
+                    aria-label={`Xóa ${product.name}${product.sizeName ? ` · ${product.sizeName}` : ""}`}
                   >
                     Xóa
                   </button>
@@ -203,7 +215,7 @@ export function CheckoutDialog({ cart, onClose }) {
       "Garden Dreams — yêu cầu đặt hoa",
       ...receipt.items.map(
         (item) =>
-          `${item.name} × ${item.quantity}: ${money(item.price * item.quantity)}`,
+          `${item.name}${item.sizeName ? ` · ${item.sizeName}` : ""} × ${item.quantity}: ${money(item.price * item.quantity)}`,
       ),
       `Tạm tính: ${money(receipt.subtotal)} (chưa gồm phí giao)`,
       `Người nhận: ${receipt.name}`,
@@ -349,14 +361,15 @@ export function CheckoutDialog({ cart, onClose }) {
               </label>
               <div className="checkout-summary">
                 {cart.map((line) => (
-                  <p key={line.id}>
+                  <p key={cartKey(line)}>
                     <span>
                       {products.find((p) => p.id === line.id).name} ×{" "}
                       {line.quantity}
+                      {cartChoice(line, products)?.sizeName && ` · ${cartChoice(line, products).sizeName}`}
                     </span>
                     <span>
                       {money(
-                        products.find((p) => p.id === line.id).price *
+                        cartChoice(line, products).price *
                           line.quantity,
                       )}
                     </span>

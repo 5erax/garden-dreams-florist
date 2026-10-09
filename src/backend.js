@@ -54,6 +54,7 @@ const messages = {
   INVALID_TIME: "Chọn khung giờ giao hợp lệ.",
   INVALID_ITEMS: "Sản phẩm hoặc số lượng chưa hợp lệ.",
   PRODUCT_UNAVAILABLE: "Một sản phẩm đã ngừng nhận đặt.",
+  VARIANT_UNAVAILABLE: "Cỡ bó đã ngừng nhận đặt hoặc không thuộc sản phẩm này. Chọn lại cỡ trước khi gửi.",
   SHIPPING_UNAVAILABLE: "Dịch vụ giao này chưa khả dụng.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
   PRICE_CHANGED:

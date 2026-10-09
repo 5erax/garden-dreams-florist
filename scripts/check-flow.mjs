@@ -17,7 +17,7 @@ const alice = client(),
 assert.deepEqual(await ok(anonymous.rpc("gd_environment")), {
   environment: "local",
   projectRef: null,
-  features: { productAlbum: true, productImageUpload: false, productVariants: true },
+  features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true },
 });
 for (const [c, email] of [
   [alice, "alice@example.test"],
@@ -34,6 +34,9 @@ const catalog = await ok(anonymous.from("gd_products").select("*").order("id"));
 const shipping = await ok(
   anonymous.from("gd_shipping").select("*").order("name"),
 );
+const size = await ok(admin.from("gd_product_variants").insert({ product_id: catalog[0].id,
+  sku: "SDK-L", size_name: "Bó lớn thử", price: 690000, active: true }).select("*").single());
+assert.equal((await ok(anonymous.from("gd_product_variants").select("*").eq("id", size.id).single())).price, 690000);
 const id = randomUUID(),
   message = "Cảm ơn mẹ vì luôn chờ con về.\nCon thương mẹ.";
 const request = {
@@ -54,6 +57,18 @@ let order = await ok(alice.rpc("gd_create_order", { p_request: request }));
 assert.equal(order.is_test, true);
 assert.equal(order.total, request.expectedTotal);
 assert.equal(order.bank.account, shop.bank_account);
+const sizedRequest = { ...request, requestId: randomUUID(), expectedTotal: 2 * size.price + catalog[0].price + shipping[0].fee,
+  items: [{ id: catalog[0].id, variantId: size.id, quantity: 2, price: 1 }, { id: catalog[0].id, quantity: 1 }] };
+const sizedOrder = await ok(alice.rpc("gd_create_order", { p_request: sizedRequest }));
+assert.equal(sizedOrder.items[0].price, size.price);
+assert.equal(sizedOrder.items[0].sizeName, size.size_name);
+assert.equal(sizedOrder.items[0].sku, size.sku);
+const changedSize = await ok(admin.from("gd_product_variants").update({ price: 790000, active: false })
+  .eq("id", size.id).eq("version", size.version).select("*").single());
+assert.ok(changedSize.version > size.version);
+assert.equal((await ok(anonymous.from("gd_product_variants").select("*").eq("id", size.id))).length, 0);
+assert.deepEqual((await ok(alice.rpc("gd_create_order", { p_request: sizedRequest }))).items, sizedOrder.items);
+assert.match((await alice.rpc("gd_create_order", { p_request: { ...sizedRequest, requestId: randomUUID() } })).error.message, /VARIANT_UNAVAILABLE/);
 const album = ["/flowers/bouquet_2.webp", catalog[0].image];
 const albumProduct = await ok(admin.from("gd_products").update({ images: album })
   .eq("id", catalog[0].id).eq("version", catalog[0].version).select("*").single());
@@ -222,5 +237,5 @@ assert.equal((await ok(alice.from("gd_admin_audit").select("id"))).length, 0);
 assert.ok((await ok(admin.from("gd_admin_audit").select("id"))).length > 0);
 for (const c of [alice, bob, admin]) await c.auth.signOut();
 console.log(
-  "SDK integration passed: sign-in, dynamic catalog, albums/cover/version isolation, preserved order/ship/bank snapshots, tracking, admin payment, exact card sharing, revoke, RLS, product/shipping/shop edits and audit. Synthetic local data only; Storage file API is not simulated.",
+  "SDK integration passed: sign-in, dynamic catalog, album/size/version isolation, server-priced sizes and snapshot-preserving retries, order/ship/bank snapshots, tracking, admin payment, exact card sharing, revoke, RLS, product/shipping/shop edits and audit. Synthetic local data only; Storage file API is not simulated.",
 );

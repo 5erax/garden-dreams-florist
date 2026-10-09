@@ -166,7 +166,7 @@ export default function CustomerPortal() {
                 <img src={order.items[0].image} alt={order.items[0].name} />
                 <div>
                   <span className="eyebrow">{order.reference}</span>
-                  <h3>{order.items.map((i) => i.name).join(", ")}</h3>
+                  <h3>{order.items.map((i) => `${i.name}${i.sizeName ? ` · ${i.sizeName}` : ""}`).join(", ")}</h3>
                   <p>
                     {new Intl.DateTimeFormat("vi-VN").format(
                       new Date(order.created_at),
