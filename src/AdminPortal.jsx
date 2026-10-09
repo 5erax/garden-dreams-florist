@@ -19,6 +19,9 @@ const newProduct = {
 const newShipping = { name: "", area: "", fee: 0, active: false };
 export default function AdminPortal() {
   const store = useStore();
+  return <AdminWorkspace key={`${store.session?.user.id || "signed-out"}:${Boolean(store.isAdmin)}`} store={store} />;
+}
+function AdminWorkspace({ store }) {
   const [tab, setTab] = useState("orders"),
     [rows, setRows] = useState([]),
     [busy, setBusy] = useState(false),
