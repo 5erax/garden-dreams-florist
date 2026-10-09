@@ -5,6 +5,11 @@ import { AuthPanel } from "./PortalShell.jsx";
 import { beforeCursor } from "./cursor.js";
 import OrderDetail from "./OrderDetail.jsx";
 import { money, occasions } from "./catalog.js";
+import ProductPhotosEditor from "./ProductPhotosEditor.jsx";
+import AdminVariants from "./AdminVariants.jsx";
+import AdminDelivery from "./AdminDelivery.jsx";
+import OperationsDesk from "./OperationsDesk.jsx";
+import ReconciliationDesk from "./ReconciliationDesk.jsx";
 
 const newProduct = {
   name: "",
@@ -13,6 +18,7 @@ const newProduct = {
   stems: "",
   description: "",
   image: "/flowers/bouquet_1.webp",
+  images: [],
   active: true,
   featured: false,
 };
@@ -33,6 +39,7 @@ function AdminWorkspace({ store }) {
     [filter, setFilter] = useState("");
   async function load(append = false) {
     if (!store.isAdmin) return;
+    if (["calendar", "desk", "reconciliation"].includes(tab)) return;
     setBusy(true);
     setError("");
     try {
@@ -113,6 +120,7 @@ function AdminWorkspace({ store }) {
           image: f.image.trim(),
           active: f.active === "on",
           featured: f.featured === "on",
+          ...(store.features.productAlbum ? { images: edit.images || [] } : {}),
         };
       if (tab === "shipping")
         fields = {
@@ -184,6 +192,9 @@ function AdminWorkspace({ store }) {
           ["products", "Bộ sưu tập"],
           ["shipping", "Giao hoa"],
           ["shop", "Cửa hàng & thanh toán"],
+          ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
+          ...(store.features.operationsDesk ? [["desk", "Bàn xử lý đơn"]] : []),
+          ...(store.features.reconciliationLedger ? [["reconciliation", "Đối soát tiền"]] : []),
         ].map(([key, name]) => (
           <button
             key={key}
@@ -195,6 +206,7 @@ function AdminWorkspace({ store }) {
           </button>
         ))}
       </nav>
+      {tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
       <div className="portal-section-heading">
         <h2>
           {tab === "orders"
@@ -233,6 +245,7 @@ function AdminWorkspace({ store }) {
           {["products", "shipping"].includes(tab) && (
             <button
               className="button outline"
+              disabled={busy}
               onClick={() =>
                 setEdit(
                   tab === "products" ? { ...newProduct } : { ...newShipping },
@@ -345,7 +358,9 @@ function AdminWorkspace({ store }) {
                 </strong>
                 <small>{row.active ? "Đang bật" : "Đã tắt"}</small>
               </div>
-              <button className="button outline" onClick={() => setEdit(row)}>
+              <button className="button outline" disabled={busy} onClick={() => setEdit(
+                tab === "products" && store.features.productAlbum ? { ...row, images: row.images || [] } : row,
+              )}>
                 Chỉnh sửa
               </button>
             </article>
@@ -412,14 +427,21 @@ function AdminWorkspace({ store }) {
                   />
                 </label>
                 <label>
-                  Ảnh (đường dẫn /flowers/ hoặc URL HTTPS)
+                  {item.images?.length ? "Ảnh bìa (ảnh đầu album)" : "Ảnh bìa dự phòng (đường dẫn /flowers/ hoặc URL HTTPS)"}
                   <input
                     name="image"
                     maxLength={500}
-                    defaultValue={item.image}
+                    value={item.images?.[0] || item.image}
+                    readOnly={Boolean(item.images?.length)}
+                    onChange={(e) => setEdit(old => ({ ...old, image: e.target.value }))}
                     required
                   />
                 </label>
+                {store.features.productAlbum && <ProductPhotosEditor
+                  images={item.images || []}
+                  onChange={(images) => setEdit(old => ({ ...old, images }))}
+                  onBusyChange={setBusy}
+                />}
                 <label className="check-label">
                   <input
                     name="active"
@@ -610,10 +632,14 @@ function AdminWorkspace({ store }) {
           </fieldset>
         </form>
       )}
+      {tab === "products" && edit?.id && store.features.productVariants && <AdminVariants
+        key={edit.id} productId={edit.id} disabled={busy} onBusyChange={setBusy} onSaved={store.refresh}
+      />}
       <p className="fineprint">
         Quyền được kiểm tra trong database cho mọi thao tác. Giá và phí mới chỉ
         áp dụng cho đơn đặt sau khi lưu.
       </p>
+      </>}
     </>
   );
 }

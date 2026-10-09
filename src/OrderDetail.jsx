@@ -9,6 +9,9 @@ import {
 } from "./backend.js";
 import { money } from "./catalog.js";
 import { vietqrPayload } from "./vietqr.js";
+import { useStore } from "./Store.jsx";
+import OrderRequests from "./OrderRequests.jsx";
+import Reconciliation from "./Reconciliation.jsx";
 
 export function BankPayment({ order }) {
   const [qr, setQr] = useState(""),
@@ -203,6 +206,7 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
   );
 }
 export default function OrderDetail({ order, admin = false, onUpdated }) {
+  const { features } = useStore();
   const [events, setEvents] = useState([]),
     [memory, setMemory] = useState(null),
     [error, setError] = useState("");
@@ -255,7 +259,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
         p_id: order.id,
         p_version: order.version,
         p_status: status,
-        p_payment: payment,
+        p_payment: features.reconciliationLedger ? order.payment_status : payment,
         p_note: note,
       });
       onUpdated(next);
@@ -329,6 +333,8 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
         </section>
       </div>
       <BankPayment order={order} />
+      {features.reconciliationLedger && <Reconciliation key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
+      {features.orderRequests && <OrderRequests key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
       <section className="order-timeline">
         <h3>Hành trình của bó hoa</h3>
         <ol>
@@ -360,7 +366,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
       )}
       {admin && (
         <form className="admin-order-form" onSubmit={update}>
-          <h3>Cập nhật đơn & đối soát</h3>
+          <h3>{features.reconciliationLedger ? "Cập nhật tiến trình" : "Cập nhật đơn & đối soát"}</h3>
           <div className="form-grid">
             <label>
               Trạng thái đơn
@@ -379,6 +385,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
               Trạng thái tiền
               <select
                 value={payment}
+                disabled={features.reconciliationLedger}
                 onChange={(e) => setPayment(e.target.value)}
               >
                 {Object.entries(paymentStatuses).map(([key, name]) => (
@@ -390,16 +397,15 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
             </label>
           </div>
           <label>
-            Ghi chú / mã đối soát
+            {features.reconciliationLedger ? "Ghi chú tiến trình (khách đọc được)" : "Ghi chú / mã đối soát"}
             <input
               name="note"
               maxLength={500}
-              placeholder="Chỉ xác nhận sau khi kiểm tra ngân hàng hoặc tiền COD"
+              placeholder={features.reconciliationLedger ? "Ví dụ: hoa đã sẵn sàng để giao" : "Chỉ xác nhận sau khi kiểm tra ngân hàng hoặc tiền COD"}
             />
           </label>
           <p className="fineprint">
-            Hoàn tiền tại đây chỉ ghi nhận khoản bạn đã xử lý bên ngoài; website
-            không tự chuyển tiền.
+            {features.reconciliationLedger ? "Ghi nhận tiền thu/hoàn và chứng từ trong sổ đối soát phía trên." : "Hoàn tiền tại đây chỉ ghi nhận khoản bạn đã xử lý bên ngoài; website không tự chuyển tiền."}
           </p>
           <button className="button primary" disabled={busy}>
             {busy ? "Đang lưu…" : "Lưu cập nhật"}

@@ -1,19 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkEnvironment, checkBackendEnvironment } from "./environment.js";
+import { isAuthCallback } from "./auth-callback.js";
 import { guestStorage } from "./guest-session.js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const config = checkEnvironment(import.meta.env);
+const { url, key } = config;
+export const appEnvironment = config.environment;
 export const backendReady = Boolean(url && key);
-if (key?.startsWith("sb_secret_"))
-  throw new Error("Chỉ dùng Supabase publishable key trong frontend.");
-if (key?.startsWith("eyJ")) {
-  try {
-    if (JSON.parse(atob(key.split(".")[1])).role !== "anon")
-      throw new Error("INVALID_PUBLIC_KEY");
-  } catch {
-    throw new Error("Supabase key chưa đúng loại public/anon.");
-  }
-}
+// Capture the callback marker before the SDK consumes and clears its fragment.
+export const authCallbackPending =
+  typeof window !== "undefined" && isAuthCallback(window.location);
 let deviceStorage;
 try { deviceStorage = globalThis.localStorage; } catch {}
 const storageKey = backendReady ? `sb-${new URL(url).hostname.split(".")[0]}-auth-token` : "gd-demo-session";
@@ -30,6 +26,30 @@ export const backend = backendReady
       },
     })
   : null;
+
+let environmentCheck;
+export async function verifyEnvironment() {
+  if (!backend) throw new Error("Backend chưa được kết nối.");
+  if (!environmentCheck)
+    environmentCheck = (async () => {
+      const { data, error } = await backend.rpc("gd_environment");
+      if (error)
+        throw new Error(
+          "Chưa xác nhận được môi trường backend. Kiểm tra migration và kết nối.",
+        );
+      try {
+        checkBackendEnvironment(config, data);
+      } catch {
+        throw new Error(
+          "Cấu hình website và môi trường backend không khớp. Chưa thể thao tác.",
+        );
+      }
+      return data;
+    })().finally(() => {
+      environmentCheck = null;
+    });
+  return environmentCheck;
+}
 
 export async function guestCheckoutEnabled() {
   if (!backendReady) return false;
@@ -49,8 +69,27 @@ const messages = {
   INVALID_TIME: "Chọn khung giờ giao hợp lệ.",
   INVALID_ITEMS: "Sản phẩm hoặc số lượng chưa hợp lệ.",
   PRODUCT_UNAVAILABLE: "Một sản phẩm đã ngừng nhận đặt.",
+  VARIANT_UNAVAILABLE: "Cỡ bó đã ngừng nhận đặt hoặc không thuộc sản phẩm này. Chọn lại cỡ trước khi gửi.",
   SHIPPING_UNAVAILABLE: "Dịch vụ giao này chưa khả dụng.",
+  DELIVERY_UNAVAILABLE: "Ca giao vừa thay đổi, đã đầy hoặc qua giờ nhận đặt. Kiểm tra lịch và chọn ca khác; thông tin đang nhập vẫn được giữ.",
+  INVALID_DELIVERY_RULE: "Kiểm tra khu vực, ngày trong tuần, sức chứa và thời gian đặt trước.",
+  DELIVERY_RULE_REQUIRED: "Tạo ít nhất một ca đang nhận, có sức chứa và thuộc dịch vụ đang hoạt động trước khi bật lịch.",
+  DELIVERY_RULE_IDENTITY_IMMUTABLE: "Giữ nguyên khu vực và ca/ngày của cấu hình này. Tạo cấu hình khác nếu cần chuyển.",
+  CAPACITY_BELOW_RESERVATIONS: "Không thể giảm sức chứa dưới số đơn đã giữ chỗ. Xử lý các đơn trước khi đổi năng lực.",
+  DAY_HAS_RESERVATIONS: "Ngày này có đơn đã giữ chỗ. Xử lý lịch giao của các đơn trước khi đóng ngày.",
+  CALENDAR_SNAPSHOT_IMMUTABLE: "Lịch đã lưu trên đơn không thể sửa trực tiếp.",
+  INVALID_QUEUE_FILTER: "Kiểm tra bộ lọc và mã đơn bắt đầu bằng GD-. Tải lại danh sách nếu mốc phân trang không còn hợp lệ.",
+  INVALID_NOTE: "Ghi chú cần từ 1 đến 1.000 ký tự.",
+  INVALID_ORDER_REQUEST: "Kiểm tra loại yêu cầu và lý do từ 5 đến 500 ký tự.",
+  REQUEST_TOO_LATE: "Đơn đã vào sản xuất hoặc kết thúc; yêu cầu này không thể tự áp dụng. Shop cần kiểm tra cách hỗ trợ phù hợp.",
+  REQUEST_ALREADY_OPEN: "Đơn đã có yêu cầu đang chờ. Theo dõi hoặc rút yêu cầu đó trước khi gửi thêm.",
+  REQUEST_ALREADY_PROCESSED: "Yêu cầu đã được xử lý. Tải lại lịch sử để xem quyết định.",
+  REQUEST_RATE_LIMIT: "Bạn vừa gửi nhiều yêu cầu. Chờ một chút rồi thử lại; yêu cầu đã lưu vẫn có trong đơn.",
+  ADDRESS_REQUOTE_REQUIRED: "Đổi địa chỉ cần kiểm tra lại vùng giao, phí và ca. Biểu mẫu này chỉ sửa tên và điện thoại tại địa chỉ hiện có.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
+  INVALID_RECONCILIATION: "Kiểm tra thao tác thu/hoàn, nội dung đối soát và mã tham chiếu.",
+  PAYMENT_REFERENCE_USED: "Mã giao dịch này đã được dùng để đối soát một đơn khác. Kiểm tra chứng từ trước khi tiếp tục.",
+  INVALID_REPORT_PERIOD: "Chọn khoảng ngày hợp lệ, tối đa 92 ngày, theo giờ Việt Nam.",
   PRICE_CHANGED:
     "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",
   IDEMPOTENCY_CONFLICT:
@@ -81,11 +120,13 @@ export function backendError(error) {
 }
 export async function call(name, args = {}) {
   if (!backend) throw new Error("Backend chưa được kết nối.");
+  await verifyEnvironment();
   const { data, error } = await backend.rpc(name, args);
   if (error) throw new Error(backendError(error), { cause: error });
   return data;
 }
 export async function result(query) {
+  await verifyEnvironment();
   const { data, error } = await query;
   if (error) throw new Error(backendError(error));
   return data;
@@ -104,4 +145,4 @@ export const paymentStatuses = {
   REFUNDED: "Đã ghi nhận hoàn tiền",
 };
 export const orderColumns =
-  "id,reference,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at";
+  "id,reference,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";

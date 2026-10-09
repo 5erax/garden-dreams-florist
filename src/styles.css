@@ -2237,6 +2237,19 @@ form .optional {
 .payment-tools { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
 .payment-tools .button { font-size: 13px; padding: 12px; min-height: 44px; }
 .payment-tools .text-link { min-height: 44px; display: inline-flex; align-items: center; }
+.delivery-slot-options { display: grid; gap: 10px; margin: 12px 0 18px !important; }
+.delivery-slot-options legend { font-size: 14px; margin-bottom: 12px; }
+.live-checkout form .delivery-slot {
+  display: flex; align-items: center; gap: 12px; padding: 14px;
+  margin: 0; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--paper); cursor: pointer;
+}
+.delivery-slot.is-selected { border-color: var(--rose); background: #f3e7e9; }
+.delivery-slot.is-unavailable { color: var(--muted); cursor: default; background: #eee8df; }
+.live-checkout form .delivery-slot input { width: 20px; height: 20px; min-height: 20px; margin: 0; padding: 0; accent-color: var(--rose); }
+.delivery-slot strong { font-size: 14px; font-weight: 500; display: block; }
+.delivery-slot small { font-size: 12px; display: block; margin-top: 4px; }
+.delivery-schedule-error .text-button { min-height: 44px; }
 @media (max-width: 767px) {
   .live-checkout .checkout-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .checkout-review { padding: 20px 16px; }
