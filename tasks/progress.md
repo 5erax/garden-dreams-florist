@@ -4,7 +4,11 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
-- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Chủ shop xác nhận thêm mới; baseline staging 10.787 dòng, mục tiêu tổng 25.787 dòng không rỗng. Sau lịch giao và bàn xử lý đơn đạt **11.801** (+1.014, còn 13.986). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Sau các lát cắt đầu đạt **13.128** (+2.341, còn 12.659). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **Đã nhận và đối chiếu tài liệu Word nghiệp vụ v1**: lưu nguyên bản/SHA-256 và traceability đủ 95 chức năng tại docs/product. Nguồn điều chỉnh backlog BU/FC, không tự chốt các DEC còn mở hoặc thay quyết định COD/VietQR/kỉ niệm của chủ shop.
+- **BU-13: mã nguồn/local correction tên/điện thoại và yêu cầu hủy đã xong.** Khách gửi/rút/theo dõi; admin duyệt theo trạng thái hiện tại, UUID/version/audit không PII. Đổi địa chỉ cần re-quote nên chưa áp trực tiếp. Hủy không tự hoàn tiền. Review đã phát hiện và sửa free-text retention/rate-limit race; 8 SQL và 8 helper tests qua, mutation bỏ guard địa chỉ bị test bắt. Migration 011 chưa cài hosted.
+- **ACC-F03 / BU-32: lịch sử mua và tách tải route đã xong local.** Owner scope explicit, tìm/lọc phần đã tải, phân trang 20/cap 200, focus trở lại đơn. Route retry giữ session/cart. 8 history + 2 route tests qua; JS ban đầu 678,58 kB, chưa đo Core Web Vitals/browser thật.
+- **Gói upgrade staging 005→011 đã chuẩn bị**, đúng project staging, một transaction, từ chối production/nhầm project/schema không đúng baseline; 3 test kiểm guard/rollback/giữ đơn cũ qua. File này khác fresh staging-setup.sql và chưa được chạy trên hosting.
 - **BU-12: bàn xử lý đơn đã có mã nguồn/local**, hàng đợi theo ngày/trạng thái, tìm mã, cursor, tổng tiền cần thu/đã đối soát và ghi chú nội bộ append-only/idempotent. RLS ngăn khách xem ghi chú; queue không trả thiệp, địa chỉ, số điện thoại hoặc ngân hàng. 69 tests và build staging qua; migration 010 chưa cài hosted.
 - **BU-10 và phần giữ chỗ BU-11: mã nguồn/local đã xong**, chưa nghiệm thu hosted/browser. Admin có ca/ngày nghỉ/cutoff/sức chứa, checkout dùng lịch server theo capability. Xác nhận kiểm tra chỗ trong transaction; hủy nhả chỗ theo trạng thái, tính cả đơn cũ đã xác nhận. Migration 009 mặc định lịch tự động tắt, giữ luồng manual tương thích backend cũ.
 - Kiểm chứng lát cắt mới: **65 tests** và build staging qua. Mutation bỏ kiểm tra ca đầy bị 3 test bắt, đã khôi phục. Chưa thử hai connection PostgreSQL thật chạy đồng thời; PGlite đã thử hai intent tranh chỗ và rollback/version/retry, không thay nghiệm thu concurrency hosted.
@@ -16,7 +20,7 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
 - **BU-07: mã nguồn album đã kiểm chứng local, chưa nghiệm thu Storage/UI thật.** Chuẩn bị trên branch staging trong lúc dashboard bị chặn; BU-06 vẫn là điều kiện nghiệm thu/phát hành.
 - **BU-08–09: mã nguồn quản lý/chọn cỡ và snapshot đơn đã kiểm chứng local.** 36 tests, SDK local và build qua; chưa nghiệm thu UI/backend thật.
-- **BU-03–04, BU-06 và BU-10–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
+- **BU-03–04, BU-06 và các task còn lại chưa nghiệm thu.** BU-10–13 và phần độc lập ACC-F03/BU-32 đã có local như trên; vẫn giữ các cổng trong todo.md.
 - Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
 
 ## Nhật ký

@@ -80,6 +80,12 @@ const messages = {
   CALENDAR_SNAPSHOT_IMMUTABLE: "Lịch đã lưu trên đơn không thể sửa trực tiếp.",
   INVALID_QUEUE_FILTER: "Kiểm tra bộ lọc và mã đơn bắt đầu bằng GD-. Tải lại danh sách nếu mốc phân trang không còn hợp lệ.",
   INVALID_NOTE: "Ghi chú cần từ 1 đến 1.000 ký tự.",
+  INVALID_ORDER_REQUEST: "Kiểm tra loại yêu cầu và lý do từ 5 đến 500 ký tự.",
+  REQUEST_TOO_LATE: "Đơn đã vào sản xuất hoặc kết thúc; yêu cầu này không thể tự áp dụng. Shop cần kiểm tra cách hỗ trợ phù hợp.",
+  REQUEST_ALREADY_OPEN: "Đơn đã có yêu cầu đang chờ. Theo dõi hoặc rút yêu cầu đó trước khi gửi thêm.",
+  REQUEST_ALREADY_PROCESSED: "Yêu cầu đã được xử lý. Tải lại lịch sử để xem quyết định.",
+  REQUEST_RATE_LIMIT: "Bạn vừa gửi nhiều yêu cầu. Chờ một chút rồi thử lại; yêu cầu đã lưu vẫn có trong đơn.",
+  ADDRESS_REQUOTE_REQUIRED: "Đổi địa chỉ cần kiểm tra lại vùng giao, phí và ca. Biểu mẫu này chỉ sửa tên và điện thoại tại địa chỉ hiện có.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
   PRICE_CHANGED:
     "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",

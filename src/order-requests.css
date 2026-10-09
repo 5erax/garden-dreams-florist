@@ -1,0 +1,49 @@
+.order-requests { margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--line); }
+.order-requests-heading { display: flex; justify-content: space-between; align-items: start; gap: 24px; }
+.order-requests h3 { font-size: 30px; margin: 12px 0 20px; }
+.order-requests p, .order-requests label, .order-requests legend { font-size: 14px; }
+.order-requests .text-button { min-height: 44px; }
+.order-request-explanation { max-width: 78ch; line-height: 1.8; margin-bottom: 20px; }
+.order-request-form, .order-request-review { padding: 24px; background: var(--paper); border: 1px solid var(--line); margin: 24px 0; }
+.order-requests fieldset { min-width: 0; padding: 0; border: 0; margin: 0; }
+.order-requests fieldset:disabled { opacity: .7; }
+.order-requests legend { font-weight: 600; margin-bottom: 20px; }
+.order-requests form label { display: block; margin: 16px 0; }
+.order-requests form input:not([type="radio"]), .order-requests textarea { width: 100%; font-size: 16px; }
+.order-request-types { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.order-request-types label { margin: 0 !important; display: flex !important; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 4px; padding: 12px 16px; min-height: 48px; cursor: pointer; }
+.order-request-types input { accent-color: var(--rose); width: 18px; height: 18px; flex-shrink: 0; }
+.order-request-types label:has(input:checked) { border-color: var(--rose); background: var(--cream); }
+.order-request-types label:focus-within { outline: 2px solid var(--rose); outline-offset: 3px; }
+.order-request-notice, .order-request-recovery { background: #eee8df; border-left: 2px solid var(--rose); padding: 18px 20px; margin: 20px 0; }
+.order-request-recovery > p { margin: 12px 0; }
+.order-request-checkbox { display: flex; gap: 12px; align-items: start; margin: 18px 0; line-height: 1.7; }
+.order-request-checkbox input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--rose); flex-shrink: 0; }
+.order-request-history { list-style: none; padding: 0; display: grid; gap: 16px; margin: 24px 0; }
+.order-request-card { border: 1px solid var(--line); background: var(--paper); padding: 24px; }
+.order-request-card-top { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 12px; }
+.order-request-card h4 { font-size: 22px; font-weight: 400; margin: 0; }
+.order-request-status { background: var(--cream); color: var(--muted); border-radius: 20px; padding: 7px 12px; font-size: 12px; white-space: nowrap; }
+.order-request-status.is-open { background: #eee8df; color: var(--ink); }
+.order-request-card time { display: block; font-size: 12px; color: var(--muted); }
+.order-request-reason { margin: 18px 0; white-space: pre-wrap; }
+.order-request-card dl { margin: 20px 0; font-size: 14px; }
+.order-request-card dl div { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 16px; padding: 8px 0; }
+.order-request-card dt { color: var(--muted); }
+.order-request-card dd { margin: 0; }
+.order-request-card blockquote { border-left: 2px solid var(--rose); padding: 14px 18px; margin: 20px 0; background: var(--cream); font-size: 16px; white-space: pre-wrap; }
+.order-request-card blockquote span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.order-request-actions { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 20px; }
+.order-request-review { margin-bottom: 0; }
+.order-request-empty { color: var(--muted); padding: 18px 0; }
+@media (hover: hover) and (pointer: fine) {
+  .order-request-types label:hover { border-color: var(--rose); }
+}
+@media (max-width: 767px) {
+  .order-requests-heading { flex-direction: column; gap: 4px; }
+  .order-requests h3 { font-size: 26px; margin-bottom: 8px; }
+  .order-request-form, .order-request-review, .order-request-card { padding: 20px 16px; }
+  .order-request-card-top { flex-wrap: wrap; gap: 12px; }
+  .order-request-card dl div { grid-template-columns: 1fr; gap: 6px; }
+  .order-request-actions .button { width: 100%; justify-content: center; }
+}

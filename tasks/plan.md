@@ -26,6 +26,10 @@ Khi dashboard/SMTP chưa thao tác được, tiếp tục chuẩn bị mã ngu�
 
 ## Đợt mở rộng kỹ thuật, giao diện và chức năng — yêu cầu 15.000 LOC
 
+### Nguồn nghiệp vụ cập nhật
+
+Chủ shop yêu cầu tạm dừng phần đang làm để nhận và áp dụng `Flower_Commerce_Functions_Business_Rules_v1.docx`. Đã lưu nguyên bản/nội dung trích trong docs/product; [hợp đồng triển khai](../docs/product/IMPLEMENTATION-CONTRACT.md) và [đối chiếu 95 chức năng](../docs/product/TRACEABILITY.md) điều chỉnh các lát cắt tiếp theo. Ưu tiên P0 correctness/chuỗi end-to-end, sau đó P1/P2 theo nguồn; không thay các quyết định COD/VietQR/kỉ niệm đã chốt, không tự điền ngưỡng DEC còn mở. Backlog BU/FC và mục tiêu thêm 15.000 LOC vẫn giữ, chưa đủ số và chưa nghiệm thu P0.
+
 Chủ shop yêu cầu mở rộng quy mô đợt cải tiến tiếp theo. Baseline trước đợt này trên branch staging `bb848bc`: **10.787 dòng không rỗng** trong src, api, scripts, tests và migrations. Chủ shop xác nhận thêm 15.000 dòng mới trong đợt này; mục tiêu tổng là 25.787 dòng không rỗng. Không bỏ yêu cầu LOC, không tự gọi đủ số dòng khi chưa đạt; không tăng số bằng thư viện, SQL bundle trùng, tài liệu hoặc định dạng lại. `npm run loc` ghi physical/nonblank và nhóm file để báo tiến độ. Chú thích được tính và công khai trong cách đo, không dùng chú thích dài để tăng lượng.
 
 Mở rộng kế hoạch BU/FC đã có, không tạo backlog cạnh tranh hoặc đóng các task còn dở. Thứ tự mã nguồn: BU-10 lịch giao → BU-11 giữ chỗ → BU-12 bàn xử lý đơn → BU-13 thay đổi/hủy → BU-14 đối soát → BU-15–18 vận hành/quyền/báo cáo; sau đó các module inventory/recipe và BU-19–32 theo phụ thuộc. Công việc không phụ thuộc SMTP có thể phát triển và kiểm thử local trên staging trong lúc chờ cấu hình hosted; điều kiện phát hành/mở bán vẫn giữ nguyên.
