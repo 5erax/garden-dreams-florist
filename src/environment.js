@@ -1,7 +1,7 @@
 export const productionProjectRef = "ztzpipgptticvliotbsc";
 export const stagingProjectRef = "tgvozhrkolcpszyyrgth";
 
-export function checkEnvironment(env) {
+export function checkEnvironment(env, { command = "build" } = {}) {
   const url = env.VITE_SUPABASE_URL?.trim() || "";
   const key = env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() || "";
   const declared = env.VITE_APP_ENV?.trim();
@@ -20,6 +20,8 @@ export function checkEnvironment(env) {
     throw new Error("INVALID_APP_ENV");
   if (env.VERCEL_ENV === "preview" && environment === "production")
     throw new Error("PREVIEW_CANNOT_USE_PRODUCTION");
+  if (command === "serve" && environment === "production")
+    throw new Error("DEV_CANNOT_USE_PRODUCTION");
   if (
     env.VERCEL_ENV === "production" &&
     !["production", "demo"].includes(environment)
@@ -30,7 +32,12 @@ export function checkEnvironment(env) {
     return { environment, url, key, projectRef: null };
   }
   if (environment === "demo") throw new Error("DEMO_CANNOT_USE_BACKEND");
-  const endpoint = new URL(url);
+  let endpoint;
+  try {
+    endpoint = new URL(url);
+  } catch {
+    throw new Error("INVALID_SUPABASE_URL");
+  }
   if (
     endpoint.username ||
     endpoint.password ||

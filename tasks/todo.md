@@ -28,10 +28,10 @@ Quy ước kiểm chứng:
 
 ### BU-01 — Môi trường thử và dữ liệu thử — M
 
-Trạng thái: đang thực hiện; BU-01a (validator cấu hình) đã kiểm chứng local. Theo dõi bằng chứng tại [progress.md](progress.md). Còn cờ test/database và staging thật trước khi tick cả task.
+Trạng thái: BU-01a/b đã kiểm chứng; schema staging thật và cấu hình preview đã nối, chờ xác nhận preview deployment READY. Theo dõi bằng chứng tại [progress.md](progress.md).
 
 - [ ] Preview/staging dùng cấu hình riêng; có cờ test không tính vào doanh thu/kỉ niệm mua thật.
-- [ ] Fixture và script không thể vô tình đổ dữ liệu giả vào production.
+- [x] Fixture và script không thể vô tình đổ dữ liệu giả vào production.
       Phụ thuộc: không. File: migration mới, config mẫu, seed test, hướng dẫn deploy. Kiểm: SQL, SDK, Build, Ops.
 
 ### BU-02 — Email xác thực và callback — M

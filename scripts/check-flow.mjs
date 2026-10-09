@@ -14,6 +14,10 @@ const alice = client(),
   bob = client(),
   admin = client(),
   anonymous = client();
+assert.deepEqual(await ok(anonymous.rpc("gd_environment")), {
+  environment: "local",
+  projectRef: null,
+});
 for (const [c, email] of [
   [alice, "alice@example.test"],
   [bob, "bob@example.test"],
@@ -46,6 +50,7 @@ const request = {
   expectedTotal: catalog[0].price + shipping[0].fee,
 };
 let order = await ok(alice.rpc("gd_create_order", { p_request: request }));
+assert.equal(order.is_test, true);
 assert.equal(order.total, request.expectedTotal);
 assert.equal(order.bank.account, shop.bank_account);
 assert.equal(
@@ -91,6 +96,8 @@ const memory = await ok(
   alice.from("gd_memories").select("*").eq("order_id", id).maybeSingle(),
 );
 assert.equal(memory.share_token, null);
+assert.equal(memory.is_test, true);
+assert.equal(Number(await ok(anonymous.rpc("gd_memory_count"))), 0);
 const link = await ok(
   alice.rpc("gd_share_memory", {
     p_id: memory.id,

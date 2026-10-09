@@ -5,7 +5,13 @@ import {
   useState,
   useCallback,
 } from "react";
-import { backend, backendReady, result } from "./backend.js";
+import {
+  backend,
+  backendReady,
+  result,
+  appEnvironment,
+  verifyEnvironment,
+} from "./backend.js";
 import { products as demoProducts } from "./catalog.js";
 
 const Store = createContext(null);
@@ -26,11 +32,14 @@ export function StoreProvider({ children }) {
     [loading, setLoading] = useState(backendReady),
     [error, setError] = useState("");
   const [recovery, setRecovery] = useState(false);
+  const [environmentVerified, setEnvironmentVerified] = useState(false);
   const refresh = useCallback(async () => {
     if (!backend) return;
     setLoading(true);
     setError("");
     try {
+      await verifyEnvironment();
+      setEnvironmentVerified(true);
       const [cfg, catalog, services] = await Promise.all([
         result(backend.from("gd_shop").select("*").eq("id", 1).single()),
         result(backend.from("gd_products").select("*").order("id")),
@@ -40,6 +49,7 @@ export function StoreProvider({ children }) {
       setProducts(catalog.filter((p) => p.active));
       setShipping(services.filter((s) => s.active));
     } catch (e) {
+      setEnvironmentVerified(false);
       setError(e.message);
     } finally {
       setLoading(false);
@@ -98,11 +108,17 @@ export function StoreProvider({ children }) {
         loading,
         error,
         refresh,
-        connected: backendReady,
+        connected: backendReady && environmentVerified,
         recovery,
         setRecovery,
       }}
     >
+      {backendReady && appEnvironment !== "production" && (
+        <p className="portal-notice" role="status">
+          Môi trường thử nghiệm · Đơn hoa và kỉ niệm ở đây là dữ liệu thử. Không
+          chuyển tiền hoặc giao hoa theo các đơn này.
+        </p>
+      )}
       {children}
     </Store.Provider>
   );

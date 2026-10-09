@@ -41,9 +41,25 @@ test("configuration fails closed on cross-environment backends and preview produ
     { VITE_SUPABASE_URL: "https://example.com" },
   ])
     assert.throws(() => checkEnvironment(env));
+  assert.throws(
+    () =>
+      checkEnvironment(
+        { ...remote(productionProjectRef), VITE_APP_ENV: "production" },
+        { command: "serve" },
+      ),
+    /DEV_CANNOT_USE_PRODUCTION/,
+  );
 });
 test("only public frontend keys and plain trusted HTTPS/loopback endpoints are accepted", () => {
   const env = { ...remote(stagingProjectRef), VITE_APP_ENV: "staging" };
+  assert.throws(
+    () =>
+      checkEnvironment({
+        ...env,
+        VITE_SUPABASE_URL: "invalid-url-with-private-value",
+      }),
+    (error) => error.message === "INVALID_SUPABASE_URL",
+  );
   for (const url of [
     "http://tgvozhrkolcpszyyrgth.supabase.co",
     "https://user:pass@tgvozhrkolcpszyyrgth.supabase.co",

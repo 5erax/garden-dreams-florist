@@ -74,6 +74,9 @@ await db.query("insert into public.gd_admins values($1)", [
   users["admin@example.test"].id,
 ]);
 await db.exec(
+  "update gd_private.runtime set environment='local',project_ref=null;",
+);
+await db.exec(
   "update public.gd_shop set accepting_orders=true,transfer_enabled=true,bank_bin='970436',bank_account='000000000000',bank_name='Ngân hàng kiểm thử — KHÔNG CHUYỂN TIỀN',account_name='TEST ONLY'; update public.gd_shipping set name='Giao hoa nội thành',area='Khu vực giả để kiểm thử',active=true,fee=30000;",
 );
 let queue = Promise.resolve();
@@ -88,6 +91,7 @@ const tables = new Set([
   "gd_admin_audit",
 ]);
 const functions = {
+  gd_environment: [],
   gd_create_order: ["p_request"],
   gd_update_order: ["p_id", "p_version", "p_status", "p_payment", "p_note"],
   gd_share_memory: ["p_id", "p_visibility", "p_signature"],

@@ -1,18 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import { checkEnvironment, checkBackendEnvironment } from "./environment.js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const config = checkEnvironment(import.meta.env);
+const { url, key } = config;
+export const appEnvironment = config.environment;
 export const backendReady = Boolean(url && key);
-if (key?.startsWith("sb_secret_"))
-  throw new Error("Chỉ dùng Supabase publishable key trong frontend.");
-if (key?.startsWith("eyJ")) {
-  try {
-    if (JSON.parse(atob(key.split(".")[1])).role !== "anon")
-      throw new Error("INVALID_PUBLIC_KEY");
-  } catch {
-    throw new Error("Supabase key chưa đúng loại public/anon.");
-  }
-}
 export const backend = backendReady
   ? createClient(url, key, {
       // Keep bearer tokens in memory; refreshing the page requires signing in again.
@@ -23,6 +15,29 @@ export const backend = backendReady
       },
     })
   : null;
+
+let environmentCheck;
+export async function verifyEnvironment() {
+  if (!backend) throw new Error("Backend chưa được kết nối.");
+  if (!environmentCheck)
+    environmentCheck = (async () => {
+      const { data, error } = await backend.rpc("gd_environment");
+      if (error)
+        throw new Error(
+          "Chưa xác nhận được môi trường backend. Kiểm tra migration và kết nối.",
+        );
+      try {
+        checkBackendEnvironment(config, data);
+      } catch {
+        throw new Error(
+          "Cấu hình website và môi trường backend không khớp. Chưa thể thao tác.",
+        );
+      }
+    })().finally(() => {
+      environmentCheck = null;
+    });
+  return environmentCheck;
+}
 
 const messages = {
   AUTH_REQUIRED: "Vui lòng đăng nhập trước.",
@@ -66,11 +81,13 @@ export function backendError(error) {
 }
 export async function call(name, args = {}) {
   if (!backend) throw new Error("Backend chưa được kết nối.");
+  await verifyEnvironment();
   const { data, error } = await backend.rpc(name, args);
   if (error) throw new Error(backendError(error));
   return data;
 }
 export async function result(query) {
+  await verifyEnvironment();
   const { data, error } = await query;
   if (error) throw new Error(backendError(error));
   return data;
@@ -89,4 +106,4 @@ export const paymentStatuses = {
   REFUNDED: "Đã ghi nhận hoàn tiền",
 };
 export const orderColumns =
-  "id,reference,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at";
+  "id,reference,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";
