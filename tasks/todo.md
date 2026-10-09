@@ -102,6 +102,10 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 ### BU-10 — Cấu hình lịch và năng lực giao — M
 
+Đợt mở rộng 15.000 LOC: được chủ shop yêu cầu tiếp tục phát triển mã nguồn và giao diện trên staging; các cổng nghiệm thu/phát hành phía trên vẫn giữ. `npm run loc` đo theo policy trong plan.md, chờ xác định mục tiêu là tổng hay tăng thêm.
+
+Đã chuẩn bị migration 009, AdminDelivery và DeliveryPicker, tương thích qua capability. 65 tests/build staging qua; chưa cài migration trên hosting, chưa nghiệm thu browser. Lịch mặc định thủ công; không tự áp ca/ngày nghỉ/sức chứa giả lên shop thật.
+
 - [ ] Admin cấu hình vùng/phí, ngày nghỉ, slot/cutoff và năng lực; dữ liệu sai bị backend từ chối.
 - [ ] Khách thấy khung giờ được phép và điều kiện xác nhận; không có slot giả khi shop đóng.
       Phụ thuộc: BU-09. File: migration, admin lịch, checkout lịch và test. Kiểm: SQL, SDK, UI, Build.

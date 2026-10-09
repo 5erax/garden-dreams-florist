@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useStore } from "./Store.jsx";
 import { call } from "./backend.js";
 import { money } from "./catalog.js";
-import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
+import { subtotal, validateOrder, cartChoice, cartKey } from "./order.js";
 import { Modal } from "./ShopDialogs.jsx";
 import GuestCheckout, { RememberGuest } from "./GuestCheckout.jsx";
 import { BankPayment } from "./OrderDetail.jsx";
 import { sendCheckout } from "./checkout-request.js";
 import { shopAddress } from "./shop-contact.js";
 import { AuthPanel } from "./PortalShell.jsx";
+import DeliveryPicker from "./DeliveryPicker.jsx";
 
 export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
   const {
@@ -20,6 +21,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
     loading,
     refresh,
     guestEnabled,
+    features = {},
   } = useStore();
   const [draft] = useState(() => pending.current && pending.current.ownerId === session?.user.id ? pending.current.request : null);
   const [shippingId, setShippingId] = useState(draft?.shippingId || shipping[0]?.id || ""),
@@ -28,6 +30,8 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
     [busy, setBusy] = useState(false),
     [receipt, setReceipt] = useState(null);
   const [requestId] = useState(() => draft?.requestId || crypto.randomUUID());
+  const [scheduleReady, setScheduleReady] = useState(!features.deliveryCalendar);
+  const [scheduleRevision, setScheduleRevision] = useState(0);
   useEffect(() => {
     if (!shipping.some((s) => s.id === shippingId))
       setShippingId(shipping[0]?.id || "");
@@ -43,6 +47,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
+    if (!scheduleReady) { setError("Kiểm tra và chọn ca giao khả dụng trước khi gửi."); return; }
     setError("");
     const raw = Object.fromEntries(new FormData(event.currentTarget));
     try {
@@ -163,22 +168,14 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
             >
               <div className="checkout-fields">
               <h3>Giao hoa khi nào?</h3>
-              <div className="form-grid">
-                <label>Ngày mong muốn
-                  <input name="deliveryDate" defaultValue={draft?.deliveryDate || ""} type="date" min={vietnamDate()} max={vietnamDate(new Date(Date.now() + 90 * 86400000))} required />
-                </label>
-                <label>Khung giờ
-                  <select name="deliveryTime" defaultValue={draft?.deliveryTime || "Chiều · 13–17h"}>
-                    <option>Sáng · 9–12h</option><option>Chiều · 13–17h</option><option>Tối · 18–20h</option>
-                  </select>
-                </label>
-              </div>
               <label>Khu vực giao hoa
                 <select value={shippingId} onChange={event => setShippingId(event.target.value)} required>
                   {shipping.map(s => <option key={s.id} value={s.id}>{s.name} · {money(s.fee)}</option>)}
                 </select>
               </label>
               {service && <p className="fineprint">{service.area}. Shop xác nhận địa chỉ và lịch giao trước khi nhận đơn.</p>}
+              <DeliveryPicker shippingId={shippingId} calendar={features.deliveryCalendar} initialDate={draft?.deliveryDate} initialTime={draft?.deliveryTime}
+                onReady={setScheduleReady} revision={scheduleRevision} />
               <h3>Hoa gửi đến ai?</h3>
               <div className="form-grid">
                 <label>
@@ -290,7 +287,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                   {error}
                 </p>
               )}
-              <button className="button primary" type="submit">
+              <button className="button primary" type="submit" disabled={!scheduleReady}>
                 {busy ? "Đang lưu yêu cầu…" : `Đặt hoa · ${money(total)}`}
               </button>
               <p className="fineprint">
@@ -302,6 +299,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
           {error && !pending.current && (
             <button className="button outline" disabled={busy || loading} onClick={async () => {
               await refresh();
+              setScheduleRevision(value => value+1);
               setError("");
             }}>Cập nhật giá & dịch vụ giao</button>
           )}

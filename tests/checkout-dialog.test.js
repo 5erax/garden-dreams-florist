@@ -7,7 +7,7 @@ import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { products } from "../src/catalog.js";
 
-let server, Checkout, BankPayment;
+let server, Checkout, BankPayment, DeliveryPicker, selectedDelivery;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../",import.meta.url)),configFile:false,envDir:false,
@@ -20,6 +20,7 @@ before(async () => {
   });
   ({default:Checkout}=await server.ssrLoadModule('/src/LiveCheckout.jsx'));
   ({BankPayment}=await server.ssrLoadModule('/src/OrderDetail.jsx'));
+  ({default:DeliveryPicker,selectedDelivery}=await server.ssrLoadModule('/src/DeliveryPicker.jsx'));
 });
 after(async () => { delete globalThis.checkoutTestStore; await server?.close(); });
 function render(store, pending = {current:null}) {
@@ -78,4 +79,15 @@ test("VietQR provides account/reference copy actions only for unpaid active bank
   assert.equal(renderBank({status:"CANCELLED"}), "");
   assert.equal(renderBank({payment_status:"PAID"}), "");
   assert.equal(renderBank({payment_method:"COD"}), "");
+});
+test("calendar checkout waits for a server choice; old backends retain their existing date/time flow", () => {
+  const html=render({features:{deliveryCalendar:true}});
+  assert.match(html,/type="submit" disabled=""/);
+  assert.match(html,/name="deliveryDate"/);
+  const legacy=renderToStaticMarkup(createElement(DeliveryPicker,{shippingId:"fixture",onReady(){}}));
+  assert.match(legacy,/name="deliveryTime"/);
+  assert.match(legacy,/Chiều · 13–17h/);
+  assert.doesNotMatch(legacy,/<select[^>]*disabled/);
+  assert.equal(selectedDelivery([{time:"morning",available:false},{time:"afternoon",available:true}],"morning"), "");
+  assert.equal(selectedDelivery([{time:"afternoon",available:true}],"afternoon"), "afternoon");
 });

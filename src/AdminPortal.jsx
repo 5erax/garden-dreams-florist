@@ -7,6 +7,7 @@ import OrderDetail from "./OrderDetail.jsx";
 import { money, occasions } from "./catalog.js";
 import ProductPhotosEditor from "./ProductPhotosEditor.jsx";
 import AdminVariants from "./AdminVariants.jsx";
+import AdminDelivery from "./AdminDelivery.jsx";
 
 const newProduct = {
   name: "",
@@ -33,6 +34,7 @@ export default function AdminPortal() {
     [filter, setFilter] = useState("");
   async function load(append = false) {
     if (!store.isAdmin) return;
+    if (tab === "calendar") return;
     setBusy(true);
     setError("");
     try {
@@ -185,6 +187,7 @@ export default function AdminPortal() {
           ["products", "Bộ sưu tập"],
           ["shipping", "Giao hoa"],
           ["shop", "Cửa hàng & thanh toán"],
+          ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
         ].map(([key, name]) => (
           <button
             key={key}
@@ -196,6 +199,7 @@ export default function AdminPortal() {
           </button>
         ))}
       </nav>
+      {tab === "calendar" ? <AdminDelivery /> : <>
       <div className="portal-section-heading">
         <h2>
           {tab === "orders"
@@ -628,6 +632,7 @@ export default function AdminPortal() {
         Quyền được kiểm tra trong database cho mọi thao tác. Giá và phí mới chỉ
         áp dụng cho đơn đặt sau khi lưu.
       </p>
+      </>}
     </>
   );
 }

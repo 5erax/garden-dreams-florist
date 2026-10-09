@@ -71,6 +71,13 @@ const messages = {
   PRODUCT_UNAVAILABLE: "Một sản phẩm đã ngừng nhận đặt.",
   VARIANT_UNAVAILABLE: "Cỡ bó đã ngừng nhận đặt hoặc không thuộc sản phẩm này. Chọn lại cỡ trước khi gửi.",
   SHIPPING_UNAVAILABLE: "Dịch vụ giao này chưa khả dụng.",
+  DELIVERY_UNAVAILABLE: "Ca giao vừa thay đổi, đã đầy hoặc qua giờ nhận đặt. Kiểm tra lịch và chọn ca khác; thông tin đang nhập vẫn được giữ.",
+  INVALID_DELIVERY_RULE: "Kiểm tra khu vực, ngày trong tuần, sức chứa và thời gian đặt trước.",
+  DELIVERY_RULE_REQUIRED: "Tạo ít nhất một ca đang nhận, có sức chứa và thuộc dịch vụ đang hoạt động trước khi bật lịch.",
+  DELIVERY_RULE_IDENTITY_IMMUTABLE: "Giữ nguyên khu vực và ca/ngày của cấu hình này. Tạo cấu hình khác nếu cần chuyển.",
+  CAPACITY_BELOW_RESERVATIONS: "Không thể giảm sức chứa dưới số đơn đã giữ chỗ. Xử lý các đơn trước khi đổi năng lực.",
+  DAY_HAS_RESERVATIONS: "Ngày này có đơn đã giữ chỗ. Xử lý lịch giao của các đơn trước khi đóng ngày.",
+  CALENDAR_SNAPSHOT_IMMUTABLE: "Lịch đã lưu trên đơn không thể sửa trực tiếp.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
   PRICE_CHANGED:
     "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",

@@ -3,6 +3,25 @@
   background: var(--cream);
   overflow-wrap: anywhere;
 }
+.delivery-mode { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; padding: 24px; background: #eee8df; margin: 24px 0 36px; }
+.delivery-mode > div { flex: 1; min-width: min(280px, 100%); }
+.delivery-mode h3 { font-size: 26px; margin-bottom: 12px; }
+.delivery-mode p, .delivery-rule-card p, .delivery-holidays p { font-size: 14px; }
+.delivery-rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px; margin-bottom: 32px; }
+.delivery-rule-card { background: var(--paper); border: 1px solid var(--line); padding: 24px; border-radius: 4px; }
+.delivery-rule-card h3 { font-size: 28px; margin: 14px 0; }
+.delivery-rule-card dl { font-size: 14px; margin: 20px 0; }
+.delivery-rule-card dl div { display: flex; justify-content: space-between; gap: 16px; margin: 10px 0; }
+.delivery-rule-card dd { margin: 0; font-variant-numeric: tabular-nums; }
+.delivery-rule-card .text-button { display: block; margin-top: 16px; min-height: 44px; }
+.delivery-admin .admin-edit-form label { font-size: 14px; }
+.delivery-admin .admin-edit-form input:not([type="checkbox"]), .delivery-admin .admin-edit-form select { font-size: 16px; }
+.weekday-options { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 24px 0 !important; }
+.weekday-options legend { font-size: 14px; margin-bottom: 16px; }
+.weekday-options label { margin: 0; min-height: 44px; }
+.delivery-holidays { list-style: none; margin: 20px 0 28px; padding: 0; }
+.delivery-holidays li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.delivery-holidays .text-button { min-height: 44px; }
 .portal-header {
   display: flex;
   align-items: center;

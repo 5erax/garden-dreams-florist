@@ -4,6 +4,10 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Đợt mở rộng 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng không rỗng; sau lát cắt lịch giao đạt **11.482** (+695). `npm run loc` loại thư viện, docs/build và SQL setup trùng. Đang chờ cách tính 15.000 tổng hay tăng mới; chưa tuyên bố đạt mốc.
+- **BU-10 và phần giữ chỗ BU-11: mã nguồn/local đã xong**, chưa nghiệm thu hosted/browser. Admin có ca/ngày nghỉ/cutoff/sức chứa, checkout dùng lịch server theo capability. Xác nhận kiểm tra chỗ trong transaction; hủy nhả chỗ theo trạng thái, tính cả đơn cũ đã xác nhận. Migration 009 mặc định lịch tự động tắt, giữ luồng manual tương thích backend cũ.
+- Kiểm chứng lát cắt mới: **65 tests** và build staging qua. Mutation bỏ kiểm tra ca đầy bị 3 test bắt, đã khôi phục. Chưa thử hai connection PostgreSQL thật chạy đồng thời; PGlite đã thử hai intent tranh chỗ và rollback/version/retry, không thay nghiệm thu concurrency hosted.
+
 - **Ưu tiên mới: bản bán hàng đầu tiên để đưa vào dùng sớm.** Chủ shop đã xác nhận bán các mẫu/giá hiện có, địa chỉ, MB Bank/chủ tài khoản và ba mức phí giao. Các phần mở rộng big update để sau; không tự coi các gate còn thiếu là đã nghiệm thu. Xem [LAUNCH-STATUS.md](../LAUNCH-STATUS.md).
 
 - **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
