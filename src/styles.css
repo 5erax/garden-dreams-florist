@@ -1171,6 +1171,9 @@ dialog[open] {
   color: var(--muted);
 }
 .product-detail-copy .fineprint { font-size: 12px; }
+address { font-style: normal; overflow-wrap: anywhere; }
+.footer-bottom address { flex-basis: 100%; }
+.receipt .button { margin: 12px 12px 0 0; }
 .product-detail-copy button { touch-action: manipulation; }
 .product-detail-copy dl {
   font-size: 13px;

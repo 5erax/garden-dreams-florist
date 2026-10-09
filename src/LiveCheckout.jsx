@@ -6,8 +6,10 @@ import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./ord
 import { Modal } from "./ShopDialogs.jsx";
 import { AuthPanel } from "./PortalShell.jsx";
 import { BankPayment } from "./OrderDetail.jsx";
+import { sendCheckout } from "./checkout-request.js";
+import { shopAddress } from "./shop-contact.js";
 
-export default function LiveCheckout({ cart, onClose, onComplete }) {
+export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
   const {
     shop,
     products,
@@ -15,13 +17,15 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
     session,
     error: storeError,
     loading,
+    refresh,
   } = useStore();
-  const [shippingId, setShippingId] = useState(shipping[0]?.id || ""),
-    [payment, setPayment] = useState(shop.cod_enabled ? "COD" : "VIETQR");
+  const [draft] = useState(() => pending.current && pending.current.ownerId === session?.user.id ? pending.current.request : null);
+  const [shippingId, setShippingId] = useState(draft?.shippingId || shipping[0]?.id || ""),
+    [payment, setPayment] = useState(draft?.paymentMethod || (shop.cod_enabled ? "COD" : "VIETQR"));
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [receipt, setReceipt] = useState(null);
-  const [requestId] = useState(() => crypto.randomUUID());
+  const [requestId] = useState(() => draft?.requestId || crypto.randomUUID());
   useEffect(() => {
     if (!shipping.some((s) => s.id === shippingId))
       setShippingId(shipping[0]?.id || "");
@@ -49,21 +53,25 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
       setError(e.message);
       return;
     }
+    await sendRequest({
+      ...raw,
+      requestId,
+      items: cart.map(({ id, quantity, variantId }) => ({ id, quantity, ...(variantId == null ? {} : { variantId }) })),
+      consent: raw.consent === "on",
+      shippingId,
+      paymentMethod: payment,
+      expectedTotal: total,
+    });
+  }
+  async function sendRequest(request) {
+    if (busy || !session) return;
+    setError("");
     setBusy(true);
     try {
-      const order = await call("gd_create_order", {
-        p_request: {
-          ...raw,
-          requestId,
-          items: cart.map(({ id, quantity, variantId }) => ({ id, quantity, ...(variantId == null ? {} : { variantId }) })),
-          consent: raw.consent === "on",
-          shippingId,
-          paymentMethod: payment,
-          expectedTotal: total,
-        },
-      });
+      const { order, request: submitted } = await sendCheckout(pending, session.user.id, request,
+        payload => call("gd_create_order", { p_request: payload }));
       setReceipt(order);
-      onComplete();
+      onComplete(submitted);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -78,7 +86,19 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
         if (!busy) onClose();
       }}
     >
-      {!session ? (
+      {!loading && !storeError && !shop.accepting_orders && !receipt && !pending.current ? (
+        <div className="receipt">
+          <span className="eyebrow">LIÊN HỆ GARDEN DREAMS</span>
+          <h2>Bó hoa bạn chọn,<br /><em>cửa hàng sẽ tư vấn.</em></h2>
+          <p>Đặt hoa trực tuyến đang được chuẩn bị. Liên hệ cửa hàng để trao đổi về bó hoa và ngày giao; chưa có đơn nào được gửi từ bước này.</p>
+          <address>{shop.address || shopAddress}</address>
+          <p>{shipping.length
+            ? shipping.map(service => `${service.name}: ${money(service.fee)}`).join(" · ")
+            : "Miễn phí giao trong Long Thành. Ngoài khu vực: 30.000đ; khu vực xa hơn: 50.000đ."} Shop xác nhận địa chỉ và mức phí trước khi nhận giao.</p>
+          <a className="button primary" href={`tel:${shop.phone}`}>Gọi {shop.phone}</a>
+          <a className="button outline" href={`https://zalo.me/${shop.phone}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
+        </div>
+      ) : !session ? (
         <AuthPanel />
       ) : receipt ? (
         <div className="receipt">
@@ -121,7 +141,19 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
               {storeError}
             </p>
           )}
-          <form onSubmit={submit}>
+          {pending.current?.ownerId === session.user.id && (
+            <div className="portal-notice" role="status">
+              <h3>Kiểm tra yêu cầu vừa gửi</h3>
+              <p>Chưa nhận được xác nhận. Thử lại sẽ dùng đúng yêu cầu cũ để tránh tạo hai đơn, kể cả khi bạn đã đóng bước thanh toán hoặc sửa giỏ hoa.</p>
+              <p>Tổng đã gửi: <strong>{money(pending.current.request.expectedTotal)}</strong></p>
+              {error && <p className="form-error" role="alert">{error}</p>}
+              <button className="button primary" disabled={busy} onClick={() => sendRequest(pending.current.request)}>
+                {busy ? "Đang kiểm tra…" : "Thử lại yêu cầu vừa gửi"}
+              </button>
+              <a className="text-link" href="#account" onClick={onClose}>Kiểm tra lịch sử mua</a>
+            </div>
+          )}
+          <form onSubmit={submit} hidden={pending.current?.ownerId === session.user.id}>
             <fieldset
               disabled={
                 busy ||
@@ -136,6 +168,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                   Tên người nhận
                   <input
                     name="name"
+                    defaultValue={draft?.name || ""}
                     required
                     minLength={2}
                     maxLength={80}
@@ -146,6 +179,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                   Số điện thoại
                   <input
                     name="phone"
+                    defaultValue={draft?.phone || ""}
                     type="tel"
                     required
                     maxLength={20}
@@ -157,6 +191,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                 Địa chỉ nhận hoa
                 <textarea
                   name="address"
+                  defaultValue={draft?.address || ""}
                   required
                   minLength={10}
                   maxLength={300}
@@ -169,6 +204,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                   Ngày mong muốn
                   <input
                     name="deliveryDate"
+                    defaultValue={draft?.deliveryDate || ""}
                     type="date"
                     min={vietnamDate()}
                     max={vietnamDate(new Date(Date.now() + 90 * 86400000))}
@@ -177,7 +213,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                 </label>
                 <label>
                   Khung giờ
-                  <select name="deliveryTime" defaultValue="Chiều · 13–17h">
+                  <select name="deliveryTime" defaultValue={draft?.deliveryTime || "Chiều · 13–17h"}>
                     <option>Sáng · 9–12h</option>
                     <option>Chiều · 13–17h</option>
                     <option>Tối · 18–20h</option>
@@ -188,6 +224,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                 Lời nhắn trên thiệp (giữ riêng)
                 <textarea
                   name="message"
+                  defaultValue={draft?.message || ""}
                   maxLength={500}
                   rows={3}
                   placeholder="Lời thương bạn muốn gửi…"
@@ -252,7 +289,7 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
                 </div>
               </div>
               <label className="consent">
-                <input name="consent" type="checkbox" required />
+                <input name="consent" type="checkbox" defaultChecked={draft?.consent || false} required />
                 <span>
                   Tôi đồng ý cho cửa hàng dùng thông tin để xử lý và giao đơn
                   hoa.
@@ -276,6 +313,12 @@ export default function LiveCheckout({ cart, onClose, onComplete }) {
               </p>
             </fieldset>
           </form>
+          {error && !pending.current && (
+            <button className="button outline" disabled={busy || loading} onClick={async () => {
+              await refresh();
+              setError("");
+            }}>Cập nhật giá & dịch vụ giao</button>
+          )}
           {!shipping.length && (
             <p className="portal-notice">
               Cửa hàng đang cấu hình dịch vụ giao hoa.

@@ -19,7 +19,7 @@ before(async () => {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(""),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(""),
     },
-    server: { middlewareMode: true, hmr: false, watch: null },
+    server: { middlewareMode: true, hmr: false, ws: false, watch: null },
   });
   ({ ProductDialog } = await server.ssrLoadModule("/src/ShopDialogs.jsx"));
 });

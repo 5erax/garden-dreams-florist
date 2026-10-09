@@ -2,6 +2,7 @@ import { useState } from "react";
 import { backend } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
+import { shopAddress } from "./shop-contact.js";
 
 export function PortalShell({ children }) {
   const { shop, session, isAdmin } = useStore();
@@ -41,6 +42,7 @@ export function PortalShell({ children }) {
       <footer className="portal-footer">
         {shop.name} · Những lời thương được giữ lại.
         <a href={`tel:${shop.phone}`}>{shop.phone}</a>
+        <address>{shop.address || shopAddress}</address>
       </footer>
     </div>
   );
