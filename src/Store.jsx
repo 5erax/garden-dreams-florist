@@ -12,6 +12,7 @@ import {
   appEnvironment,
   verifyEnvironment,
   authCallbackPending,
+  guestCheckoutEnabled,
 } from "./backend.js";
 import { authCallbackRoute } from "./auth-callback.js";
 import { products as demoProducts } from "./catalog.js";
@@ -37,10 +38,12 @@ export function StoreProvider({ children }) {
   const [authError, setAuthError] = useState("");
   const [environmentVerified, setEnvironmentVerified] = useState(false);
   const [features, setFeatures] = useState({});
+  const [guestEnabled, setGuestEnabled] = useState(false);
   const refresh = useCallback(async () => {
     if (!backend) return;
     setLoading(true);
     setError("");
+    guestCheckoutEnabled().then(setGuestEnabled);
     try {
       const runtime = await verifyEnvironment();
       setFeatures(runtime.features || {});
@@ -149,6 +152,7 @@ export function StoreProvider({ children }) {
         refresh,
         connected: backendReady && environmentVerified,
         recovery,
+        guestEnabled,
         setRecovery,
       }}
     >

@@ -1,12 +1,24 @@
 import { useState } from "react";
-import { backend } from "./backend.js";
+import { backend, guestSessionStorage } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
 import { shopAddress } from "./shop-contact.js";
+import { Modal } from "./ShopDialogs.jsx";
 
 export function PortalShell({ children }) {
   const { shop, session, isAdmin } = useStore();
   const [error, setError] = useState("");
+  const [leaving, setLeaving] = useState(false), [busy, setBusy] = useState(false);
+  async function signOut() {
+    setBusy(true); setError("");
+    try {
+      const { error } = await backend.auth.signOut();
+      if (error) throw error;
+      guestSessionStorage.setRemember(false);
+      setLeaving(false); location.hash = "#account";
+    } catch { setError("Chưa đăng xuất được. Thử lại khi kết nối ổn định."); }
+    finally { setBusy(false); }
+  }
   return (
     <div className="portal">
       <header className="portal-header">
@@ -23,11 +35,8 @@ export function PortalShell({ children }) {
         {session && (
           <button
             className="text-button"
-            onClick={async () => {
-              const { error } = await backend.auth.signOut();
-              if (error) setError("Chưa đăng xuất được.");
-              else location.hash = "#account";
-            }}
+            disabled={busy}
+            onClick={() => session.user.is_anonymous ? setLeaving(true) : signOut()}
           >
             Đăng xuất
           </button>
@@ -39,6 +48,13 @@ export function PortalShell({ children }) {
         </p>
       )}
       <main className="portal-main">{children}</main>
+      {leaving && <Modal title="Rời phiên khách" className="info-dialog" onClose={() => { if (!busy) setLeaving(false); }}>
+        <h2>Giữ lại <em>góc của bạn.</em></h2>
+        <p>Đăng xuất sẽ mất đường truy cập lịch sử của phiên khách này. Gắn email và xác nhận tài khoản trong Góc của tôi trước khi rời phiên để giữ lại đơn và lời nhắn.</p>
+        <button className="button primary" disabled={busy} onClick={() => setLeaving(false)}>Giữ phiên khách</button>
+        <button className="button outline" disabled={busy} onClick={signOut}>Vẫn đăng xuất</button>
+        {error && <p className="form-error" role="alert">{error}</p>}
+      </Modal>}
       <footer className="portal-footer">
         {shop.name} · Những lời thương được giữ lại.
         <a href={`tel:${shop.phone}`}>{shop.phone}</a>

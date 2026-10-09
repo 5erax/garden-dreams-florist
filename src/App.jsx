@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartKey, removeOrderedItems } from "./order.js";
 import {
@@ -48,15 +43,8 @@ function Reveal({ children, className = "" }) {
 function Hero() {
   const { shop } = useStore();
   const [first, ...rest] = shop.name.split(/\s+/);
-  const ref = useRef(null),
-    video = useRef(null);
+  const video = useRef(null);
   const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const videoY = useTransform(scrollYProgress, [0, 1], [0, 180]);
-  const textY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   useEffect(() => {
     if (reduced) video.current?.pause();
   }, [reduced]);
@@ -64,10 +52,9 @@ function Hero() {
     <section
       className="hero"
       id="home"
-      ref={ref}
       aria-label="Garden Dreams — Hoa mang lời thương"
     >
-      <motion.div className="hero-video" style={{ y: reduced ? 0 : videoY }}>
+      <div className="hero-video">
         <video
           ref={video}
           autoPlay={!reduced}
@@ -80,7 +67,7 @@ function Hero() {
         >
           <source src="/hero_bg.mp4" type="video/mp4" />
         </video>
-      </motion.div>
+      </div>
       <div className="hero-shade" />
       <img
         className="flower-frame frame-left"
@@ -106,7 +93,6 @@ function Hero() {
       </div>
       <motion.div
         className="hero-copy"
-        style={{ y: reduced ? 0 : textY }}
         initial={reduced ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -126,21 +112,6 @@ function Hero() {
           Chọn một bó hoa <Icon name="arrow" />
         </a>
       </motion.div>
-      <div className="hero-bottom">
-        <p>
-          Được tạo nên từ thiên nhiên.
-          <br />
-          Được chọn bằng cả tấm lòng.
-        </p>
-        <a href="#collection" className="scroll-cue">
-          Cuộn để gặp những đóa hoa <span>↓</span>
-        </a>
-        <p className="hero-edition">
-          The floral collection
-          <br />
-          <span>20 bó hoa · 20 lời thương</span>
-        </p>
-      </div>
     </section>
   );
 }
@@ -240,6 +211,12 @@ export default function App() {
         : [...current, id],
     );
   }
+  function buy(id, quantity, variantId) {
+    add(id, quantity, variantId);
+    setSelected(null);
+    setPanel("checkout");
+    setNotice("");
+  }
   function selectOccasion(value) {
     setOccasion(value);
     setShowAll(false);
@@ -274,7 +251,7 @@ export default function App() {
       <PortalShell>
         {pendingNotice}
         {route === "#account" ? (
-          <CustomerPortal />
+          <CustomerPortal key={session?.user.id || "signed-out"} />
         ) : route === "#admin" ? (
           <AdminPortal />
         ) : route === "#garden" ? (
@@ -643,15 +620,23 @@ export default function App() {
           />
         </section>
       </main>
-      <footer>
+      <footer className="shop-footer">
         <div className="footer-top">
-          <a className="brand" href="#home">
-            <Icon name="flower" />
-            <span>{shop.name}</span>
-          </a>
-          <p>{shop.about}</p>
+          <div className="footer-story">
+            <a className="brand" href="#home"><Icon name="flower" /><span>{shop.name}</span></a>
+            <p>{shop.about}</p>
+            <address>{shop.address || shopAddress}</address>
+          </div>
+          <nav className="footer-navigation" aria-label="Khám phá cửa hàng">
+            <h3>Cửa hàng</h3>
+            <a href="#collection">Chọn hoa</a>
+            <a href="#account">Đơn hoa của tôi</a>
+            <a href="#garden">Vườn kỉ niệm</a>
+            {isAdmin && <a href="#admin">Quản trị</a>}
+          </nav>
           <div className="footer-contact">
-            <a href={`tel:${shop.phone}`}>{shop.phone}</a>
+            <h3>Gặp Garden Dreams</h3>
+            <a className="footer-phone" href={`tel:${shop.phone}`}>{shop.phone}</a>
             <a
               className="text-link"
               href={`https://zalo.me/${shop.phone.replace(/^\+84/, "0")}`}
@@ -661,19 +646,12 @@ export default function App() {
               Trao đổi qua Zalo <Icon name="arrow" />
             </a>
           </div>
-          <a className="text-link" href="#home">
-            Về đầu trang ↑
-          </a>
         </div>
         <div className="footer-bottom">
-          <address>{shop.address || shopAddress}</address>
           <span>
             © {new Date().getFullYear()} {shop.name}
           </span>
-          <a href="#account">Góc của tôi</a>
-          <a href="#garden">Vườn kỉ niệm</a>
-          {isAdmin && <a href="#admin">Quản trị</a>}
-          <div>
+          <div className="footer-policies">
             <button onClick={() => setPanel("privacy")}>
               Thông tin & riêng tư
             </button>
@@ -681,13 +659,7 @@ export default function App() {
               Đặt hoa & giao nhận
             </button>
           </div>
-          <span>
-            {connected
-              ? shop.accepting_orders
-                ? "Made with love, on Earth."
-                : "Cửa hàng chưa mở nhận đơn"
-              : "Bản trải nghiệm · giá & bộ sưu tập mẫu"}
-          </span>
+          <a href="#home" className="footer-back">Về đầu trang ↑</a>
         </div>
       </footer>
       <div
@@ -712,6 +684,7 @@ export default function App() {
           product={selectedProduct}
           onClose={() => setSelected(null)}
           onAdd={add}
+          onBuy={buy}
           favorite={favorites.includes(selected.id)}
           onFavorite={() => favorite(selected.id)}
         />
@@ -757,7 +730,7 @@ export default function App() {
               <p>
                 Giỏ hàng và hoa yêu thích được lưu trong trình duyệt của bạn.
                 Tài khoản được dùng cho lịch sử mua và theo dõi đơn. Phiên đăng
-                nhập giữ trong bộ nhớ, không lưu token vào localStorage.
+                nhập tài khoản giữ trong bộ nhớ. Chỉ khi bạn chọn giữ phiên khách trên thiết bị, token của phiên khách mới lưu vào localStorage để xem lại đơn; không chọn trên máy chung. Xóa dữ liệu trình duyệt hoặc đăng xuất sẽ mất đường truy cập phiên khách chưa gắn email.
               </p>
               <p>
                 Trong chế độ xem thử, tên, số điện thoại, địa chỉ và lời nhắn

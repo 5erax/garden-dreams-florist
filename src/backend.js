@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { checkEnvironment, checkBackendEnvironment } from "./environment.js";
 import { isAuthCallback } from "./auth-callback.js";
+import { guestStorage } from "./guest-session.js";
 
 const config = checkEnvironment(import.meta.env);
 const { url, key } = config;
@@ -9,11 +10,17 @@ export const backendReady = Boolean(url && key);
 // Capture the callback marker before the SDK consumes and clears its fragment.
 export const authCallbackPending =
   typeof window !== "undefined" && isAuthCallback(window.location);
+let deviceStorage;
+try { deviceStorage = globalThis.localStorage; } catch {}
+const storageKey = backendReady ? `sb-${new URL(url).hostname.split(".")[0]}-auth-token` : "gd-demo-session";
+export const guestSessionStorage = guestStorage(storageKey, deviceStorage);
 export const backend = backendReady
   ? createClient(url, key, {
-      // Keep bearer tokens in memory; refreshing the page requires signing in again.
+      // Only explicitly remembered guest sessions persist; regular accounts stay in memory.
       auth: {
-        persistSession: false,
+        persistSession: true,
+        storageKey,
+        storage: guestSessionStorage,
         autoRefreshToken: true,
         detectSessionInUrl: true,
       },
@@ -42,6 +49,14 @@ export async function verifyEnvironment() {
       environmentCheck = null;
     });
   return environmentCheck;
+}
+
+export async function guestCheckoutEnabled() {
+  if (!backendReady) return false;
+  try {
+    const response = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key }, signal: AbortSignal.timeout(8000) });
+    return response.ok && (await response.json()).external?.anonymous_users === true;
+  } catch { return false; }
 }
 
 const messages = {

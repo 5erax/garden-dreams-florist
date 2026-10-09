@@ -16,6 +16,17 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Nhật ký
 
+### UX — Sửa bố cục và rút ngắn bước đặt hoa (09/10/2026)
+
+- Hero không còn dịch chữ theo cuộn hoặc lời nhắc cuộn ghim đè CTA; xóa các padding hero cũ ở breakpoint. Footer thành ba vùng, địa chỉ rõ ràng và hàng chính sách tự xuống dòng.
+- Hover nhẹ cho hoa/nút/tim, có giới hạn pointer và reduced motion. Giá, nút và trường checkout dễ đọc hơn.
+- Nút thêm & đặt ngay đi thẳng sang một form giao hoa/người nhận/thanh toán; tổng có ảnh sản phẩm, phí và số tiền trước khi gửi. Giữ retry chống đơn trùng và không xóa hoa thêm sau yêu cầu cũ. VietQR thêm sao chép tài khoản/nội dung và tải ảnh mã.
+- Xây phiên khách bằng Supabase anonymous Auth, giữ RLS theo UID. Chỉ hiện khi provider bật; lưu phiên thiết bị là opt-in, tài khoản thường vẫn giữ token trong bộ nhớ. Gắn email xác minh giữ cùng UID; đăng xuất phiên khách có cảnh báo mất đường truy cập.
+- Nghiên cứu nghiệp vụ từ Bloom & Wild, 1-800-Flowers và Interflora được ghi tại SHOP-EXPERIENCE.md. Không sao chép cam kết giao/cutoff của các shop đó.
+- 43 tests qua, mutation điều kiện lưu guest bị test bắt và đã khôi phục; build production qua. Production/staging vẫn tắt anonymous users; chưa kiểm chứng email upgrade/QR trong app ngân hàng hoặc đơn guest trên hosting. Browser đang lưu quyền từ chối; không vượt bằng công cụ khác. Chưa tăng bộ đếm BU hay mở nhận đơn thật.
+- [PR #4](https://github.com/5erax/garden-dreams-florist/pull/4) đã merge; production commit `18e28ae6a10a6169d22a704daf84e70c954fbfaf`. Vercel API xác nhận deployment `dpl_Ds67hnGVzJyMTruQ6o4QCnsfzH5B` READY, target production, đúng project/SHA; alias [website](https://garden-dreams-florist.vercel.app) trỏ đúng deployment này.
+- Đồng bộ bản sửa production vào branch staging, giữ runtime/capability checks và callback Auth. 56 tests qua, build staging qua (JS 687.42 kB). Không đưa các migration album/cỡ chưa nghiệm thu lên production.
+
 ### BU-01a — Chặn cấu hình backend nhầm môi trường
 
 - Hoàn thành validator Vite: preview không dùng project production, staging chỉ dùng project staging đã chốt; local chỉ dùng loopback; chỉ chấp nhận publishable/anon key.
