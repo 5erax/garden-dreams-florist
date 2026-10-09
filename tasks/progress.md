@@ -188,3 +188,10 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - 68 production tests và production build qua; staging tests/build cũng qua sau đồng bộ. Kiểm định dạng/kích thước ảnh và asset trong build; review không đổi backend, quyền hay tiền. Không dùng kết quả này thay browser QA.
 - PR #7 merge head `2d98ee3f59b16171cd627137efb2f23a0782c579`; main `dc894b91232df887798c0efa314043dce858b454`. Vercel `dpl_HmW3jZc72jV4gA8jLsAuEoystWLE` READY, đúng target production/SHA/branch và alias garden-dreams-florist.vercel.app.
 - Hai lần mở cửa hàng và dashboard staging đều bị Browser Use từ chối vì saved permission; không đi vòng. Chưa chạy hosted migrations 006–012, chưa nghiệm thu SMTP/customer/admin, chưa mở accepting_orders. Yêu cầu 90% là mục tiêu, chưa có bằng chứng đạt tỷ lệ đó.
+
+### Tiếp tục khi browser bị chặn — cách ly phiên quản trị
+
+- Không dừng phát triển: sửa Store lưu ID tài khoản đã xác thực admin và so với phiên hiện tại; remount AdminWorkspace khi đổi tài khoản hoặc quyền để bỏ danh sách đơn, thông tin liên hệ, lựa chọn và draft cũ. RLS vẫn là kiểm soát backend, không cấp thêm quyền.
+- Kiểm caller Store/AdminPortal/OrderDetail và effect cleanup. 3 regressions: kết quả quyền đến muộn, logout/đổi chủ, mất/lấy lại quyền và giao diện tài khoản chưa xác thực. Mutation bỏ so khớp ID bị bắt, đã khôi phục. 137 staging tests/build và 71 production tests/build qua.
+- LOC canonical 14.566 (+3.779 từ baseline 10.787), còn 11.221 để đạt mục tiêu thêm 15.000. Task toàn bộ/90% và hosted acceptance chưa được xác nhận. Không đổi trạng thái nhận đơn hoặc cài migration production mới.
+- PR #8 đã merge head `2ba84cd643b2a39c4fdb7c5eb45d1b2b7004cfc7`; main `ae826d81ed1a70265033c9b848b58fc61d0fefbb`. Vercel `dpl_GhkUhkr2cq6NPAWBxFFXZA5AWWkR` READY, đúng production/SHA và alias garden-dreams-florist.vercel.app. Nguồn staging `fad76bd`; schema/auth backend và nhận đơn giữ nguyên.

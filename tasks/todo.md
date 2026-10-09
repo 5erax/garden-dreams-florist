@@ -156,6 +156,8 @@ Mã/local hoàn thành: migration 012, Reconciliation/Desk, thu-hoàn toàn ph�
 
 ### BU-16 — Vai trò vận hành và xem audit — M
 
+Sửa độc lập cho bản mở bán: quyền admin gắn với ID tài khoản đã kiểm tra, workspace reset khi đổi tài khoản/quyền; 3 regression tests và mutation qua. Đây là cách ly phiên của quyền hiện có, chưa phải ma trận vai trò vận hành hoặc nghiệm thu hosted của BU-16.
+
 - [ ] Chủ shop quản lý quyền; khách/nhân viên không tự cấp quyền hoặc xóa quyền chủ shop cuối cùng.
 - [ ] Backend giới hạn theo vai trò/field: đối soát không thấy thiệp/địa chỉ ngoài nhu cầu, giao nhận không sửa tiền; audit không sửa được từ client.
       Phụ thuộc: BU-15, ma trận quyền chủ shop chốt. File: permission RPC/RLS, Store, admin quyền/audit và test; chia thành lượt nếu cần. Kiểm: SQL, SDK từng vai trò, UI, Build.
