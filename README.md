@@ -35,13 +35,15 @@ Vercel project: `garden-dreams-florist`.
 
 URL: https://garden-dreams-florist.vercel.app/ (deploy trực tiếp đã thành công).
 
-Kết nối GitHub để tự deploy mỗi lần push chưa bật: bộ duyệt tự động yêu cầu xác nhận quyền tích hợp lâu dài với repo riêng tư. Có thể deploy thủ công bằng Vercel CLI từ thư mục này.
+Kết nối GitHub với Vercel đã thực hiện sau khi chủ cửa hàng xác nhận ngày 09/10/2026. Đang kiểm tra lần push đầu tiên qua kết nối này; vẫn có thể deploy thủ công bằng Vercel CLI.
+
+Hướng phát triển mới: backend lưu đơn/thanh toán độc lập với Vercel, quản trị shop, theo dõi đơn và vườn kỉ niệm. Xem [CAPABILITY-MAP.md](./CAPABILITY-MAP.md) để duyệt ranh giới module trước khi viết backend. Website hiện tại vẫn là bản trải nghiệm; các chức năng mới chưa triển khai.
 
 Tài khoản Vercel hiện là Hobby; gói này chỉ cho mục đích phi thương mại. Cần gói phù hợp trước khi dùng website để bán thật: https://vercel.com/docs/plans/hobby.
 
-Kho Blob riêng tư `garden-dreams-orders` đã tạo ở Singapore. Kết nối OIDC vào production/preview chưa được thực hiện vì bộ duyệt tự động yêu cầu người dùng xác nhận quyền truy cập này. Không có thông tin khách hàng trong kho.
+Kho Blob riêng tư `garden-dreams-orders` đã tạo ở Singapore và chưa kết nối; không có thông tin khách hàng trong kho. Theo yêu cầu backend độc lập mới, hướng phát triển dùng PostgreSQL thay vì Blob. API Blob hiện có chỉ là mã cũ chưa bật, sẽ được thay khi backend mới triển khai.
 
-## Bật nhận đơn thật
+## Luồng Blob cũ — chưa bật, được thay trong hướng phát triển mới
 
 1. Xác nhận giá, ảnh sản phẩm, khu vực/chi phí giao, chính sách và quyền sử dụng thương mại của tài nguyên mẫu.
 2. Chuyển hosting sang gói phù hợp cho kinh doanh.
