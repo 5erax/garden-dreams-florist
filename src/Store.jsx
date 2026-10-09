@@ -18,6 +18,9 @@ import { authCallbackRoute } from "./auth-callback.js";
 import { products as demoProducts } from "./catalog.js";
 
 const Store = createContext(null);
+export function sessionIsAdmin(session, adminUserId) {
+  return Boolean(session?.user?.id && session.user.id === adminUserId);
+}
 const demoShop = {
   name: "Garden Dreams",
   phone: "0832345780",
@@ -31,7 +34,7 @@ export function StoreProvider({ children }) {
     [products, setProducts] = useState(demoProducts),
     [shipping, setShipping] = useState([]);
   const [session, setSession] = useState(null),
-    [admin, setAdmin] = useState(false),
+    [adminUserId, setAdminUserId] = useState(null),
     [loading, setLoading] = useState(backendReady),
     [error, setError] = useState("");
   const [recovery, setRecovery] = useState(false);
@@ -75,7 +78,7 @@ export function StoreProvider({ children }) {
       data: { subscription },
     } = backend.auth.onAuthStateChange((event, next) => {
       setSession(next);
-      setAdmin(false);
+      setAdminUserId(null);
       if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY")
         setAuthError("");
       if (event === "PASSWORD_RECOVERY") {
@@ -118,7 +121,7 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     let active = true;
     if (!session) {
-      setAdmin(false);
+      setAdminUserId(null);
       return;
     }
     result(
@@ -129,10 +132,10 @@ export function StoreProvider({ children }) {
         .maybeSingle(),
     )
       .then((row) => {
-        if (active) setAdmin(Boolean(row));
+        if (active) setAdminUserId(row ? session.user.id : null);
       })
       .catch(() => {
-        if (active) setAdmin(false);
+        if (active) setAdminUserId(null);
       });
     return () => {
       active = false;
@@ -146,7 +149,7 @@ export function StoreProvider({ children }) {
         shipping,
         features,
         session,
-        isAdmin: admin,
+        isAdmin: sessionIsAdmin(session, adminUserId),
         loading,
         error,
         refresh,
