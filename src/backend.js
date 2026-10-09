@@ -37,9 +37,9 @@ const messages = {
   SHIPPING_UNAVAILABLE: "Dịch vụ giao này chưa khả dụng.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
   PRICE_CHANGED:
-    "Giá hoặc phí giao đã thay đổi. Tải lại bộ sưu tập và kiểm tra tổng tiền trước khi gửi.",
+    "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",
   IDEMPOTENCY_CONFLICT:
-    "Yêu cầu đã gửi với nội dung khác. Vui lòng mở lại bước đặt hoa.",
+    "Yêu cầu này đã được gửi trước đó. Kiểm tra lịch sử mua trước khi đặt thêm.",
   VERSION_CONFLICT:
     "Dữ liệu vừa được cập nhật ở nơi khác. Tải lại trước khi sửa.",
   INVALID_TRANSITION: "Không thể chuyển đơn sang trạng thái này.",
@@ -67,7 +67,7 @@ export function backendError(error) {
 export async function call(name, args = {}) {
   if (!backend) throw new Error("Backend chưa được kết nối.");
   const { data, error } = await backend.rpc(name, args);
-  if (error) throw new Error(backendError(error));
+  if (error) throw new Error(backendError(error), { cause: error });
   return data;
 }
 export async function result(query) {

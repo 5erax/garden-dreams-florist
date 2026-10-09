@@ -123,6 +123,7 @@ export default function AdminPortal() {
           name: f.name.trim(),
           phone: f.phone.replace(/[\s().-]/g, ""),
           about: f.about.trim(),
+          ...(Object.hasOwn(rows[0], "address") ? { address: f.address.trim() } : {}),
           accepting_orders: f.accepting_orders === "on",
           cod_enabled: f.cod_enabled === "on",
           transfer_enabled: f.transfer_enabled === "on",
@@ -486,6 +487,12 @@ export default function AdminPortal() {
             )}
             {tab === "shop" && (
               <>
+                {Object.hasOwn(item, "address") && (
+                  <label>
+                    Địa chỉ cửa hàng
+                    <input name="address" minLength={10} maxLength={300} defaultValue={item.address} required />
+                  </label>
+                )}
                 <div className="form-grid">
                   <label>
                     Tên cửa hàng

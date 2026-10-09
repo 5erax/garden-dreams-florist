@@ -41,6 +41,14 @@ export const subtotal = (cart, catalog = products) =>
     0,
   );
 
+export function removeOrderedItems(cart, ordered, catalog = products) {
+  const quantities = new Map(ordered.map(line => [cartKey(line), line.quantity]));
+  return normalizeCart(cart, catalog).flatMap(line => {
+    const quantity = line.quantity - (quantities.get(cartKey(line)) || 0);
+    return quantity > 0 ? [{ ...line, quantity }] : [];
+  });
+}
+
 export function validateOrder(input, now = new Date(), catalog = products) {
   if (!input || typeof input !== "object" || Array.isArray(input))
     throw new Error("Thông tin đặt hoa không hợp lệ.");
