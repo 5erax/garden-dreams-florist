@@ -4,6 +4,12 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Cập nhật mới nhất 10/10/2026:** bản commerce main 4d55f05 đã deploy production READY tại dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ; xác minh exact SHA/alias. Backend production đã nâng cấp atomic 004→012 qua Supabase MCP được chủ shop cấp quyền. Một đơn cũ, 20 sản phẩm, ba dịch vụ giao active và trạng thái nhận đơn true có sẵn được giữ; không ghi nhận khoản thu, mọi bảng Garden Dreams có RLS.
+- **Kiểm chứng:** 143 tests/build production qua; SQL acceptance hosted staging qua COD 0/30k/50k, VietQR UNPAID, idempotency, quyền khách/admin, fulfillment, kỉ niệm opt-in/revoke; toàn bộ dữ liệu thử rollback. Có regression migration thất bại rollback, giữ snapshot đơn/shop/catalog và không chạy lại nhầm.
+- **Retention:** phát hiện production thiếu pg_cron/job; đã cài retention.sql hiện có. Job active=true, 03:00 Việt Nam, không có liên hệ quá hạn. Chưa có scheduled-run history và backup/restore hosted.
+- **Chưa nghiệm thu:** browser bị saved permission block cho cả hai trang; Auth production/template recovery, UI và QR app ngân hàng còn mở. Không tick toàn bộ BU-02/03/04/05 hoặc khẳng định 90%. Hosted DB đã có album/cỡ/lịch/bàn vận hành/yêu cầu/sổ tiền; nhận đơn bằng tài khoản email vẫn cần nghiệm thu đầu-cuối.
+- **LOC canonical:** 14.743 (+3.956 từ baseline 10.787), còn 11.044 tới mục tiêu thêm 15.000; SQL bundle trùng không được tính. Ưu tiên release chức năng hữu ích theo chỉ đạo chủ shop, không padding.
+
 - **Phát hành giao diện ngày 10/10/2026:** lịch sử mua có owner scope rõ, tìm/lọc phần đã tải, cursor 20 đơn/cap 200, trạng thái tiền độc lập giao hàng và focus restoration. Tách tải account/admin/garden, có retry giữ phiên/giỏ. 53 tests và build production qua; chưa nghiệm thu browser/CWV.
 - **Đã nhận đặc tả Word v1 và đối chiếu 95 chức năng:** file gốc, SHA-256, contract và traceability tại docs/product. Các quyết định COD/VietQR thủ công và kỉ niệm opt-in giữ nguyên; ngưỡng DEC còn mở chưa tự điền.
 - **Nguồn nâng cấp đầy đủ ở branch feature/bu-01-isolated-staging, commit a825e76:** lịch giao/capacity, bàn xử lý đơn/ghi chú riêng, yêu cầu correction/hủy có quyền/retry/version/audit/retention, và gói upgrade staging 005→011. 98 tests + build staging qua. Database hosted chưa có migrations 006–011; không merge nguồn backend staging chưa nghiệm thu vào production.
