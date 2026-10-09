@@ -1,0 +1,18 @@
+.route-state {
+  min-height: min(50vh, 440px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(32px, 7vw, 96px) 16px;
+  text-align: center;
+}
+.route-state > svg { width: 34px; height: 34px; color: var(--rose); margin-bottom: 20px; }
+.route-state h1 { font-size: clamp(32px, 4vw, 56px); margin: 16px 0; }
+.route-state p { max-width: 48ch; line-height: 1.7; margin-bottom: 24px; }
+.route-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+.route-error h1:focus { outline: none; }
+@media (max-width: 520px) {
+  .route-actions { width: 100%; }
+  .route-actions > * { width: 100%; }
+}

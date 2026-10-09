@@ -19,6 +19,9 @@ try {
         "utf8",
       ),
     );
+  await db.exec(
+    "update gd_private.runtime set environment='local',project_ref=null;",
+  );
   // This benchmark measures memory storage and pagination, excluding order storage.
   await db.exec(
     "alter table public.gd_memories drop constraint gd_memories_order_id_fkey;",
@@ -34,8 +37,18 @@ try {
   }
   await db.exec("analyze public.gd_memories;");
   assert.equal(
-    Number((await db.query("select public.gd_memory_count() n")).rows[0].n),
+    Number(
+      (
+        await db.query(
+          "select count(*) n from public.gd_memories where is_test",
+        )
+      ).rows[0].n,
+    ),
     1000000,
+  );
+  assert.equal(
+    Number((await db.query("select public.gd_memory_count() n")).rows[0].n),
+    0,
   );
   const first = (await db.query("select public.gd_garden(null,null,24) page"))
     .rows[0].page;

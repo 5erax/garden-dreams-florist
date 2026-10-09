@@ -102,6 +102,10 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 ### BU-10 — Cấu hình lịch và năng lực giao — M
 
+Đợt mở rộng 15.000 LOC: được chủ shop yêu cầu tiếp tục phát triển mã nguồn và giao diện trên staging; các cổng nghiệm thu/phát hành phía trên vẫn giữ. `npm run loc` đo theo policy trong plan.md, chờ xác định mục tiêu là tổng hay tăng thêm.
+
+Đã chuẩn bị migration 009, AdminDelivery và DeliveryPicker, tương thích qua capability. 65 tests/build staging qua; chưa cài migration trên hosting, chưa nghiệm thu browser. Lịch mặc định thủ công; không tự áp ca/ngày nghỉ/sức chứa giả lên shop thật.
+
 - [ ] Admin cấu hình vùng/phí, ngày nghỉ, slot/cutoff và năng lực; dữ liệu sai bị backend từ chối.
 - [ ] Khách thấy khung giờ được phép và điều kiện xác nhận; không có slot giả khi shop đóng.
       Phụ thuộc: BU-09. File: migration, admin lịch, checkout lịch và test. Kiểm: SQL, SDK, UI, Build.
@@ -114,6 +118,8 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 ### BU-12 — Bàn xử lý đơn theo ca — M
 
+Mã/local: queue/cursor/filter/summary/ghi chú riêng có migration 010 và tests; chưa tick acceptance hosted/UI.
+
 - [ ] Admin có hàng đợi hôm nay/chờ xác nhận/bó/giao/đối soát; tìm và lọc bằng truy vấn có phân trang/index.
 - [ ] Ghi chú nội bộ và sự kiện khách thấy được tách rõ; đổi tab/filter không hiển thị kết quả truy vấn cũ.
       Phụ thuộc: BU-11. File: AdminPortal tách màn hình, query/RPC, index và test. Kiểm: SQL, SDK, UI, Build.
@@ -123,6 +129,8 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 - [ ] Một ca thử có lịch, slot và hàng đợi đúng; xác nhận đồng thời không overbook.
 
 ### BU-13 — Yêu cầu thay đổi hoặc hủy — M
+
+Mã/local: migration 011 và OrderRequests cho CANCEL / correction tên-điện thoại cùng địa chỉ, idempotency/version/audit/retention. Re-quote địa chỉ/slot/phí và chính sách hủy sau sản xuất còn thiếu; chưa tick acceptance hosted.
 
 - [ ] Khách gửi và theo dõi yêu cầu; backend kiểm tra chủ đơn/thời điểm/trạng thái và admin xử lý có audit.
 - [ ] Không ghi đè snapshot/tiền đã nhận hoặc báo đã hủy trước khi yêu cầu thực sự được xử lý.
@@ -269,6 +277,8 @@ Trạng thái: chuẩn bị lát cắt storefront theo các skill chủ shop g�
       Phụ thuộc: BU-30; tái dùng route/renderer BU-20–21. File: public rendering/prerender, sitemap/metadata, deployment config và test. Kiểm: crawler integration, SDK privacy, Build, UI.
 
 ### BU-32 — Hiệu năng, đo hành trình và nghiệm thu cuối — M
+
+Mã/local: route splitting + loading/error/retry và build manifest; lịch sử khách owner scoped/tìm-lọc bounded. Chưa có field Core Web Vitals hoặc nghiệm thu cuối.
 
 - [ ] Tách tải theo trang, tối ưu ảnh/video/font và đo trên thiết bị/mạng ghi rõ; hướng tới LCP≤2,5s, CLS≤0,1, INP≤200ms khi đủ field data.
 - [ ] Funnel không gửi thông điệp/PII/token ra analytics; các luồng A/B vẫn đúng sau tối ưu và có rollback.

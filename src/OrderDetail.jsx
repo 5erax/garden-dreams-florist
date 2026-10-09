@@ -9,6 +9,8 @@ import {
 } from "./backend.js";
 import { money } from "./catalog.js";
 import { vietqrPayload } from "./vietqr.js";
+import { useStore } from "./Store.jsx";
+import OrderRequests from "./OrderRequests.jsx";
 
 export function BankPayment({ order }) {
   const [qr, setQr] = useState(""),
@@ -203,6 +205,7 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
   );
 }
 export default function OrderDetail({ order, admin = false, onUpdated }) {
+  const { features } = useStore();
   const [events, setEvents] = useState([]),
     [memory, setMemory] = useState(null),
     [error, setError] = useState("");
@@ -329,6 +332,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
         </section>
       </div>
       <BankPayment order={order} />
+      {features.orderRequests && <OrderRequests key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
       <section className="order-timeline">
         <h3>Hành trình của bó hoa</h3>
         <ol>

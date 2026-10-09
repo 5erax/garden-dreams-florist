@@ -1,0 +1,392 @@
+TÀI LIỆU ĐẶC TẢ SẢN PHẨM
+NỀN TẢNG BÁN HOAQUY MÔ LỚN
+Functional Requirements • Business Rules • Operational Workflows
+Phiên bản 1.0  |  Ngày 09/10/2026  |  Trạng thái: Draft for Product Owner review
+Thông tin tài liệu
+Hạng mục | Định nghĩa
+Mô hình mặc định | Một thương hiệu bán hoa có nhiều chi nhánh, website D2C, giao hàng theo khung giờ; chưa phải marketplace nhiều người bán.
+Địa bàn/tiền tệ | Thiết kế mặc định cho Việt Nam; VND, múi giờ Asia/Ho_Chi_Minh. Tích hợp nhà vận chuyển/thanh toán là cấu hình, chưa chọn nhà cung cấp.
+Mục đích | Làm nguồn yêu cầu nghiệp vụ để PO, BA, Designer, Backend, Frontend, QA và Codex triển khai.
+Trạng thái quyết định | Những số liệu, ngưỡng, SLA, chính sách hoàn tiền/thuế là cấu hình cần PO chốt; không mặc định là quy định pháp lý.
+Mức ưu tiên | P0 = luồng bán hàng chạy được; P1 = vận hành đa chi nhánh; P2 = tăng trưởng/enterprise.
+
+1. Phạm vi và nguyên tắc thiết kế
+Bán bó hoa, hoa giỏ, hoa hộp, hoa lẵng, hoa sự kiện, phụ kiện/quà tặng; hỗ trợ hàng dựng sẵn và bó hoa theo công thức (BOM).
+Customer storefront + Admin/OMS + POS tối thiểu + WMS nguyên liệu + Điều phối giao hàng + BI tài chính + API tích hợp.
+Khách có thể là người mua khác với người nhận; thông tin người nhận bảo mật và chỉ hiển thị cho người được phân quyền.
+Không triển khai marketplace, thanh toán chia tiền cho nhiều người bán hay đấu giá trong scope mặc định.
+Giá trị tồn kho, thanh toán, phân bổ hàng và trạng thái đơn là dữ liệu giao dịch phải có audit trail, idempotency và kiểm soát cạnh tranh.
+2. Vai trò và quyền
+Vai trò | Quyền nghiệp vụ chính
+Guest / Customer | Duyệt hàng, đặt hàng; customer xem/chỉnh dữ liệu của mình, đánh giá đơn đã hoàn tất.
+Customer Service | Xem/sửa yêu cầu giao hàng trong ngưỡng; hỗ trợ đổi, hủy, trả tiền có phê duyệt.
+Florist | Nhận đơn sản xuất, thay thế nguyên liệu trong hạn mức, cập nhật ảnh hoàn thiện.
+Warehouse Staff | Nhập, xuất, kiểm kê, hủy hoa hỏng; không tự chỉnh doanh thu.
+Branch Manager | Điều phối hàng, phân công, xử lý ngoại lệ thuộc chi nhánh; xem báo cáo chi nhánh.
+Delivery Staff | Chỉ xem chi tiết giao hàng được phân công; cập nhật POD/trạng thái.
+Finance / Accountant | Đối soát thanh toán, hoàn tiền được phê duyệt, hạch toán chi phí, khóa kỳ.
+Marketing / Merchandiser | Nội dung, khuyến mãi, danh mục, giá trong giới hạn duyệt.
+Operations Manager | Quy tắc vùng giao, công suất khung giờ, chuyển chi nhánh.
+Super Admin | Quản lý hệ thống và phân quyền; thao tác nhạy cảm vẫn phải có log/4-eyes khi cấu hình.
+
+3. Phạm vi module và độ ưu tiên
+Module | Ưu tiên | Phụ thuộc chính
+Identity, Catalog, Price, Cart, Checkout, OMS | P0 | Auth, database, payment, stock reservation
+Branch, BOM, Inventory, Fulfillment, Delivery | P0–P1 | Catalog, OMS, geo/slot
+Payments, Promotions, Customer care, Notifications | P0–P1 | OMS, ledger, templates
+Revenue, Finance, Reporting, Audit, Security | P0–P1 | Order/payment/inventory events
+Loyalty, B2B, Subscriptions, POS full, Forecast | P2 | Vận hành lõi ổn định
+
+4. Đặc tả chi tiết chức năng & business rules
+CAT  Danh mục và tìm kiếm
+Mục tiêu: Khách tìm được sản phẩm phù hợp với dịp và điểm giao.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+CAT-F01 | Trang chủ: collection theo dịp, người nhận, màu sắc, ngân sách, mùa | Khách
+CAT-F02 | Category, tag, search full-text, autocomplete, synonym, lọc/sort | Khách
+CAT-F03 | Trang sản phẩm: hình/video, kích thước, số cành, ý nghĩa, lựa chọn | Khách
+CAT-F04 | Danh mục/collection, slug, SEO, trạng thái xuất bản | Merchandiser
+CAT-F05 | Cross-sell phụ kiện, quà, thiệp và upsell kích cỡ | Khách
+CAT-F06 | Danh mục theo khả năng phục vụ từng vùng/chi nhánh | Hệ thống
+
+CAT-BR01  SKU/variant có ID bất biến; URL slug có redirect khi thay đổi. Sản phẩm chỉ public khi có ảnh, giá, trạng thái bán và thông tin bắt buộc.
+CAT-BR02  Giá và khả năng đặt mua là theo chi nhánh/điểm giao/ngày giao; “còn hàng” không dựa độc nhất vào số lượng thành phẩm.
+CAT-BR03  Ảnh thực tế có thể khác theo mùa: ghi rõ chính sách thay thế và ngưỡng tương đồng; không cam kết chính xác loại hoa nếu không giữ chỗ.
+CAT-BR04  Không hiển thị sản phẩm bị gỡ bán trong kết quả tìm kiếm; vẫn giữ snapshot trong đơn cũ.
+Ngoại lệ & kiểm thử bắt buộc:
+Tìm không có kết quả, vùng không được phục vụ, một biến thể chỉ có ở vài chi nhánh.
+BQT  Thiết kế bó hoa / BOM
+Mục tiêu: Quản lý nguyên liệu và tùy biến có kiểm soát.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+BQT-F01 | BOM định mức theo cành, bó, giấy, dây, hộp, thiệp | Florist/Admin
+BQT-F02 | Variant kích thước, phong cách và tông màu | Khách
+BQT-F03 | Bó hoa tùy chỉnh theo ngân sách, lời nhắn, ảnh tham khảo | Khách/CS
+BQT-F04 | Tính chi phí dự kiến và báo giá tùy chỉnh | Hệ thống/CS
+BQT-F05 | Đề nghị thay thế nguyên liệu trước khi sản xuất | Florist
+BQT-F06 | Quản lý phiên bản BOM và ảnh hoàn thiện | Admin/Florist
+
+BQT-BR01  Mỗi BOM có phiên bản, hiệu lực và đơn vị đo chuẩn; đơn ghi snapshot BOM dùng để sản xuất.
+BQT-BR02  ATP của bó = min(floor(nguyên liệu khả dụng / định mức)) theo từng nguyên liệu bắt buộc, có xét reservation và spoilage.
+BQT-BR03  Thay thế nguyên liệu phải thỏa chính sách tương đương, chênh chi phí và xác nhận khách nếu vượt ngưỡng duyệt.
+BQT-BR04  Tùy chỉnh ảnh tham khảo chỉ là yêu cầu, không mặc nhiên là cam kết; phải có báo giá/xác nhận khi không chuẩn hóa.
+Ngoại lệ & kiểm thử bắt buộc:
+Thiếu một nguyên liệu, BOM đổi sau checkout, cắt giảm giá do thay thế.
+PRC  Giá, thuế và báo giá
+Mục tiêu: Giá nhất quán giữa danh mục, giỏ và hóa đơn.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+PRC-F01 | Bảng giá theo SKU, size, chi nhánh, mùa, thời điểm | Merchandiser
+PRC-F02 | Phụ phí giao giờ cao điểm/xa/đặt gấp | Hệ thống
+PRC-F03 | Báo giá đơn tùy chỉnh và thời hạn hiệu lực | CS
+PRC-F04 | Hiển thị chi tiết tiền hàng, giảm giá, giao hàng, thuế | Khách
+PRC-F05 | Lịch sử thay đổi giá và phê duyệt | Finance/Admin
+
+PRC-BR01  Giá niêm yết, chương trình giảm, thuế và phí vận chuyển phải tách bạch; đơn lưu snapshot tất cả khoản tiền.
+PRC-BR02  Server là nguồn tính giá duy nhất; không tin số tiền từ frontend.
+PRC-BR03  Khuyến mãi không cộng dồn trừ khi quy tắc campaign cho phép; rounding VND phải nhất quán theo cấu hình.
+PRC-BR04  Giá sau thanh toán không tự đổi khi giá catalog cập nhật; chỉnh giá đơn phải có phiên bản và audit.
+ACC  Tài khoản và khách hàng
+Mục tiêu: Danh tính, địa chỉ và quyền riêng tư.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+ACC-F01 | Đăng ký, đăng nhập, OTP/SSO tùy tích hợp, quên mật khẩu | Khách
+ACC-F02 | Địa chỉ, sổ người nhận, danh sách yêu thích | Khách
+ACC-F03 | Theo dõi lịch sử đơn, mua lại, yêu cầu hỗ trợ | Khách
+ACC-F04 | Consent marketing, unsubscribe và xuất/xóa dữ liệu theo chính sách | Khách
+ACC-F05 | Quản lý hồ sơ, hợp nhất tài khoản trùng có phê duyệt | CS/Admin
+
+ACC-BR01  Guest checkout có thể hỗ trợ; xác minh chủ sở hữu để liên kết đơn về account.
+ACC-BR02  Số điện thoại người nhận không tự biến thành tài khoản; masking PII theo quyền và nhu cầu vận hành.
+ACC-BR03  Không lưu plaintext password/OTP; giới hạn thử đăng nhập và chống credential stuffing.
+ACC-BR04  Xóa dữ liệu cá nhân phải cân bằng với yêu cầu lưu chứng từ giao dịch theo chính sách và quy định áp dụng.
+CRT  Giỏ hàng và checkout
+Mục tiêu: Đặt đơn nhanh, chính xác và có kiểm tra tồn kho.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+CRT-F01 | Giỏ khách và người đăng nhập, đồng bộ giỏ | Khách
+CRT-F02 | Chọn người nhận, thiệp, ngày và slot giao | Khách
+CRT-F03 | Kiểm tra khu vực, phí giao, cutoff và ATP | Hệ thống
+CRT-F04 | Áp mã giảm giá, quà kèm, xuất hóa đơn nếu hỗ trợ | Khách
+CRT-F05 | Đặt hàng không tạo đơn trùng khi retry | Hệ thống
+CRT-F06 | Trang xác nhận với mã đơn và phương thức thanh toán | Khách
+
+CRT-BR01  Checkout phải tính lại giá, tồn kho, promotion và slot bằng dữ liệu server; giá hiển thị trước đó không đủ để cam kết.
+CRT-BR02  Reservation tồn kho/slot có TTL cấu hình; giữ chỗ phải giải phóng khi checkout hết hạn hoặc thanh toán thất bại.
+CRT-BR03  Tạo đơn dùng idempotency key; cùng một khóa + cùng payload trả về cùng kết quả, không trừ kho hai lần.
+CRT-BR04  Không cho chọn khung giờ đã hết năng lực, quá cutoff hoặc ngoài vùng giao; lỗi phải nói rõ lựa chọn thay thế.
+CRT-BR05  Trạng thái thanh toán chưa xác nhận không tự coi là đã thu tiền.
+Ngoại lệ & kiểm thử bắt buộc:
+Hai khách mua nguyên liệu cuối cùng, quay lại trang thanh toán, thay đổi slot trong lúc xử lý.
+OMS  Quản lý đơn hàng
+Mục tiêu: Luồng đơn minh bạch, không mất sự kiện.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+OMS-F01 | Tạo, xác nhận, hủy, sửa đơn theo quyền và cutoff | CS/OMS
+OMS-F02 | Tách đơn theo chi nhánh/lịch giao khi được phép | Operations
+OMS-F03 | Timeline đơn, lý do trạng thái và tác nhân | Customer/Admin
+OMS-F04 | Kịch bản giao lại, thiếu hàng, đổi hoa, khiếu nại | CS
+OMS-F05 | SLA từng công đoạn, cảnh báo overdue | Operations
+OMS-F06 | Hoàn/đổi một phần sản phẩm và phụ phí | CS/Finance
+
+OMS-BR01  State machine chuẩn: DRAFT → PENDING_PAYMENT/CONFIRMED → ALLOCATED → IN_PRODUCTION → READY → OUT_FOR_DELIVERY → DELIVERED; CANCELLED/FAILED là terminal có chính sách ngoại lệ.
+OMS-BR02  Đơn COD có thể CONFIRMED trước khi thu tiền; giao thành công khác với đã nhận đủ tiền.
+OMS-BR03  Hủy trước sản xuất khác hủy sau sản xuất; phí hủy/hoàn tùy cấu hình và thông báo trước checkout.
+OMS-BR04  Mọi transition có actor, timestamp, previous/new state, reason; transition không hợp lệ bị từ chối.
+OMS-BR05  Chỉnh đơn đã phân bổ phải tính lại reservation, giá và trạng thái thanh toán, không chỉnh trực tiếp dòng DB.
+Ngoại lệ & kiểm thử bắt buộc:
+Webhook giao lặp, khách hủy ngay trước khi xuất kho, giao thiếu một trong nhiều item.
+BRN  Đa chi nhánh và phân bổ
+Mục tiêu: Phân đơn tới điểm thực hiện phù hợp.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+BRN-F01 | Quản lý chi nhánh, lịch mở cửa, năng lực, vùng giao | Operations
+BRN-F02 | Chọn chi nhánh theo tồn kho, khoảng cách, công suất, SLA | Routing
+BRN-F03 | Chuyển chi nhánh trước khi sản xuất | Operations
+BRN-F04 | Điều chuyển nguyên liệu liên chi nhánh | Warehouse
+BRN-F05 | Báo cáo P&L theo chi nhánh | Finance
+
+BRN-BR01  Không phân đơn vượt số suất florist hoặc slot giao của chi nhánh; trừ khi có quyền override và lưu lý do.
+BRN-BR02  Kho thuộc chi nhánh và lô hàng cụ thể, không gộp “tồn toàn hệ thống” khi hứa giao tại địa điểm.
+BRN-BR03  Chuyển chi nhánh giữ lịch sử phân bổ và ghi bút toán chuyển kho nếu hàng đã di chuyển.
+BRN-BR04  Chi nhánh đã ngừng nhận đơn vẫn được xử lý đơn đã phát sinh theo kế hoạch hoặc tái phân bổ.
+INV  Kho hoa & nguyên liệu
+Mục tiêu: Đúng số lượng, đúng lô, đúng hao hụt.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+INV-F01 | SKU nguyên liệu, đơn vị đo, conversion và lô hạn dùng | Warehouse
+INV-F02 | Nhập hàng, giá vốn, nhà cung cấp và QC lô | Warehouse
+INV-F03 | Reservation, xuất sản xuất, hoàn về kho | Warehouse/OMS
+INV-F04 | Kiểm kê, điều chỉnh chênh lệch và phân quyền duyệt | Warehouse Manager
+INV-F05 | Hủy hoa hư, hết hạn, mất nước và báo cáo wastage | Warehouse
+INV-F06 | Cảnh báo tồn tối thiểu, đặt hàng bổ sung | Purchasing
+
+INV-BR01  Available = on_hand − reserved − quarantined − unavailable; không âm trong điều kiện thông thường.
+INV-BR02  Với hoa dễ hỏng, xuất theo FEFO khi thỏa chất lượng và thời điểm giao; lô hết hạn/không đạt QC không được dùng.
+INV-BR03  Mọi thay đổi kho là movement ledger bất biến, có nguồn nghiệp vụ và idempotency; sửa sai bằng bút toán bù.
+INV-BR04  Giá vốn cần ghi tại thời điểm xuất theo phương pháp đã chốt (FIFO/weighted average); không lấy giá bán làm giá vốn.
+INV-BR05  Sản xuất hụt định mức ghi tiêu hao phát sinh; thay đổi BOM không được xóa lịch sử định mức.
+Ngoại lệ & kiểm thử bắt buộc:
+Trừ nguyên liệu trùng webhook, hết hạn giữa reservation và sản xuất, hoàn nguyên liệu không còn đạt QC.
+PRD  Sản xuất / xưởng bó hoa
+Mục tiêu: Hoàn thành bó đúng mẫu và thời hạn.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+PRD-F01 | Hàng đợi sản xuất theo giao hàng/cutoff | Florist
+PRD-F02 | Phiếu công việc BOM & yêu cầu cá nhân hóa | Florist
+PRD-F03 | Quét/xác nhận nguyên liệu thực xuất | Florist/Warehouse
+PRD-F04 | QC: ảnh, chất lượng, ghi chú thay thế | QC
+PRD-F05 | Báo thiếu, làm lại, bỏ sản phẩm lỗi | Florist Manager
+
+PRD-BR01  Chỉ chuyển READY khi QC đạt và có đủ item; ghi người thực hiện và thời gian bắt đầu/kết thúc.
+PRD-BR02  Không sửa BOM/thiệp sau khóa sản xuất nếu thiếu phê duyệt và tái hoạch định.
+PRD-BR03  Không công bố ảnh sản phẩm kèm thông tin người nhận ra công khai nếu không có quyền.
+PRD-BR04  Đơn sửa lỗi phải thể hiện chi phí phát sinh, nguyên liệu hủy và trách nhiệm vận hành.
+DLV  Giao hoa theo lịch
+Mục tiêu: Giao đúng người, đúng địa điểm, đúng slot.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+DLV-F01 | Vùng phục vụ theo địa chỉ, địa lý, ngày lễ | Operations
+DLV-F02 | Lịch giao, capacity, cutoff, time-slot và phí | Operations
+DLV-F03 | Gán shipper nội bộ/đối tác và tuyến giao | Dispatcher
+DLV-F04 | OTP/ảnh/chữ ký xác nhận giao (POD) có chính sách dữ liệu | Delivery
+DLV-F05 | Giao lại, không liên hệ được, từ chối nhận, thay địa chỉ | CS/Dispatcher
+DLV-F06 | Theo dõi vị trí/status nếu nhà vận chuyển hỗ trợ | Customer
+
+DLV-BR01  Kiểm tra địa chỉ chính xác và địa bàn phục vụ trước khi cho chọn slot; slot chịu capacity ở mức branch/driver.
+DLV-BR02  Đổi địa chỉ sau cutoff phải định giá lại và được bộ phận vận hành duyệt.
+DLV-BR03  Không đánh dấu DELIVERED chỉ vì đối tác báo đã lấy hàng; cần POD hoặc sự kiện giao thành công đáng tin cậy.
+DLV-BR04  Thông tin người nhận chỉ chia sẻ tối thiểu cho shipper; hạn chế thời gian lưu POD theo chính sách.
+DLV-BR05  Khi giao thất bại, xác định người chịu phí giao lại và chất lượng hoa còn đủ để giao lại hay không.
+Ngoại lệ & kiểm thử bắt buộc:
+Địa chỉ sai, khách đổi giờ sát giờ giao, tài xế offline, webhook trạng thái đảo thứ tự.
+PAY  Thanh toán, COD và hoàn tiền
+Mục tiêu: Ghi nhận đúng luồng tiền.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+PAY-F01 | COD, chuyển khoản, cổng thanh toán (theo tích hợp) | Khách
+PAY-F02 | Payment intent, xác minh webhook chữ ký | Payment Service
+PAY-F03 | Đối soát giao dịch và statement provider | Finance
+PAY-F04 | Refund toàn phần/một phần, approval và timeline | Finance/CS
+PAY-F05 | COD collection và bàn giao tiền theo ca/chi nhánh | Finance/Delivery
+PAY-F06 | Hóa đơn/chứng từ theo cấu hình và quy định áp dụng | Finance
+
+PAY-BR01  Không dùng redirect thành công từ trình duyệt làm bằng chứng đã thanh toán; chỉ xác nhận bằng server-to-server được xác minh hoặc đối soát.
+PAY-BR02  Mỗi payment event có provider ID duy nhất; xử lý idempotent và không đánh dấu PAID hai lần.
+PAY-BR03  Tiền thu (cash collected) ≠ doanh số ghi nhận ≠ tiền phải thu; mỗi loại phải có định nghĩa dashboard riêng.
+PAY-BR04  Refund không vượt số tiền đủ điều kiện hoàn còn lại; phụ phí/hàng đã giao được tính theo chính sách.
+PAY-BR05  COD được tất toán khi đối soát đã nhận tiền, không chỉ khi giao thành công.
+Ngoại lệ & kiểm thử bắt buộc:
+Webhook trả tiền sau hủy, webhook lặp, hoàn tiền một phần, COD shipper chưa nộp tiền.
+PRM  Khuyến mãi & quà tặng
+Mục tiêu: Tăng conversion mà giữ biên lợi nhuận.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+PRM-F01 | Voucher fixed/percent, giới hạn tiền và thời hạn | Marketing
+PRM-F02 | Giảm theo giỏ, combo, quà kèm, miễn phí vận chuyển | Marketing
+PRM-F03 | Mã cá nhân, giới hạn khách/đơn/toàn chiến dịch | Marketing
+PRM-F04 | Lịch campaign lễ lớn, teaser, landing page | Marketing
+PRM-F05 | Phân tích uplift và hiệu quả chiến dịch | Marketing/Finance
+
+PRM-BR01  Áp campaign có thứ tự ưu tiên nhất quán; không cho tổng giảm giá âm tiền hàng.
+PRM-BR02  Giữ lượt dùng voucher theo reservation tạm; chỉ chốt lượt sau khi đơn hợp lệ theo chính sách.
+PRM-BR03  Đơn hủy hoàn lại quota voucher nếu điều kiện cho phép; phải chống lạm dụng bằng cùng định danh khách.
+PRM-BR04  Ngân sách campaign và ngưỡng margin thấp cần phê duyệt trước khi công bố.
+CRM  Chăm sóc khách hàng
+Mục tiêu: Theo dõi yêu cầu và xử lý có SLA.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+CRM-F01 | Ticket theo đơn, lý do, bằng chứng, ưu tiên | CS
+CRM-F02 | Trao đổi nội bộ và phản hồi khách đa kênh | CS
+CRM-F03 | Complaint, đổi bó, gửi lại, hoàn tiền | CS
+CRM-F04 | Đánh giá sau giao, kiểm duyệt chống spam | Customer/Moderation
+CRM-F05 | Lịch sử hỗ trợ và phân loại nguyên nhân lỗi | CS Manager
+
+CRM-BR01  CS không được tự thay đổi trạng thái PAID hoặc số tiền sổ cái.
+CRM-BR02  Chỉ cho đánh giá dựa trên đơn hợp lệ đã hoàn thành nếu triển khai verified purchase.
+CRM-BR03  Ticket chứa thông tin cá nhân phải tuân RBAC, phân loại và thời hạn lưu dữ liệu.
+CRM-BR04  Vượt SLA phải cảnh báo/escalation; giải pháp được chọn phải có lý do và lịch sử phê duyệt.
+NTF  Thông báo & giao tiếp
+Mục tiêu: Cập nhật kịp thời và tránh spam.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+NTF-F01 | Email/SMS/Zalo/push tùy nhà cung cấp | Customer
+NTF-F02 | Thông báo xác nhận đơn, thanh toán, chuẩn bị, giao, hoàn tiền | System
+NTF-F03 | Template có version, ngôn ngữ, placeholder an toàn | Admin
+NTF-F04 | Retry queue, dead-letter, bounce và opt-out | System
+NTF-F05 | Reminder dịp kỷ niệm với consent | Marketing
+
+NTF-BR01  Thông báo giao dịch cần thiết tách khỏi tin quảng cáo và consent.
+NTF-BR02  Mỗi event x template x recipient có deduplication key; retry không phát nhiều thông báo không cần thiết.
+NTF-BR03  Không đưa PII hoặc token thanh toán vào log/notification payload quá mức cần thiết.
+NTF-BR04  Thông báo không được tự suy ra giao thành công hoặc thanh toán thành công nếu trạng thái hệ thống chưa xác nhận.
+FIN  Doanh thu, chi phí và báo cáo
+Mục tiêu: Đo đúng tình hình kinh doanh.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+FIN-F01 | Dashboard ngày/tuần/tháng, kênh, branch, sản phẩm | Finance/Manager
+FIN-F02 | Gross sales, discount, net sales, paid amount, refund, receivable | Finance
+FIN-F03 | COGS theo nguyên liệu sử dụng, lãng phí, vận chuyển | Finance
+FIN-F04 | Gross profit, contribution margin, net profit | Finance
+FIN-F05 | Reconciliation COD / payment provider / bank | Finance
+FIN-F06 | Báo cáo hiệu quả theo khung giờ, loại hoa, chiến dịch | Management
+FIN-F07 | Xuất CSV/XLSX có lọc và kiểm soát quyền | Finance
+
+FIN-BR01  KPI phải đi kèm định nghĩa và bộ lọc kỳ ghi nhận: order date / delivered date / settlement date không trộn lẫn.
+FIN-BR02  Gross sales = tổng giá niêm yết dòng hàng đủ điều kiện, trước discounts; net sales = gross sales − item/order discount − returns/cancellations theo chính sách kế toán đã chốt; thuế và phí giao tách trường.
+FIN-BR03  Cash collected = thanh toán đã xác nhận − refund đã thực hiện; COD chưa thu không nằm trong cash collected.
+FIN-BR04  Gross profit = net sales − COGS (định nghĩa phí ship/bao bì minh bạch); net profit chỉ hiển thị nếu có đầy đủ chi phí vận hành đã hạch toán.
+FIN-BR05  Đơn hủy/hoàn cần bút toán điều chỉnh theo kỳ phù hợp; khóa sổ không cho sửa trực tiếp số liệu nguồn.
+FIN-BR06  Số dashboard phải truy vết được về orders, payments, refunds, inventory movements và expenses; cache chỉ là bản sao.
+Ngoại lệ & kiểm thử bắt buộc:
+COD giao thành công nhưng chưa thu, trả tiền sau kỳ, phiếu hoàn tiền từng phần, phí giao do cửa hàng chịu.
+SEC  Quản trị, bảo mật và audit
+Mục tiêu: Bảo vệ khách hàng và giao dịch.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+SEC-F01 | RBAC/ABAC theo role, branch và object ownership | Super Admin
+SEC-F02 | MFA quản trị; session/device; rate limit | Security
+SEC-F03 | Audit log bất biến cho giá, kho, tiền, dữ liệu nhạy cảm | Security
+SEC-F04 | Secret management và rotation, PII masking | Engineering
+SEC-F05 | Backup, restore drills, DR, incident response | Engineering
+SEC-F06 | Consent, retention, export/delete request và log truy cập | Compliance
+
+SEC-BR01  Endpoint phải authorize trên server, không chỉ ẩn button ở UI; branch scoping mặc định deny.
+SEC-BR02  Chỉnh sửa bank/refund/price lớn hoặc kho điều chỉnh lớn có thể yêu cầu maker-checker 2 bước theo ngưỡng.
+SEC-BR03  Ghi audit actor, action, entity, request ID, before/after có lọc PII, timestamp; không cho xóa audit bởi người vận hành.
+SEC-BR04  Không lưu dữ liệu thẻ nhạy cảm tại hệ thống nếu không đủ chuẩn tuân thủ; tokenization qua PSP.
+SEC-BR05  Dùng backup mã hóa, thử khôi phục định kỳ, cảnh báo truy cập bất thường và yêu cầu nguyên tắc quyền tối thiểu.
+INT  Tích hợp & nền tảng
+Mục tiêu: Kết nối hệ thống an toàn và mở rộng.
+ID chức năng | Chức năng / hành vi mong đợi | Vai trò
+INT-F01 | API/webhook thanh toán, vận chuyển, SMS, hóa đơn | Engineering
+INT-F02 | Event bus/outbox, retry, DLQ, idempotency | Engineering
+INT-F03 | Full-text search, media CDN, image optimization | Engineering
+INT-F04 | Job batch dự báo, báo cáo, đồng bộ tồn | Engineering
+INT-F05 | Quan sát metrics, tracing, logs và alerting | SRE
+
+INT-BR01  Outbox hoặc cơ chế tương đương phải đảm bảo cập nhật DB và phát event đáng tin cậy.
+INT-BR02  Webhook đầu vào xác thực chữ ký, chống replay, timestamp và dedupe; webhook ngoài có thể đến trễ/khác thứ tự.
+INT-BR03  API có version, paging, throttle và contract test; không phụ thuộc một nhà cung cấp duy nhất ở lớp domain.
+INT-BR04  Các job thất bại phải retry có giới hạn, thông báo và đường xử lý thủ công; không “nuốt” lỗi.
+5. Các workflow liên phòng ban
+WF-01 Đặt hoa và thanh toán online
+Browse → variant/BOM → địa chỉ/slot → kiểm tra ATP/giá → reservation → tạo đơn pending payment → xác minh PSP → confirmed → phân chi nhánh → sản xuất → QC → giao → POD → reconciliation.
+WF-02 COD
+Tạo đơn COD → kiểm tra rủi ro/giá trị đơn → confirmed → sản xuất → giao → POD → công nợ COD → shipper nộp tiền → finance đối soát → settled.
+WF-03 Thiếu nguyên liệu
+Cảnh báo thiếu → tìm lô/chi nhánh khác hoặc substitutable ingredient → đánh giá ảnh hưởng chất lượng/giá → xin duyệt khách nếu cần → điều chỉnh BOM snapshot và movement.
+WF-04 Hủy và hoàn
+Khách/CS yêu cầu → xét cutoff/stage → xác định phí/thu hồi reservation → duyệt → hủy hoặc trả hàng → refund PSP/COD → xác minh refund → cập nhật báo cáo.
+WF-05 Giao thất bại
+Attempt/POD thất bại → lý do & bằng chứng → chăm sóc liên hệ → kiểm tra chất lượng hoa/slot → giao lại / hủy / hoàn có chính sách → ghi phí phát sinh.
+WF-06 Đối soát cuối ngày
+Đơn đã ghi nhận → PSP statements + COD collections + bank → tìm lệch (thiếu/đúp/trễ) → xử lý exception → báo cáo ngày → khóa kỳ tùy quyền.
+WF-07 Lễ cao điểm
+Forecast năng lực/định mức → khóa cutoff/slot → kiểm tra nguyên liệu & mua hàng → giám sát backlog thời gian thực → điều hướng chi nhánh có ghi log.
+6. Dữ liệu cốt lõi (entity map)
+Domain | Entity tối thiểu | Khóa / quan hệ quan trọng
+Identity | User, Customer, Address, Recipient, Consent, Role, Permission | user_id; recipient độc lập customer
+Commerce | Product, Variant, Collection, Media, PriceList, Campaign, Coupon | variant_id, price_version
+Flower BOM | BouquetRecipe, RecipeVersion, RecipeItem, Ingredient, SubstitutionPolicy | recipe_version_id; quantity + UoM
+Inventory | Branch, Warehouse, Batch, StockBalance, Reservation, StockMovement, Supplier, PurchaseOrder | batch_id + branch_id; immutable movement
+Sales | Cart, CartItem, Order, OrderLine, OrderAdjustment, OrderEvent | order_id; customer snapshot; state_version
+Payments | PaymentIntent, PaymentTransaction, Refund, CODCollection, Settlement | provider_transaction_id unique
+Delivery | DeliveryZone, SlotCapacity, DeliveryReservation, Shipment, Attempt, POD | slot_id + branch_id + fulfillment date
+Production | WorkOrder, WorkOrderItem, QCResult, MaterialConsumption | order_line_id + recipe_version
+Support & Finance | Ticket, Expense, CostAllocation, FinancialAdjustment, AuditLog | entity_ref, idempotency_key, accounting_date
+
+7. Trạng thái chuẩn và bất biến quan trọng
+Đối tượng | Các trạng thái gợi ý / invariant
+Order | DRAFT, PENDING_PAYMENT, CONFIRMED, ALLOCATED, IN_PRODUCTION, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED, FAILED; partial return/refund thể hiện bằng substate/dữ liệu chi tiết.
+Payment | INITIATED, PENDING, AUTHORIZED, CAPTURED/PAID, FAILED, EXPIRED, PARTIALLY_REFUNDED, REFUNDED; COD ở sổ công nợ riêng.
+Reservation | ACTIVE, CONSUMED, RELEASED, EXPIRED; one active logical hold per cart checkout attempt.
+Work order | QUEUED, STARTED, BLOCKED, QC_PENDING, COMPLETED, REWORK, CANCELLED.
+Shipment | PLANNED, ASSIGNED, PICKED_UP, IN_TRANSIT, DELIVERED, ATTEMPT_FAILED, RETURNED.
+Inventory | on_hand ≥ 0; reserved ≥ 0; available ≥ 0 ngoại trừ quy trình điều chỉnh đặc biệt được duyệt.
+
+8. API contract khung tham chiếu
+API group | Endpoint ví dụ | Nguyên tắc
+Catalog | GET /v1/products, GET /v1/products/{id} | Search/filter/paging; public-safe payload
+Cart/Checkout | POST /v1/carts, POST /v1/checkouts/quote, POST /v1/orders | POST orders idempotency-key bắt buộc
+Orders | GET /v1/orders/{id}, POST /v1/orders/{id}/cancel | Role + ownership + state guard
+Operations | POST /v1/work-orders/{id}/start, POST /v1/shipments/{id}/attempts | Branch-scoped RBAC
+Inventory | GET /v1/stock, POST /v1/stock/movements, POST /v1/reservations | Concurrency control + append-only ledger
+Payments | POST /v1/payments/webhooks/{provider}, POST /v1/refunds | Signature verification + dedupe
+Analytics | GET /v1/reports/revenue, GET /v1/reports/inventory-waste | Explicit period + metric basis
+
+9. NFR – yêu cầu phi chức năng & KPI mục tiêu đề xuất
+Nhóm | Mục tiêu khởi điểm cần kiểm nghiệm
+Sẵn sàng | Mục tiêu tham khảo 99.9% uptime; xác định RTO/RPO theo ngân sách thực tế.
+Hiệu năng | Core Web Vitals tốt trên mobile; p95 API đọc < 500ms, API ghi < 1s ở tải mục tiêu (không áp SLA cho PSP).
+Tải | Kiểm thử tải ngày thường và peak 10–20× dịp lễ; số đơn/giây xác định bằng forecast.
+An toàn dữ liệu | Encrypt in transit & at rest, least-privilege, MFA admin, backup & restore drill.
+Tính đúng | Không double charge/oversell; đối soát và số ledger truy vết được.
+Khả năng truy cập | Ưu tiên WCAG 2.2 AA cho thao tác mua hàng quan trọng.
+Quan sát | Tracing xuyên checkout → order → payment → delivery; alert theo error budget.
+Đa kênh | API-first chuẩn bị POS/ứng dụng mobile mà không nhân bản business rules.
+
+10. Acceptance scenarios tối thiểu cho QA
+ID | Given / When | Then – điều kiện chấp nhận
+AT-01 | Đơn online trả tiền một lần; callback lặp 3 lần | Chỉ 1 đơn, 1 payment accepted và đúng 1 stock reservation consumed.
+AT-02 | 2 khách mua cùng nguyên liệu cuối | Không oversell; một người nhận out-of-stock hoặc phương án thay thế.
+AT-03 | Hết capacity ở slot giao | Checkout từ chối slot cũ và gợi ý slot còn chỗ.
+AT-04 | Khách thay địa chỉ sau ALLOCATED | Yêu cầu duyệt; tính lại phí và branch nếu áp dụng; audit đầy đủ.
+AT-05 | Refund một phần sau giao | Net sales/refund/cash collected đúng, không hoàn vượt số dư.
+AT-06 | COD giao xong nhưng chưa đối soát tiền | Delivered = true; collected cash chưa tăng; COD receivable hiển thị.
+AT-07 | Thay thế hoa vượt ngưỡng cho phép | Không tự sản xuất khi chưa có khách/manager duyệt.
+AT-08 | Stock batch hết hạn sau giữ chỗ | Không xuất lô hỏng; chuyển lô/branch hoặc xử lý thiếu hàng.
+AT-09 | User chi nhánh A truy vấn đơn B | 403/404 phù hợp; không rò thông tin qua report/export.
+AT-10 | PSP webhook đến đảo thứ tự | State cuối hợp lệ không bị downgrade; sự kiện lưu để truy vết.
+AT-11 | Điều chỉnh kho lớn | Yêu cầu maker-checker, ledger và audit.
+AT-12 | Khóa kỳ báo cáo và phát sinh refund kỳ sau | Không sửa ngầm báo cáo kỳ đã khóa; adjustment rõ ràng.
+
+11. MVP → P1 → P2 và phụ thuộc triển khai
+Giai đoạn | Phạm vi | Điều kiện hoàn tất
+P0 — Bán hàng end-to-end | Catalog, pricing, cart, checkout, basic payment/COD, OMS, 1 branch, basic BOM/stock, delivery slots, admin, basic revenue, RBAC, audit | 01 đơn được mua → sản xuất → giao → đối soát trên staging, đạt AT-01/02/03/06/09.
+P1 — Vận hành quy mô | Multi-branch routing, purchase/stock batches, FEFO, QC, returns/refunds, full finance, notifications, advanced promotion, delivery ops | Đạt AT-01–12, reconciliation kỳ, backup restore, performance gates.
+P2 — Tăng trưởng | Customer loyalty, gifting calendar, B2B orders, corporate invoicing, POS expansion, subscription hoa định kỳ, forecasting | ROI rõ, không làm hỏng invariants P0/P1.
+
+12. Quyết định còn mở — PO xác nhận trước khi coding
+DEC-01  Một thương hiệu nhiều chi nhánh hay marketplace nhiều chủ shop? (Tài liệu mặc định: một thương hiệu).
+DEC-02  Giao hoa do nhân viên nội bộ, đối tác hay hybrid? Thành phố triển khai đầu tiên và vùng giao tối đa?
+DEC-03  Cho guest checkout, COD và chuyển khoản thủ công hay bắt buộc cổng thanh toán?
+DEC-04  Điều kiện hủy/hoàn khi hoa đã bó; ngưỡng duyệt thay thế; SLA giao đúng giờ và đền bù?
+DEC-05  Giữ chỗ tồn kho và slot bao lâu? Khả năng công suất tối đa mỗi florist/mỗi slot?
+DEC-06  Tồn kho theo cành, bó, thùng hay đa đơn vị; quy tắc FEFO, QC và ngày loại bỏ?
+DEC-07  Hóa đơn điện tử, VAT, chính sách lưu dữ liệu, thuế và kế toán cụ thể theo đơn vị pháp lý?
+DEC-08  Định nghĩa doanh thu chính thức: ngày giao, ngày thu tiền hay ngày ghi nhận kế toán?
+DEC-09  Có bán sỉ, hợp đồng sự kiện/cưới, subscription hoặc dịch vụ hoa theo tháng từ giai đoạn đầu?
+DEC-10  Mục tiêu tải mùa lễ (đơn/ngày, peak checkout/min), RPO/RTO, ngân sách cloud và nhân sự vận hành?
+13. Hướng dẫn dùng tài liệu với Codex
+Đưa file này vào docs/product/flower-commerce-functional-business-rules.docx hoặc chuyển thành Markdown cho repo.
+Yêu cầu Codex lập traceability matrix: function ID → user story/issue → DB entities → API → UI → test ID.
+Yêu cầu xây domain model và state machine trước khi viết checkout/payment/inventory.
+Mỗi PR nêu ID yêu cầu nào được đáp ứng, ảnh hưởng đến rule nào, migration và kết quả test.
+Không tự chọn các DEC chưa được chốt; triển khai option có cấu hình/toggle hoặc ghi ADR trước.
+P0 ưu tiên correctness và chuỗi end-to-end; không đánh đổi tính đúng tồn kho/thanh toán lấy hiệu ứng UI.
+Kết thúc tài liệu • v1.0 — Chủ sở hữu sản phẩm phê duyệt trước khi chuyển Draft thành Baseline.

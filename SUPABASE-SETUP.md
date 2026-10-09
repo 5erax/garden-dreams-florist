@@ -8,7 +8,9 @@ Trong Supabase Dashboard, tạo project Free mới, chọn khu vực gần Việ
 
 ## 2. Cài database — chọn một cách
 
-**SQL Editor, dễ nhất cho project mới:** mở [supabase/setup.sql](supabase/setup.sql), sao chép toàn bộ nội dung vào SQL Editor của project và Run. File chạy bốn migration theo thứ tự, gồm 20 bó hoa mẫu, cấu trúc dữ liệu, quyền và nghiệp vụ. Không tạo đơn, khách hàng hay admin giả. Chỉ chạy một lần trên project mới; không dùng trên database đã cài hệ thống này.
+**SQL Editor, dễ nhất cho project production mới:** mở [supabase/setup.sql](supabase/setup.sql), sao chép toàn bộ nội dung vào SQL Editor của project và Run. File chạy migrations 001–004 theo thứ tự, gồm 20 bó hoa mẫu, cấu trúc dữ liệu, quyền và nghiệp vụ. Sau đó chạy [migration 005](supabase/migrations/202610090005_environment.sql) để cài runtime/cờ đơn thử. Không tạo đơn, khách hàng hay admin giả. Chỉ chạy setup một lần trên project mới; production hiện tại đã có 001–004 nên chỉ áp dụng 005 trước khi deploy frontend mới.
+
+**Staging:** dùng project `tgvozhrkolcpszyyrgth` và [STAGING.md](STAGING.md), không dùng chung project production cho preview.
 
 **CLI, để quản lý lịch sử migration:** clone repo, vào thư mục repo rồi chạy:
 
@@ -44,9 +46,10 @@ Vercel → Project → Settings → Environment Variables, thêm:
 ```text
 VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+VITE_APP_ENV=production
 ```
 
-Chọn production; chỉ thêm preview nếu bạn muốn preview dùng chung database. Redeploy vì Vite nhúng cấu hình lúc build. Với local: sao chép `.env.example` thành `.env.local` và điền hai giá trị. Không dùng service-role/secret key hoặc database password trong biến `VITE_`.
+Chọn production cho các giá trị production. Preview dùng riêng URL/key project staging và `VITE_APP_ENV=staging`; không chọn cả hai target với cùng URL/key. Redeploy vì Vite nhúng cấu hình lúc build. Với local/staging, theo [STAGING.md](STAGING.md); `.env.example` mặc định là demo. Không dùng service-role/secret key hoặc database password trong biến `VITE_`.
 
 ## 5. Cấu hình trước khi nhận đơn
 

@@ -5,12 +5,14 @@ Web bán hoa React + Vite, tiếng Việt, video nền, hoa rơi, parallax và c
 - Repo private: [5erax/garden-dreams-florist](https://github.com/5erax/garden-dreams-florist).
 - Website: [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app/). Push `main` tự deploy qua GitHub.
 - **Cài backend:** [SUPABASE-SETUP.md](SUPABASE-SETUP.md). SQL chạy một lần trên project mới: [supabase/setup.sql](supabase/setup.sql).
+- **Big update:** [kế hoạch](BIG-UPDATE-PLAN.md), [checklist](tasks/todo.md) và [tiến độ sau từng task](tasks/progress.md). BU-01 tách staging đã hoàn thành; chuẩn bị email Auth ở BU-02.
+- **Backup/retention:** [quy trình và phạm vi đã kiểm chứng](BACKUP-RESTORE.md). Diễn tập local dùng dữ liệu giả; backup/restore Supabase thật và Cron history còn chờ quyền vận hành.
 
 ## Chạy local
 
 Node.js 24: `npm ci`, rồi `npm run dev`. Kiểm tra bằng `npm test`, `npm run build`, `npm audit`.
 
-Không có cấu hình Supabase thì website ở chế độ xem thử, không lưu đơn hoặc báo giả đã nhận đơn. Để nối backend, sao chép `.env.example` thành `.env.local`, điền Project URL + publishable key và cài migrations. Cửa hàng vẫn đóng nhận đơn cho đến khi admin cấu hình và bật.
+Không có cấu hình Supabase thì website ở chế độ xem thử, không lưu đơn hoặc báo giả đã nhận đơn. Cấu hình production/staging/local được kiểm tra trước build và trước thao tác dữ liệu; xem [STAGING.md](STAGING.md). Project dùng frontend mới phải có migration 005; database production hiện tại chưa áp dụng migration này. Cửa hàng vẫn đóng nhận đơn cho đến khi admin cấu hình và nghiệm thu.
 
 ## Chức năng đã viết
 
@@ -24,6 +26,10 @@ Không có cấu hình Supabase thì website ở chế độ xem thử, không l
 - QR sinh local; admin đối soát tiền thủ công, ghi nhận hoàn tiền không tự chuyển tiền. Chưa tự gọi hãng vận chuyển.
 
 ## Kiểm chứng
+
+Album sản phẩm đang được chuẩn bị trên staging: [hành vi, migration và kiểm chứng](PRODUCT-ALBUMS.md). Backend chưa có migration 006 vẫn dùng ảnh bìa và màn hình sửa sản phẩm cũ; upload mới chỉ bật khi backend xác nhận bucket đã sẵn sàng.
+
+[Cỡ bó hoa và snapshot đơn](PRODUCT-VARIANTS.md) được chuẩn bị theo migrations 007–008; frontend chỉ bật quản lý/chọn cỡ khi backend báo khả năng tương ứng. Luồng đặt Tiêu chuẩn và đơn cũ giữ tương thích.
 
 Tests dùng PostgreSQL nhúng PGlite chạy SQL thật với anon, hai khách và admin: RLS/truy cập chéo, giá/phí, idempotency, trạng thái/version, quyền ghi nhận tiền, chia sẻ/rút chia sẻ, xóa thông tin giao hàng, audit, rate limit; kiểm tra payload/CRC VietQR và cursor giữ microsecond. Không thay thế kiểm thử Supabase Auth/email hay ứng dụng ngân hàng thật.
 
