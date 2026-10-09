@@ -35,7 +35,7 @@ Vercel project: `garden-dreams-florist`.
 
 URL: https://garden-dreams-florist.vercel.app/ (deploy trực tiếp đã thành công).
 
-Kết nối GitHub với Vercel đã thực hiện sau khi chủ cửa hàng xác nhận ngày 09/10/2026. Đang kiểm tra lần push đầu tiên qua kết nối này; vẫn có thể deploy thủ công bằng Vercel CLI.
+Kết nối GitHub với Vercel đã thực hiện sau khi chủ cửa hàng xác nhận ngày 09/10/2026. Push commit `421b703` đã tự tạo deployment production `READY`, GitHub status Vercel là `success`; vẫn có thể deploy thủ công bằng Vercel CLI.
 
 Hướng phát triển mới: backend lưu đơn/thanh toán độc lập với Vercel, quản trị shop, theo dõi đơn và vườn kỉ niệm. Xem [CAPABILITY-MAP.md](./CAPABILITY-MAP.md) để duyệt ranh giới module trước khi viết backend. Website hiện tại vẫn là bản trải nghiệm; các chức năng mới chưa triển khai.
 
