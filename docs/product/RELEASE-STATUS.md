@@ -19,3 +19,7 @@ Tiếp tục BU-14 sổ đối soát, sau đó fulfillment/role/branch/inventory
 Port riêng BU-19a / ACC-F03 từ staging a23e990: preview hoa/cỡ/giá hiện tại, thêm phần còn bán vào giỏ có sẵn và dùng checkout hiện tại. Không sao chép địa chỉ/thiệp/ngày/phí/bank cũ hoặc tạo đơn từ thao tác mua lại. Catalog lỗi/chưa tải/chưa kết nối bị chặn. 68 production tests và build qua; 134 staging tests/build qua. Xem REORDER-FLOW.md.
 
 Backend/Store/orderColumns/migrations production 001–004 được giữ nguyên. Ledger và migrations 005–012 chỉ ở staging; chưa cài hosted. Production tiếp tục đóng nhận đơn. Toàn đợt trên staging có 14.515 dòng canonical (+3.728/15.000, còn 11.272); không gọi đây là hoàn tất v1 hoặc BU-19 tổng. Browser/SMTP/RPC hosted và đa connection PostgreSQL chưa nghiệm thu.
+# Brand release — 10/10/2026
+
+PR #7 is merged. Production main `dc894b91232df887798c0efa314043dce858b454`, Vercel `dpl_HmW3jZc72jV4gA8jLsAuEoystWLE` READY with the main shop alias. Replaces default tool favicon, hero video and social preview with Garden Dreams flower assets; preserves approved catalog photos and backend scope. 68 production tests/build and staging tests/build pass. Store and Supabase browsing remain blocked by saved permissions. This does not certify 90% completion or enable orders; launch blockers in LAUNCH-STATUS remain applicable.
+

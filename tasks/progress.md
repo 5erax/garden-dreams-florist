@@ -181,3 +181,10 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - PR #6 đã merge đúng head ec316abbf617bcd684e0d7ddd327e8c009d0007b; main ef50fed00c76b80d84805c799020081fbb526e98. Vercel production dpl_DEsqsg37P3tQJAX8gKxbSLf9i6A8 READY, xác nhận đúng project/SHA/target và domain garden-dreams-florist.vercel.app.
 - Staging source a23e9900e19a83b524916761f506e29cdc552eca đã deploy READY dpl_2xjXJy168fYmET2i6q8ZxVh5qPjn. Mã mua lại trên hai nhánh giống nhau; giữ backend/env/migrations staging riêng, không merge client production vào staging.
 - Cập nhật RELEASE-STATUS và traceability; 134 staging tests / 68 production tests và hai build đã qua. Browser/callback/payment/SDK hosted/concurrency chưa kiểm; shop chưa mở nhận đơn, BU-14 chưa có migration thật. Không coi READY là nghiệm thu nghiệp vụ.
+
+### Bản sử dụng sớm — ảnh và nhận diện, 10/10/2026
+
+- Hoàn thành thay favicon mặc định bằng dấu hoa cùng hệ biểu tượng cửa hàng; tên file mới tránh cache cũ. Ảnh nền riêng Garden Dreams được tạo bằng imagegen, WebP 158.882 byte; ảnh chia sẻ JPEG 259.359 byte, metadata URL tuyệt đối/alt/kích thước. Giữ ảnh sản phẩm đã được chủ shop chấp thuận. Nền hero dùng ảnh thay autoplay video.
+- 68 production tests và production build qua; staging tests/build cũng qua sau đồng bộ. Kiểm định dạng/kích thước ảnh và asset trong build; review không đổi backend, quyền hay tiền. Không dùng kết quả này thay browser QA.
+- PR #7 merge head `2d98ee3f59b16171cd627137efb2f23a0782c579`; main `dc894b91232df887798c0efa314043dce858b454`. Vercel `dpl_HmW3jZc72jV4gA8jLsAuEoystWLE` READY, đúng target production/SHA/branch và alias garden-dreams-florist.vercel.app.
+- Hai lần mở cửa hàng và dashboard staging đều bị Browser Use từ chối vì saved permission; không đi vòng. Chưa chạy hosted migrations 006–012, chưa nghiệm thu SMTP/customer/admin, chưa mở accepting_orders. Yêu cầu 90% là mục tiêu, chưa có bằng chứng đạt tỷ lệ đó.
