@@ -156,3 +156,9 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Port frontend BU-19a / ACC-F03 từ staging a23e990; giữ backend/Store/orderColumns/migrations 001–004. Preview giá/cỡ hiện tại và thêm vào giỏ; không khôi phục dữ liệu người nhận/thiệp/lịch cũ, không tạo đơn từ nút mua lại.
 - 68 production tests/build qua; bundle xác nhận endpoint production, không có ref staging. 12 helper và 3 SSR cases mới kiểm quyền lựa chọn, giỏ/limit, giá, PII và connection gate; availability mutation được bắt trên cùng nguồn staging.
 - Staging BU-14 có sổ COD/VietQR và guarded upgrade 005→012, 134 tests/build qua tới BU-19a. LOC staging 14.515 (+3.728), còn 11.272; backend hosted chưa nâng cấp, browser/email/backup acceptance và mở nhận đơn còn chờ.
+
+### Direct account-recovery release — 10/10/2026
+
+Owner explicitly authorized direct production release without human review. Account forms now keep the selected action fixed while an Auth request is pending, clear stale messages on mode switches and label password recovery clearly. Password updates use the existing safe error mapper for network, password policy, same-password and expired-session errors; fields lock while saving. No database, SMTP, session persistence, payment or accepting-orders change. 75 production tests/build and 141 staging tests/build pass. Staging source commit 423345e.
+
+Owner received staging recovery mail, establishing reported email delivery, but the body still used the signup template and landed in Spam. The local recovery template is correct. Saved browser permission still rejected the signed-in dashboard after linking the account; no bypass was used. Hosted template, callback/password update, production SMTP and real order acceptance remain unverified. Production remains closed for online orders.

@@ -12,6 +12,12 @@ export function authErrorMessage(error) {
       return "Email chưa được xác nhận. Kiểm tra hộp thư và mục Spam trước khi đăng nhập.";
     case "weak_password":
       return "Mật khẩu chưa đáp ứng yêu cầu. Dùng mật khẩu từ 12 ký tự và thử lại.";
+    case "same_password":
+      return "Mật khẩu mới cần khác mật khẩu hiện tại.";
+    case "session_not_found":
+    case "session_expired":
+    case "otp_expired":
+      return "Phiên hoặc liên kết đã hết hạn. Đăng nhập lại hoặc yêu cầu email khôi phục mới.";
     case "email_address_not_authorized":
     case "email_provider_disabled":
     case "signup_disabled":
