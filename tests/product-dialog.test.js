@@ -26,7 +26,7 @@ before(async () => {
 after(async () => { await server?.close(); });
 
 const render = product => renderToStaticMarkup(createElement(ProductDialog, {
-  product, onClose() {}, onAdd() {}, favorite: false, onFavorite() {},
+  product, onClose() {}, onAdd() {}, onBuy() {}, favorite: false, onFavorite() {},
 }));
 
 test("product detail identifies the standard size and subtotal before adding", () => {
@@ -35,6 +35,7 @@ test("product detail identifies the standard size and subtotal before adding", (
   assert.match(html, /1 bó · Tiêu chuẩn/);
   assert.ok(html.includes(money(products[0].price)));
   assert.match(html, /Chưa gồm phí giao hoa/);
+  assert.match(html, /Thêm &amp; đặt ngay/);
   assert.doesNotMatch(html, /class="button primary" disabled/);
 });
 

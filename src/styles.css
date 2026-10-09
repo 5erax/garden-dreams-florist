@@ -29,6 +29,7 @@
   --line: #dfd3cb;
   --serif: "Garden Serif", Georgia, serif;
   --sans: "Garden Sans", Arial, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   font-family: var(--sans);
   color: var(--ink);
   background: var(--cream);
@@ -158,13 +159,19 @@ button:active,
   padding: 17px 26px;
   border: 1px solid transparent;
   border-radius: 2px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
   min-height: 52px;
+  transition: transform 160ms var(--ease-out), background-color 180ms ease;
 }
 .button svg {
   width: 20px;
   height: 20px;
+  transition: transform 180ms var(--ease-out);
+}
+.button:active:not(:disabled) { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) svg { transform: translateX(3px); }
 }
 .primary {
   background: var(--ink);
@@ -216,7 +223,7 @@ button:active,
   top: 0;
   left: 0;
   width: 100%;
-  height: 100px;
+  height: 80px;
   padding: 0 5%;
   display: flex;
   align-items: center;
@@ -321,8 +328,10 @@ button:active,
   stroke: var(--rose);
 }
 .hero {
-  height: min(100svh, 1100px);
-  min-height: 720px;
+  min-height: min(100svh, 900px);
+  display: grid;
+  place-items: center;
+  padding: 128px 24px 72px;
   position: relative;
   overflow: hidden;
   color: white;
@@ -330,9 +339,7 @@ button:active,
 }
 .hero-video {
   position: absolute;
-  inset: -6% 0 0;
-  height: 110%;
-  will-change: transform;
+  inset: 0;
 }
 .hero-video video {
   height: 100%;
@@ -353,10 +360,8 @@ button:active,
   position: relative;
   z-index: 2;
   text-align: center;
-  padding-top: 170px;
-  width: max-content;
-  max-width: 90%;
-  margin: auto;
+  width: min(850px, 100%);
+  margin: 0;
 }
 .hero-copy > .eyebrow {
   letter-spacing: 4px;
@@ -365,15 +370,15 @@ button:active,
   color: #ead7d1;
 }
 .hero h1 {
-  font-size: clamp(88px, 11.8vw, 174px);
-  line-height: 0.87;
-  letter-spacing: -8px;
+  font-size: clamp(78px, 10vw, 148px);
+  line-height: 1.1;
+  letter-spacing: -5px;
   position: relative;
 }
 .hero h1 em {
   font-style: italic;
   color: var(--pink);
-  letter-spacing: -6px;
+  letter-spacing: -4px;
 }
 .hero-star {
   position: absolute;
@@ -385,8 +390,8 @@ button:active,
   animation: rotate-flower 40s linear infinite;
 }
 .hero-subtitle {
-  margin: 30px auto 26px;
-  font-size: 14px;
+  margin: 20px auto 28px;
+  font-size: 16px;
   color: #f0e6e1;
   line-height: 1.9;
 }
@@ -397,7 +402,6 @@ button:active,
 }
 .hero-cta:hover {
   background: var(--pink);
-  gap: 28px;
 }
 .mobile-break {
   display: none;
@@ -419,43 +423,6 @@ button:active,
   right: -215px;
   transform: scaleX(-1) rotate(-7deg);
   animation-name: frame-sway-right;
-}
-.hero-bottom {
-  position: absolute;
-  bottom: 34px;
-  left: 5%;
-  right: 5%;
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  z-index: 2;
-  font-size: 10px;
-  line-height: 1.9;
-  letter-spacing: 0.4px;
-  color: #ede1d8;
-}
-.hero-bottom p {
-  font-size: 10px;
-  line-height: 1.9;
-}
-.hero-edition {
-  text-align: right;
-}
-.hero-edition span {
-  color: #d2bbb2;
-}
-.scroll-cue {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  font-size: 9px;
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-  gap: 9px;
-}
-.scroll-cue span {
-  font-size: 24px;
-  animation: nudge 2s ease-in-out infinite;
 }
 .petals {
   position: absolute;
@@ -650,9 +617,13 @@ button:active,
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   mix-blend-mode: multiply;
 }
-.product-card:hover .product-open img {
-  transform: scale(1.055) rotate(-2deg);
+.product-image::after { content: ""; position: absolute; inset: 10px; border: 1px solid #94506455; border-radius: inherit; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .product-open img { transform: scale(1.025) rotate(-0.75deg); }
+  .product-card:hover .product-image::after { opacity: 1; }
+  .favorite-button:hover svg { transform: rotate(-8deg) scale(1.08); }
 }
+.favorite-button svg { transition: transform 180ms var(--ease-out); }
 .product-label {
   display: inline-block;
   margin-left: 8px;
@@ -690,7 +661,7 @@ button:active,
   justify-content: space-between;
   padding: 13px 16px;
   min-height: 44px;
-  font-size: 12px;
+  font-size: 14px;
   gap: 8px;
   transform: translateY(130%);
   transition: transform 0.25s;
@@ -733,7 +704,7 @@ button:active,
 }
 .product-details > span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
   overflow-wrap: anywhere;
 }
 .product-price {
@@ -749,7 +720,7 @@ button:active,
 }
 .product-copy strong {
   font-weight: 400;
-  font-size: 14px;
+  font-size: 17px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -759,7 +730,7 @@ button:active,
   margin-top: 54px;
 }
 .collection-more .button {
-  font-size: 11px;
+  font-size: 14px;
 }
 .collection-more .button > span {
   color: var(--muted);
@@ -972,40 +943,51 @@ footer {
   background: #f8f3ee;
 }
 .footer-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 25px;
-  padding-bottom: 45px;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+  padding-bottom: 40px;
 }
 .footer-top .brand {
   color: var(--rose);
 }
 .footer-top p {
-  font-size: 11px;
-  line-height: 1.9;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 20px 0 12px;
+  max-width: 38ch;
   color: var(--muted);
 }
 .footer-top .text-link {
-  font-size: 10px;
+  font-size: 14px;
 }
+.footer-story address { max-width: 40ch; font-size: 13px; line-height: 1.75; color: var(--muted); }
+.footer-top h3 { font: 600 14px var(--sans); margin: 0 0 16px; }
+.footer-navigation { display: grid; justify-items: start; }
+.footer-navigation a { min-height: 44px; display: flex; align-items: center; font-size: 14px; }
+.footer-navigation a:hover { color: var(--rose); }
+.footer-phone { font-size: 19px; font-variant-numeric: tabular-nums; }
 .footer-bottom {
   border-top: 1px solid var(--line);
   padding-top: 22px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   gap: 20px;
-  font-size: 9px;
+  font-size: 12px;
   color: var(--muted);
 }
 .footer-bottom > div {
   display: flex;
   gap: 22px;
+  flex-wrap: wrap;
 }
+.footer-back { margin-left: auto; min-height: 44px; display: flex; align-items: center; }
 .footer-bottom button {
-  padding: 5px 0;
-  font-size: 9px;
+  padding: 12px 0;
+  font-size: 12px;
+  min-height: 44px;
 }
 .footer-bottom button:hover {
   color: var(--rose);
@@ -1172,7 +1154,6 @@ dialog[open] {
 }
 .product-detail-copy .fineprint { font-size: 12px; }
 address { font-style: normal; overflow-wrap: anywhere; }
-.footer-bottom address { flex-basis: 100%; }
 .receipt .button { margin: 12px 12px 0 0; }
 .product-detail-copy button { touch-action: manipulation; }
 .product-detail-copy dl {
@@ -1202,7 +1183,7 @@ address { font-style: normal; overflow-wrap: anywhere; }
 }
 .detail-actions .button {
   flex: 1 1 180px;
-  font-size: 12px;
+  font-size: 14px;
   padding: 14px;
   gap: 9px;
 }
@@ -1341,7 +1322,7 @@ address { font-style: normal; overflow-wrap: anywhere; }
   font-size: 10px;
 }
 .checkout-dialog {
-  width: 640px;
+  width: 980px;
 }
 .checkout-dialog .dialog-content {
   padding: 55px 40px 30px;
@@ -1540,11 +1521,6 @@ form .optional {
     transform: translateY(25px) scaleX(-1) rotate(-1deg);
   }
 }
-@keyframes nudge {
-  50% {
-    transform: translateY(6px);
-  }
-}
 @keyframes rotate-flower {
   to {
     transform: rotate(360deg);
@@ -1561,14 +1537,8 @@ form .optional {
   }
 }
 @media (min-width: 1600px) {
-  .hero-copy {
-    padding-top: 200px;
-  }
   .hero-subtitle {
     font-size: 16px;
-  }
-  .hero h1 {
-    font-size: 180px;
   }
   .hero-cta {
     margin-top: 8px;
@@ -1590,13 +1560,10 @@ form .optional {
     padding-right: 5%;
   }
   .hero {
-    min-height: 700px;
-  }
-  .hero-copy {
-    padding-top: 165px;
+    min-height: min(100svh, 800px);
   }
   .hero h1 {
-    font-size: 130px;
+    font-size: clamp(78px, 12vw, 124px);
   }
   .hero h1 .hero-star {
     font-size: 32px;
@@ -1671,12 +1638,8 @@ form .optional {
     height: 22px;
   }
   .hero {
-    height: 92svh;
-    min-height: 640px;
-    max-height: 900px;
-  }
-  .hero-copy {
-    padding-top: 170px;
+    min-height: min(92svh, 780px);
+    padding: 112px 24px 64px;
   }
   .hero-copy > .eyebrow {
     font-size: 8px;
@@ -1696,11 +1659,11 @@ form .optional {
     top: 0;
   }
   .hero-subtitle {
-    font-size: 12px;
+    font-size: 15px;
     margin: 28px 0 24px;
   }
   .hero-cta {
-    font-size: 11px;
+    font-size: 14px;
     padding: 15px 23px;
   }
   .flower-frame {
@@ -1713,18 +1676,6 @@ form .optional {
   }
   .frame-right {
     right: -135px;
-  }
-  .hero-bottom {
-    bottom: 28px;
-    left: 20px;
-    right: 20px;
-  }
-  .hero-bottom > p {
-    display: none;
-  }
-  .hero-bottom .scroll-cue {
-    margin: auto;
-    font-size: 8px;
   }
   .service-strip {
     padding: 20px 18px;
@@ -1836,7 +1787,7 @@ form .optional {
     right: 8px;
     bottom: 8px;
     padding: 9px 10px;
-    font-size: 11px;
+    font-size: 12px;
     transform: none;
   }
   .quick-add svg {
@@ -1857,13 +1808,13 @@ form .optional {
     letter-spacing: -0.6px;
   }
   .product-copy strong {
-    font-size: 13px;
+    font-size: 16px;
   }
   .collection-more {
     margin-top: 35px;
   }
   .collection-more .button {
-    font-size: 10px;
+    font-size: 14px;
     gap: 15px;
     padding: 15px 18px;
   }
@@ -1998,34 +1949,32 @@ form .optional {
     padding: 40px 20px 20px;
   }
   .footer-top {
-    flex-wrap: wrap;
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
     padding-bottom: 30px;
   }
   .footer-top p {
-    font-size: 10px;
+    font-size: 14px;
   }
   .footer-top .text-link {
-    font-size: 9px;
+    font-size: 13px;
     margin-top: 10px;
   }
   .footer-bottom {
     align-items: start;
     flex-wrap: wrap;
     gap: 14px;
-    font-size: 8px;
+    font-size: 12px;
     padding-top: 18px;
   }
   .footer-bottom > div {
     gap: 16px;
   }
   .footer-bottom button {
-    font-size: 8px;
+    font-size: 12px;
   }
-  .footer-bottom > span:last-child {
-    width: 100%;
-    margin-top: 4px;
-  }
+  .footer-story { grid-column: 1 / -1; }
+  .footer-back { margin-left: 0; }
   .toast {
     bottom: 18px;
     padding: 14px 12px;
@@ -2138,9 +2087,6 @@ form .optional {
   .hero {
     min-height: 620px;
   }
-  .hero-copy {
-    padding-top: 165px;
-  }
   .hero h1 {
     font-size: 68px;
   }
@@ -2194,9 +2140,10 @@ form .optional {
   .frame-right {
     transform: scaleX(-1);
   }
-}
-.hero-copy {
-  padding-top: 140px;
+  .product-card:hover .product-open img,
+  .favorite-button:hover svg,
+  .button:hover:not(:disabled) svg,
+  .button:active:not(:disabled) { transform: none; }
 }
 .footer-contact {
   display: flex;
@@ -2204,11 +2151,11 @@ form .optional {
   gap: 14px;
 }
 .footer-contact > a:first-child {
-  font-size: 13px;
+  font-size: 19px;
   letter-spacing: 1px;
 }
 .footer-contact .text-link {
-  font-size: 10px;
+  font-size: 14px;
 }
 .receipt-contact {
   margin-top: 25px;
@@ -2224,23 +2171,15 @@ form .optional {
 .receipt-contact .text-link {
   font-size: 11px;
 }
-@media (max-width: 1100px) {
-  .hero-copy {
-    padding-top: 155px;
-  }
-}
 @media (max-width: 767px) {
-  .hero-copy {
-    padding-top: 155px;
-  }
   .footer-contact {
     gap: 5px;
   }
   .footer-contact > a:first-child {
-    font-size: 11px;
+    font-size: 19px;
   }
   .footer-contact .text-link {
-    font-size: 9px;
+    font-size: 14px;
   }
 }
 .filters {
@@ -2248,4 +2187,59 @@ form .optional {
 }
 .filters::-webkit-scrollbar {
   display: none;
+}
+
+.live-checkout .checkout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.checkout-fields h3, .checkout-review h3 {
+  font: 500 20px/1.35 var(--sans);
+  margin: 0 0 20px;
+}
+.checkout-fields h3:not(:first-child) { margin-top: 28px; }
+.checkout-review {
+  background: #eee8df;
+  padding: 24px;
+  border-radius: 4px;
+  min-width: 0;
+}
+.live-checkout form label, .guest-account form label { font-size: 14px; }
+.live-checkout form input:not([type="checkbox"]), .live-checkout form select,
+.live-checkout form textarea, .guest-account form input { font-size: 16px; }
+.live-checkout form input::placeholder, .live-checkout form textarea::placeholder { font-size: 15px; }
+.live-checkout form .fineprint, .live-checkout .consent, .guest-account .consent { font-size: 13px; line-height: 1.65; }
+.live-checkout .checkout-summary > p { font-size: 14px; }
+.checkout-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.checkout-item img { width: 52px; height: 64px; object-fit: cover; border-radius: 40px 40px 3px 3px; }
+.checkout-item > span:last-child { white-space: nowrap; }
+.checkout-review .cart-total { font-size: 15px; }
+.checkout-review .cart-total strong { font-size: 24px; }
+.checkout-review .button { width: 100%; padding: 17px 14px; }
+.guest-start { max-width: 580px; margin: 0 auto; }
+.guest-start > p, .guest-account > p { font-size: 15px; line-height: 1.8; margin-bottom: 20px; }
+.guest-start > .button { width: 100%; }
+.guest-start > .text-button { display: block; margin: 16px auto 0; min-height: 44px; }
+.guest-remember { font-size: 13px; line-height: 1.65; }
+.guest-account { padding: 24px; border: 1px solid var(--line); margin-bottom: 32px; }
+.guest-account form { display: flex; gap: 18px; align-items: end; flex-wrap: wrap; }
+.guest-account form label { flex: 1; min-width: min(260px, 100%); margin: 0; }
+.guest-account h2 { font-size: 28px; margin: 0 0 20px; }
+.payment-tools { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+.payment-tools .button { font-size: 13px; padding: 12px; min-height: 44px; }
+.payment-tools .text-link { min-height: 44px; display: inline-flex; align-items: center; }
+@media (max-width: 767px) {
+  .live-checkout .checkout-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .checkout-review { padding: 20px 16px; }
+  .checkout-item { gap: 10px; font-size: 13px; }
+  .live-checkout h2 { font-size: 34px; line-height: 1.2; }
 }
