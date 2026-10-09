@@ -37,6 +37,7 @@ export async function verifyEnvironment() {
           "Cấu hình website và môi trường backend không khớp. Chưa thể thao tác.",
         );
       }
+      return data;
     })().finally(() => {
       environmentCheck = null;
     });

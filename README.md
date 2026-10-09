@@ -27,6 +27,8 @@ Không có cấu hình Supabase thì website ở chế độ xem thử, không l
 
 ## Kiểm chứng
 
+Album sản phẩm đang được chuẩn bị trên staging: [hành vi, migration và kiểm chứng](PRODUCT-ALBUMS.md). Backend chưa có migration 006 vẫn dùng ảnh bìa và màn hình sửa sản phẩm cũ; upload mới chỉ bật khi backend xác nhận bucket đã sẵn sàng.
+
 Tests dùng PostgreSQL nhúng PGlite chạy SQL thật với anon, hai khách và admin: RLS/truy cập chéo, giá/phí, idempotency, trạng thái/version, quyền ghi nhận tiền, chia sẻ/rút chia sẻ, xóa thông tin giao hàng, audit, rate limit; kiểm tra payload/CRC VietQR và cursor giữ microsecond. Không thay thế kiểm thử Supabase Auth/email hay ứng dụng ngân hàng thật.
 
 Tích hợp Supabase JS SDK đã kiểm tra với SQL/RLS/RPC thật và transport giả chỉ chạy local. Chạy `node scripts/e2e-server.mjs`, rồi ở terminal khác chạy `node scripts/check-flow.mjs`. Test server chỉ bind `127.0.0.1`; tài khoản/key/password trong script là dữ liệu giả, không dùng trên production. Không triển khai test server thành backend.

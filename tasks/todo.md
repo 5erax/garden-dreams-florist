@@ -82,7 +82,7 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 - [ ] Admin upload/sắp xếp ảnh; ảnh đúng loại/dung lượng, file lạ bị chặn và không có quyền upload của khách.
 - [ ] Khách xem album và ảnh dự phòng khi ảnh lỗi; ảnh được nén và tải theo nhu cầu.
-      Phụ thuộc: BU-06. File: storage/migration, admin ảnh, ProductDialog và test. Kiểm: SQL/storage policy, SDK, UI, Build.
+      Phụ thuộc nghiệm thu/phát hành: BU-06. Được chuẩn bị mã nguồn trên staging khi dashboard bị chặn; vẫn chờ Storage/UI thật. File: storage/migration, admin ảnh, ProductDialog và test. Kiểm: SQL/storage policy, SDK, UI, Build.
 
 ### BU-08 — Admin quản lý biến thể — M
 

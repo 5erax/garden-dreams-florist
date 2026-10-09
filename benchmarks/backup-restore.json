@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-09T12:13:06.830Z",
+  "checkedAt": "2026-10-09T12:47:28.091Z",
   "environment": "local",
   "data": "synthetic-only",
   "engine": "PGlite 0.5.8",
@@ -8,7 +8,8 @@
     "202610090002_orders.sql",
     "202610090003_catalog.sql",
     "202610090004_audit.sql",
-    "202610090005_environment.sql"
+    "202610090005_environment.sql",
+    "202610090006_product_albums.sql"
   ],
   "counts": {
     "orders": 6,
@@ -17,9 +18,9 @@
     "audit": 2,
     "products": 20
   },
-  "archiveBytes": 4764081,
-  "sha256": "7e6b19efdd0e75cd48ebb46d903e890d02ef5772ebb6a6042b077f36132b3049",
-  "elapsedMs": 3272,
+  "archiveBytes": 4772201,
+  "sha256": "7633ec00197930372bb089c534ca6295193704ab09385b260d3c6dfa2d6fb332",
+  "elapsedMs": 6359,
   "passed": [
     "disk-checksum",
     "new-database-restore",

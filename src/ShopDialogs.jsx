@@ -3,6 +3,7 @@ import { money } from "./catalog.js";
 import { subtotal, validateOrder, vietnamDate } from "./order.js";
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
+import ProductGallery from "./ProductGallery.jsx";
 
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
@@ -50,9 +51,7 @@ export function ProductDialog({
   const [quantity, setQuantity] = useState(1);
   return (
     <Modal title={product.name} onClose={onClose} className="product-dialog">
-      <div className="product-detail-photo">
-        <img src={product.image} alt={`Bó hoa ${product.name}`} />
-      </div>
+      <ProductGallery key={product.id} product={product} />
       <div className="product-detail-copy">
         <span className="eyebrow">
           Một món quà cho {product.occasion.toLocaleLowerCase("vi")}

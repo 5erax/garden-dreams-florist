@@ -17,6 +17,7 @@ const alice = client(),
 assert.deepEqual(await ok(anonymous.rpc("gd_environment")), {
   environment: "local",
   projectRef: null,
+  features: { productAlbum: true, productImageUpload: false },
 });
 for (const [c, email] of [
   [alice, "alice@example.test"],
@@ -53,6 +54,21 @@ let order = await ok(alice.rpc("gd_create_order", { p_request: request }));
 assert.equal(order.is_test, true);
 assert.equal(order.total, request.expectedTotal);
 assert.equal(order.bank.account, shop.bank_account);
+const album = ["/flowers/bouquet_2.webp", catalog[0].image];
+const albumProduct = await ok(admin.from("gd_products").update({ images: album })
+  .eq("id", catalog[0].id).eq("version", catalog[0].version).select("*").single());
+assert.deepEqual(albumProduct.images, album);
+assert.equal(albumProduct.image, album[0]);
+assert.ok(albumProduct.version > catalog[0].version);
+assert.equal((await ok(anonymous.from("gd_products").select("image,images").eq("id", catalog[0].id).single())).image, album[0]);
+assert.equal((await ok(alice.from("gd_orders").select("items").eq("id", id).single())).items[0].image, catalog[0].image);
+const blockedAlbum = await alice.from("gd_products").update({ images: ["/flowers/bouquet_3.webp"] })
+  .eq("id", catalog[0].id).select("*");
+assert.ok(blockedAlbum.error || blockedAlbum.data.length === 0);
+assert.deepEqual((await ok(anonymous.from("gd_products").select("images").eq("id", catalog[0].id).single())).images, album);
+const staleAlbum = await ok(admin.from("gd_products").update({ images: [...album].reverse() })
+  .eq("id", catalog[0].id).eq("version", catalog[0].version).select("*").maybeSingle());
+assert.equal(staleAlbum, null);
 assert.equal(
   (await ok(alice.rpc("gd_create_order", { p_request: request }))).id,
   id,
@@ -206,5 +222,5 @@ assert.equal((await ok(alice.from("gd_admin_audit").select("id"))).length, 0);
 assert.ok((await ok(admin.from("gd_admin_audit").select("id"))).length > 0);
 for (const c of [alice, bob, admin]) await c.auth.signOut();
 console.log(
-  "SDK integration passed: sign-in, dynamic catalog, order/ship/bank snapshots, tracking, admin payment, exact card sharing, revoke, RLS, product/shipping/shop edits and audit. Synthetic local data only.",
+  "SDK integration passed: sign-in, dynamic catalog, albums/cover/version isolation, preserved order/ship/bank snapshots, tracking, admin payment, exact card sharing, revoke, RLS, product/shipping/shop edits and audit. Synthetic local data only; Storage file API is not simulated.",
 );

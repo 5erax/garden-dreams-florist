@@ -5,9 +5,10 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 ## Hiện tại
 
 - **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
-- **BU-02: chờ quyền dashboard/phiên Google để cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; chưa nghiệm thu email thật.
+- **BU-02: chưa cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; Supabase vẫn bị công cụ từ chối trong phiên mới. Việc tạo credential Google cần chủ tài khoản thao tác; không yêu cầu gửi secret trong chat.
 - **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
-- **BU-03–04 và BU-06–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
+- **BU-07: mã nguồn album đã kiểm chứng local, chưa nghiệm thu Storage/UI thật.** Chuẩn bị trên branch staging trong lúc dashboard bị chặn; BU-06 vẫn là điều kiện nghiệm thu/phát hành.
+- **BU-03–04, BU-06 và BU-08–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
 - Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
 
 ## Nhật ký
@@ -64,3 +65,13 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Toàn bộ **28 tests qua** sau thay đổi; [báo cáo diễn tập](../benchmarks/backup-restore.json) ghi môi trường local, migrations, checksum, phạm vi đã qua/chưa kiểm. Không chạy lại frontend build vì chỉ thay test và tài liệu/SQL health; frontend không đổi.
 - Thêm SQL kiểm tra sức khỏe Cron chỉ đọc số liệu vận hành, không xuất PII; tài liệu backup thật ghi rõ Auth/Storage/runtime cần xử lý riêng. SQL health chưa chạy trên backend thật.
 - Chưa tick BU-05: còn backup ngoài hệ thống, restore backend thật và Cron history. Không thay đổi Gmail/SMTP, không tạo phiên khách hoặc đơn trên Supabase. Tiến độ task lớn vẫn 1/32.
+
+### BU-07a/b — Quyền ảnh và album trên mã nguồn staging
+
+- Sau khi chủ shop sửa quyền và khởi động lại, công cụ vẫn từ chối Supabase do saved permission; không dùng đường khác để vượt chặn. Tiếp tục phần mã nguồn theo yêu cầu tự làm. Kế hoạch/todo ghi rõ BU-06 vẫn là cổng phát hành, không đổi tiêu chí nghiệm thu.
+- Migration 006 thêm album tối đa 8 ảnh, đồng bộ bìa và bucket public dành riêng cho ảnh sản phẩm, 2 MB/WebP, chỉ admin upload UUID mới. Ảnh đơn/kỉ niệm cũ giữ snapshot; ứng dụng không ghi đè/xóa file. Migration từ chối bucket xung đột, không biến bucket riêng tư thành public.
+- Runtime báo khả năng album/Storage: frontend mới giữ hành vi sửa sản phẩm cũ trên backend 005 đang chạy; không gửi cột `images` khi backend chưa có. Không chạy migration trên hosted backend trong bước này.
+- Admin có upload/nén/đổi thứ tự/bỏ ảnh, lưu theo version; khách có thumbnail/chọn ảnh/placeholder ảnh lỗi. Dùng Canvas/native controls và SDK đã cài, không thêm dependency.
+- **33 tests qua**, build staging qua; SDK local kiểm tra album/bìa/quyền/version/snapshot cùng luồng đơn/thanh toán/chia sẻ. Mutation tăng giới hạn lên 80 làm test 9 ảnh thất bại đúng kỳ vọng; đã phục hồi migration và chạy lại xanh. Diễn tập backup/retention vẫn qua với migration 006, báo cáo aggregate được cập nhật.
+- Review giữ ảnh cũ bên ngoài khi album trống, khóa thay bản nháp trong lúc upload, không bật upload với fixture thiếu Storage. Canvas unit test dùng stub; chưa chứng minh codec thật.
+- [PRODUCT-ALBUMS.md](../PRODUCT-ALBUMS.md) ghi phạm vi và nghiệm thu còn mở. Storage file API/policy thật, UI/mobile/keyboard và BU-06 chưa qua; không tick BU-07. Upload chưa lưu được giữ lại, chưa có cleanup orphan tự động. Tiến độ task lớn vẫn **1/32**.

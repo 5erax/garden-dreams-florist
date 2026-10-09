@@ -36,12 +36,14 @@ export function StoreProvider({ children }) {
   const [recovery, setRecovery] = useState(false);
   const [authError, setAuthError] = useState("");
   const [environmentVerified, setEnvironmentVerified] = useState(false);
+  const [features, setFeatures] = useState({});
   const refresh = useCallback(async () => {
     if (!backend) return;
     setLoading(true);
     setError("");
     try {
-      await verifyEnvironment();
+      const runtime = await verifyEnvironment();
+      setFeatures(runtime.features || {});
       setEnvironmentVerified(true);
       const [cfg, catalog, services] = await Promise.all([
         result(backend.from("gd_shop").select("*").eq("id", 1).single()),
@@ -53,6 +55,7 @@ export function StoreProvider({ children }) {
       setShipping(services.filter((s) => s.active));
     } catch (e) {
       setEnvironmentVerified(false);
+      setFeatures({});
       setError(e.message);
     } finally {
       setLoading(false);
@@ -137,6 +140,7 @@ export function StoreProvider({ children }) {
         shop,
         products,
         shipping,
+        features,
         session,
         isAdmin: admin,
         loading,

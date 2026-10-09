@@ -5,6 +5,7 @@ import { AuthPanel } from "./PortalShell.jsx";
 import { beforeCursor } from "./cursor.js";
 import OrderDetail from "./OrderDetail.jsx";
 import { money, occasions } from "./catalog.js";
+import ProductPhotosEditor from "./ProductPhotosEditor.jsx";
 
 const newProduct = {
   name: "",
@@ -13,6 +14,7 @@ const newProduct = {
   stems: "",
   description: "",
   image: "/flowers/bouquet_1.webp",
+  images: [],
   active: true,
   featured: false,
 };
@@ -110,6 +112,7 @@ export default function AdminPortal() {
           image: f.image.trim(),
           active: f.active === "on",
           featured: f.featured === "on",
+          ...(store.features.productAlbum ? { images: edit.images || [] } : {}),
         };
       if (tab === "shipping")
         fields = {
@@ -229,6 +232,7 @@ export default function AdminPortal() {
           {["products", "shipping"].includes(tab) && (
             <button
               className="button outline"
+              disabled={busy}
               onClick={() =>
                 setEdit(
                   tab === "products" ? { ...newProduct } : { ...newShipping },
@@ -341,7 +345,9 @@ export default function AdminPortal() {
                 </strong>
                 <small>{row.active ? "Đang bật" : "Đã tắt"}</small>
               </div>
-              <button className="button outline" onClick={() => setEdit(row)}>
+              <button className="button outline" disabled={busy} onClick={() => setEdit(
+                tab === "products" && store.features.productAlbum ? { ...row, images: row.images || [] } : row,
+              )}>
                 Chỉnh sửa
               </button>
             </article>
@@ -408,14 +414,21 @@ export default function AdminPortal() {
                   />
                 </label>
                 <label>
-                  Ảnh (đường dẫn /flowers/ hoặc URL HTTPS)
+                  {item.images?.length ? "Ảnh bìa (ảnh đầu album)" : "Ảnh bìa dự phòng (đường dẫn /flowers/ hoặc URL HTTPS)"}
                   <input
                     name="image"
                     maxLength={500}
-                    defaultValue={item.image}
+                    value={item.images?.[0] || item.image}
+                    readOnly={Boolean(item.images?.length)}
+                    onChange={(e) => setEdit(old => ({ ...old, image: e.target.value }))}
                     required
                   />
                 </label>
+                {store.features.productAlbum && <ProductPhotosEditor
+                  images={item.images || []}
+                  onChange={(images) => setEdit(old => ({ ...old, images }))}
+                  onBusyChange={setBusy}
+                />}
                 <label className="check-label">
                   <input
                     name="active"
