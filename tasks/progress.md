@@ -4,6 +4,11 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Phát hành giao diện ngày 10/10/2026:** lịch sử mua có owner scope rõ, tìm/lọc phần đã tải, cursor 20 đơn/cap 200, trạng thái tiền độc lập giao hàng và focus restoration. Tách tải account/admin/garden, có retry giữ phiên/giỏ. 53 tests và build production qua; chưa nghiệm thu browser/CWV.
+- **Đã nhận đặc tả Word v1 và đối chiếu 95 chức năng:** file gốc, SHA-256, contract và traceability tại docs/product. Các quyết định COD/VietQR thủ công và kỉ niệm opt-in giữ nguyên; ngưỡng DEC còn mở chưa tự điền.
+- **Nguồn nâng cấp đầy đủ ở branch feature/bu-01-isolated-staging, commit a825e76:** lịch giao/capacity, bàn xử lý đơn/ghi chú riêng, yêu cầu correction/hủy có quyền/retry/version/audit/retention, và gói upgrade staging 005→011. 98 tests + build staging qua. Database hosted chưa có migrations 006–011; không merge nguồn backend staging chưa nghiệm thu vào production.
+- **Mục tiêu thêm 15.000 LOC còn mở:** baseline 10.787; nhánh nâng cấp hiện 13.131 (+2.344, còn 12.656), không tính thư viện/docs/build hoặc SQL bundle trùng. Chủ shop yêu cầu commit/deploy phần đã làm trước khi hết quota, sau đó tiếp tục backlog.
+
 - **Ưu tiên mới: bản bán hàng đầu tiên để đưa vào dùng sớm.** Chủ shop đã xác nhận bán các mẫu/giá hiện có, địa chỉ, MB Bank/chủ tài khoản và ba mức phí giao. Các phần mở rộng big update để sau; không tự coi các gate còn thiếu là đã nghiệm thu. Xem [LAUNCH-STATUS.md](../LAUNCH-STATUS.md).
 
 - **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
