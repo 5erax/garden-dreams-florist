@@ -8,28 +8,36 @@ export const vietnamDate = (now = new Date()) =>
     day: "2-digit",
   }).format(now);
 
+export const cartKey = (line) => `${line.id}:${line.variantId ?? "base"}`;
+export function cartChoice(line, catalog = products) {
+  const product = catalog.find(p => p.id === line?.id);
+  if (!product || product.active === false) return null;
+  if (line.variantId == null) return product;
+  if (!Number.isSafeInteger(line.variantId) || line.variantId < 1) return null;
+  const variant = product.variants?.find(v => v.id === line.variantId && v.active);
+  return variant ? { ...product, price: variant.price, sizeName: variant.size_name, sku: variant.sku } : null;
+}
 export function normalizeCart(value, catalog = products) {
   if (!Array.isArray(value)) return [];
   const quantities = new Map();
   for (const line of value) {
     if (
-      !catalog.some((p) => p.id === line?.id) ||
+      !cartChoice(line, catalog) ||
       !Number.isInteger(line?.quantity) ||
       line.quantity < 1
     )
       continue;
-    quantities.set(
-      line.id,
-      Math.min(20, (quantities.get(line.id) || 0) + line.quantity),
-    );
+    const key = cartKey(line);
+    quantities.set(key, { id: line.id, ...(line.variantId == null ? {} : { variantId: line.variantId }),
+      quantity: Math.min(20, (quantities.get(key)?.quantity || 0) + line.quantity) });
   }
-  return [...quantities].map(([id, quantity]) => ({ id, quantity }));
+  return [...quantities.values()];
 }
 
 export const subtotal = (cart, catalog = products) =>
   normalizeCart(cart, catalog).reduce(
     (sum, line) =>
-      sum + catalog.find((p) => p.id === line.id).price * line.quantity,
+      sum + cartChoice(line, catalog).price * line.quantity,
     0,
   );
 
@@ -67,21 +75,22 @@ export function validateOrder(input, now = new Date(), catalog = products) {
     throw new Error("Giỏ hoa đang trống hoặc có quá nhiều sản phẩm.");
   const seen = new Set();
   const items = input.items.map((line) => {
-    const product = catalog.find((p) => p.id === line?.id);
+    const product = cartChoice(line, catalog);
     if (
       !product ||
-      seen.has(line.id) ||
+      seen.has(cartKey(line)) ||
       !Number.isInteger(line.quantity) ||
       line.quantity < 1 ||
       line.quantity > 20
     )
       throw new Error("Số lượng hoa không hợp lệ.");
-    seen.add(line.id);
+    seen.add(cartKey(line));
     return {
       id: product.id,
       name: product.name,
       price: product.price,
       quantity: line.quantity,
+      ...(line.variantId == null ? {} : { variantId: line.variantId, sizeName: product.sizeName, sku: product.sku }),
     };
   });
   const date = input.deliveryDate;

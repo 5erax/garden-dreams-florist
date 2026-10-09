@@ -11,3 +11,15 @@ Vườn dùng cursor và tải tối đa 24 dấu mỗi lần; mỗi đơn chỉ
 Kiểm chứng SQL bằng PostgreSQL nhúng PGlite với vai trò anon/authenticated, hai khách và admin. Kiểm thử truy cập chéo, sửa giá, sửa trạng thái, quyền thanh toán, chia sẻ/rút chia sẻ, concurrency và một triệu kỉ niệm giả. Kiểm thử frontend trong trình duyệt. Dữ liệu thật trên Supabase chỉ cấu hình khi quyền truy cập tài khoản được mở.
 
 Các files/spec giữ theo module id trong CAPABILITY-MAP. Không nâng gói trả phí hoặc tự gửi giao dịch/tin nhắn. API Blob cũ được gỡ khỏi luồng mới; frontend chưa nối backend vẫn hiển thị demo rõ ràng.
+
+## Đề xuất big update — 09/10/2026
+
+Chủ shop đã yêu cầu triển khai lần lượt và cập nhật sau mỗi task ngày 09/10/2026. Trạng thái/bằng chứng nằm trong [progress.md](progress.md); giữ các cổng nghiệm thu, không tick dựa vào code/build đơn thuần.
+
+Chủ shop chọn thứ tự: vận hành/bán hoa thật → vườn kỉ niệm → hoàn thiện trải nghiệm toàn website. Kế hoạch đã được cho phép triển khai: [BIG-UPDATE-PLAN.md](../BIG-UPDATE-PLAN.md).
+
+Backlog `BU-01` tới `BU-32` được bổ sung trong todo.md. Các việc chưa nghiệm thu của bản hiện tại vẫn còn nguyên và là đầu vào giai đoạn 0. Từng task là một lát cắt có dữ liệu/API/UI và kiểm chứng; chưa đổi stack, hosting hoặc gói trả phí khi lập kế hoạch.
+
+Mốc phát hành: nền tảng/QA → A vận hành → B thiệp/khu vườn → C storefront/content/SEO/mobile. Giữ các quyết định về COD/VietQR thủ công, opt-in và một kỉ niệm/đơn đã giao/paid. Migration mới nối tiếp lịch sử hiện tại, không chạy lại setup.sql.
+
+Khi dashboard/SMTP chưa thao tác được, tiếp tục chuẩn bị mã nguồn BU-07–09 trên branch staging. BU-06 và các task phụ thuộc vẫn là điều kiện nghiệm thu/phát hành; không tick chỉ dựa vào SQL local hoặc build. Backend báo khả năng album/upload/quản lý cỡ/đặt cỡ để frontend mới tương thích với backend đang chạy. Production tiếp tục đóng nhận đơn.

@@ -1,0 +1,128 @@
+# Tiến độ big update
+
+Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lần lượt 32 task; thứ tự vận hành → vườn kỉ niệm → toàn trải nghiệm. Cập nhật sau mỗi task/lát cắt được kiểm chứng. Chỉ tick task lớn khi đạt cả tiêu chí nghiệm thu và kiểm chứng môi trường thật.
+
+## Hiện tại
+
+- **BU-01: hoàn thành — 1/32 task.** Database staging/API thật, cấu hình preview, cờ thử và deployment đã kiểm chứng theo tiêu chí SQL/SDK/Build/Ops.
+- **BU-02: chưa cấu hình Gmail SMTP.** Chủ shop yêu cầu agent tự xử lý, đã chuẩn bị template/hướng dẫn và sửa callback; Supabase vẫn bị công cụ từ chối trong phiên mới. Việc tạo credential Google cần chủ tài khoản thao tác; không yêu cầu gửi secret trong chat.
+- **BU-05: đang làm phần độc lập với SMTP.** Đã kiểm chứng phục hồi/retention local; backend thật và lịch sử Cron chưa kiểm chứng.
+- **BU-07: mã nguồn album đã kiểm chứng local, chưa nghiệm thu Storage/UI thật.** Chuẩn bị trên branch staging trong lúc dashboard bị chặn; BU-06 vẫn là điều kiện nghiệm thu/phát hành.
+- **BU-08–09: mã nguồn quản lý/chọn cỡ và snapshot đơn đã kiểm chứng local.** 36 tests, SDK local và build qua; chưa nghiệm thu UI/backend thật.
+- **BU-03–04, BU-06 và BU-10–32: chưa bắt đầu.** Phụ thuộc các cổng nghiệm thu trong todo.md.
+- Production tiếp tục đóng nhận đơn. Chưa merge/deploy thay đổi backend vào production.
+
+## Nhật ký
+
+### BU-01a — Chặn cấu hình backend nhầm môi trường
+
+- Hoàn thành validator Vite: preview không dùng project production, staging chỉ dùng project staging đã chốt; local chỉ dùng loopback; chỉ chấp nhận publishable/anon key.
+- Có cấu hình demo/local/staging/production và hướng dẫn theo mode. Fixture SDK cố định loopback; benchmark cố định PGlite in-memory.
+- Kiểm chứng: 3 tests cấu hình qua, build hiện tại qua. Đã thử trường hợp URL/key thiếu, URL có credential/path/query, secret/service-role key và override preview thành production.
+- Chưa hoàn tất BU-01: còn cờ đơn thử phía database, cấu hình preview và cài/nghiệm thu schema staging thật.
+
+### BU-01b — Cờ thử tại database và xác nhận runtime
+
+- Migration 005 thêm runtime do chủ database quản lý, cờ `is_test` bất biến trên đơn/kỉ niệm, public RPC xác nhận môi trường và projection tài chính loại đơn thử. Vườn sandbox cho xem thiệp thử để QA.
+- Frontend kiểm tra cả môi trường/project trước thao tác dữ liệu và hiển thị nhãn thử. Fixture SDK/benchmark dùng runtime local, không tăng bộ đếm kỉ niệm thật.
+- File cài staging sinh từ migrations đã chạy thử bằng PostgreSQL nhúng; từ chối database đã có schema/tài khoản, không reset dữ liệu hoặc tạo khách/đơn giả.
+- Chủ shop đã chạy SQL staging. SDK qua API thật xác nhận đúng project/runtime, 20 sản phẩm, đóng nhận đơn, vườn/count rỗng, cột thử và anon bị từ chối vào 5 bảng riêng/RPC tạo đơn. Không tạo đơn hoặc gửi email trên hosting thật trong bước này.
+- Kiểm chứng: toàn bộ 25 tests qua; SDK local qua luồng đặt/đối soát/chia sẻ/revoke/quyền; build staging qua; npm audit 0 vulnerabilities. Review bổ sung chặn dev dùng production và không đưa URL không hợp lệ vào thông báo lỗi.
+- Vercel preview đã có URL/key staging và `VITE_APP_ENV=staging`; production giữ URL/key cũ, thêm marker production. Connector thiếu quyền scope; CLI hiện có quyền đúng project và đã thực hiện cấu hình.
+- Chưa chạy lại benchmark một triệu dấu sau migration 005; chưa kiểm thử giao diện/SMTP/QR thật. Còn xác nhận preview deployment READY trước khi tick toàn bộ BU-01.
+
+### BU-01c — Preview READY và kết thúc task
+
+- Đã push branch `feature/bu-01-isolated-staging`. Vercel xác nhận deployment `dpl_25B6y2Gvrf7k4oq4B8M7faWW2xZp` READY, project đúng, commit `9a2014aaf11b3dcd50b02c41c0e49608384b7e95`, target preview.
+- [Preview](https://garden-dreams-florist-8k1qq8aha-dhas-projects-901181f4.vercel.app). URL/key production vẫn ở target production; preview dùng riêng staging. Frontend build/runtime kiểm tra đúng ref và loại key.
+- Đánh dấu BU-01 hoàn tất theo kiểm chứng của task; **không** đánh dấu Auth/email, luồng người dùng thật hoặc UI hoàn tất. Mở preview để kiểm tra UI bị trình duyệt từ chối quyền (`user declined permission`); không dùng công cụ khác để vượt hạn chế. BU-04 còn chờ quyền/kiểm tra trực tiếp.
+- Production chưa áp dụng migration 005, chưa merge branch nên website hiện tại chưa nhận thay đổi backend. Không mở bán hoặc tạo đơn giả trên production.
+
+### BU-02a — Chuẩn bị SMTP, callback và template
+
+- Có [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md) với phương án ít phí, các trường SMTP, URL Configuration riêng staging/production, hai template xác nhận/khôi phục và checklist nghiệm thu.
+- Đề xuất Gmail riêng cho shop để thử staging khi chưa có domain; production đánh giá domain do shop sở hữu với Resend/Brevo Free. Chưa đăng ký dịch vụ, mua domain hoặc đưa SMTP secret vào frontend.
+- Chưa cấu hình dashboard hay gửi email thật; BU-02 **chưa hoàn thành**. Cần người gửi SMTP, callback và kiểm thử nhận/mở/khôi phục/đăng xuất trước khi tiếp tục nghiệm thu BU-03.
+
+### BU-02b — Sửa callback xác nhận/khôi phục
+
+- Chủ shop chọn Gmail riêng để thử staging và sẽ tự điền App Password trong Supabase. Không yêu cầu hoặc lưu SMTP secret trong chat/repo/frontend.
+- Nhận diện callback trước khi SDK xóa fragment; sau khi khởi tạo Auth, đưa khách về Góc của tôi, bỏ token/tham số lỗi khỏi URL và giữ query không liên quan. Link lỗi/hết hạn có thông báo chung, không hiển thị lỗi/token do provider gửi. Đăng nhập hoặc khôi phục thành công xóa thông báo cũ.
+- Kiểm chứng: 27 tests qua, gồm 2 tests nhận diện callback/làm sạch URL; build staging qua. Chưa kiểm chứng callback trực tiếp trong trình duyệt hoặc gửi/nhận email thật.
+- Đã push commit `c969382df3ae39ebe6cb2e87e197465375526a5a`; Vercel xác nhận `dpl_G6tgnuDBwABzjCrD97vYYaEkffFu` READY, đúng project/branch/commit, Vercel check trên PR SUCCESS. [Alias staging cố định](https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app) được trả về từ metadata deployment; hướng dẫn SMTP đã cập nhật Site URL/redirect tương ứng.
+- Tiến độ vẫn **1/32 task**. BU-02 chưa tick; BU-03 chờ Auth/SMTP thật và dữ liệu kiểm thử của chủ shop.
+
+### BU-02c — Hướng dẫn thao tác Gmail cho lần cấu hình đầu
+
+- Chủ shop báo chưa biết cấu hình; chưa coi câu trả lời là đã cấu hình SMTP.
+- Bổ sung 4 bước cụ thể vào AUTH-EMAIL-SETUP.md: bật xác minh 2 bước/tạo App Password, điền SMTP staging, Site URL/redirect, template và đăng ký thử. Dẫn link Google/project staging chính xác và giải thích tài khoản staging tách production.
+- Đối chiếu tài liệu chính thức Google/Supabase; chỉ thay đổi hướng dẫn, không chạy lại tests cho nội dung này. Chưa thao tác dashboard hoặc gửi email thật; tiến độ vẫn 1/32.
+
+### BU-05a — Diễn tập phục hồi và retention độc lập
+
+- Chủ shop yêu cầu agent tự làm, không giao lại thao tác cấu hình thường lệ. Kiểm tra phiên trình duyệt hiện không có tab; mở project staging bằng công cụ trình duyệt bị từ chối do saved user permission chặn supabase.com. Không thử browser/API/credential khác để vượt hạn chế này.
+- Tiếp tục BU-05 vì chỉ phụ thuộc BU-01. Test mới xuất archive database giả xuống đĩa, đóng nguồn và nạp vào database local mới; kiểm tra checksum, đơn/giá snapshot, kỉ niệm, RLS, quyền thanh toán và quyền retention sau phục hồi.
+- Kiểm tra mốc 89/90/91 ngày, đơn đang xử lý dù cũ, đơn đã xóa và chạy job lần hai; giữ thiệp/lịch sử. Test focused qua với 6 đơn/3 kỉ niệm; archive chỉ gồm dữ liệu giả và nằm trong thư mục gitignored.
+- Toàn bộ **28 tests qua** sau thay đổi; [báo cáo diễn tập](../benchmarks/backup-restore.json) ghi môi trường local, migrations, checksum, phạm vi đã qua/chưa kiểm. Không chạy lại frontend build vì chỉ thay test và tài liệu/SQL health; frontend không đổi.
+- Thêm SQL kiểm tra sức khỏe Cron chỉ đọc số liệu vận hành, không xuất PII; tài liệu backup thật ghi rõ Auth/Storage/runtime cần xử lý riêng. SQL health chưa chạy trên backend thật.
+- Chưa tick BU-05: còn backup ngoài hệ thống, restore backend thật và Cron history. Không thay đổi Gmail/SMTP, không tạo phiên khách hoặc đơn trên Supabase. Tiến độ task lớn vẫn 1/32.
+
+### BU-07a/b — Quyền ảnh và album trên mã nguồn staging
+
+- Sau khi chủ shop sửa quyền và khởi động lại, công cụ vẫn từ chối Supabase do saved permission; không dùng đường khác để vượt chặn. Tiếp tục phần mã nguồn theo yêu cầu tự làm. Kế hoạch/todo ghi rõ BU-06 vẫn là cổng phát hành, không đổi tiêu chí nghiệm thu.
+- Migration 006 thêm album tối đa 8 ảnh, đồng bộ bìa và bucket public dành riêng cho ảnh sản phẩm, 2 MB/WebP, chỉ admin upload UUID mới. Ảnh đơn/kỉ niệm cũ giữ snapshot; ứng dụng không ghi đè/xóa file. Migration từ chối bucket xung đột, không biến bucket riêng tư thành public.
+- Runtime báo khả năng album/Storage: frontend mới giữ hành vi sửa sản phẩm cũ trên backend 005 đang chạy; không gửi cột `images` khi backend chưa có. Không chạy migration trên hosted backend trong bước này.
+- Admin có upload/nén/đổi thứ tự/bỏ ảnh, lưu theo version; khách có thumbnail/chọn ảnh/placeholder ảnh lỗi. Dùng Canvas/native controls và SDK đã cài, không thêm dependency.
+- **33 tests qua**, build staging qua; SDK local kiểm tra album/bìa/quyền/version/snapshot cùng luồng đơn/thanh toán/chia sẻ. Mutation tăng giới hạn lên 80 làm test 9 ảnh thất bại đúng kỳ vọng; đã phục hồi migration và chạy lại xanh. Diễn tập backup/retention vẫn qua với migration 006, báo cáo aggregate được cập nhật.
+- Review giữ ảnh cũ bên ngoài khi album trống, khóa thay bản nháp trong lúc upload, không bật upload với fixture thiếu Storage. Canvas unit test dùng stub; chưa chứng minh codec thật.
+- [PRODUCT-ALBUMS.md](../PRODUCT-ALBUMS.md) ghi phạm vi và nghiệm thu còn mở. Storage file API/policy thật, UI/mobile/keyboard và BU-06 chưa qua; không tick BU-07. Upload chưa lưu được giữ lại, chưa có cleanup orphan tự động. Tiến độ task lớn vẫn **1/32**.
+- Đã push code commit `abf29c04ce472d14b4ba7200343259a320d44dfe`; Vercel xác nhận deployment `dpl_2hLjQjfxds2W5FxbFbjibNvR2P3B` READY, đúng project/branch/SHA, target preview và alias staging cố định. PR #1 vẫn draft, Vercel check SUCCESS. Backend hosted chưa có 006 nên màn upload được ẩn đúng kế hoạch; không coi deployment READY là đã nghiệm thu album.
+
+### BU-08 — Quản lý cỡ bó trên mã nguồn staging
+
+- Migration 007 thêm cỡ bổ sung: SKU duy nhất, tên/giá/trạng thái, parent bất biến, version và audit. Chỉ admin tạo/sửa; không xóa cỡ để giữ tham chiếu lịch sử. Khách chỉ đọc cỡ đang bật của sản phẩm đang bật.
+- Màn hình admin nằm ngoài form sửa sản phẩm, có thêm/sửa/tắt, báo conflict version, khóa thao tác khi upload/lưu ở phần khác đang chạy. Giá sản phẩm cũ là cỡ Tiêu chuẩn; không tự tạo cỡ/giá giả hay đổi đơn cũ.
+- 34 tests và build staging qua; tests kiểm tra SKU/giá/parent/quyền/ẩn cỡ tắt/version/audit. Backend chưa có 007 ẩn màn quản lý cỡ.
+- Chưa tick BU-08: chưa áp dụng hosted migration, phiên admin/UI thật và cổng BU-06–07 còn mở. Tiến độ nghiệm thu vẫn 1/32. Tiếp tục BU-09 để lựa chọn cỡ có luồng đặt và snapshot hoàn chỉnh.
+
+### BU-09 — Khách chọn cỡ và snapshot trên mã nguồn staging
+
+- Migration 008 tính giá cỡ tại máy chủ, kiểm tra parent/trạng thái, chống dòng trùng, khóa đọc catalog; giữ idempotency/rate limit/quyền/quote của luồng cũ. Giỏ phân biệt product+cỡ, loại cỡ không còn bán mà không thay bằng Tiêu chuẩn. Cỡ cũ/null vẫn dùng giá sản phẩm.
+- Nối lựa chọn trong chi tiết/giỏ/checkout/lịch sử; nút thêm nhanh mở chọn cỡ. Chi tiết dùng catalog hiện tại sau refresh, không giữ lựa chọn sản phẩm cũ để thêm cỡ đã tắt.
+- Đơn snapshot tên/ảnh/dịp/cỡ/SKU/giá; kỉ niệm mới lưu metadata bất biến từ snapshot đầu đơn. Kỉ niệm cũ để trống metadata; public RPC không thêm nội dung ngoài lựa chọn chia sẻ cũ.
+- **36 tests qua**, SDK local qua cả tạo/tắt cỡ, giá server và retry giữ snapshot; build staging qua. Test snapshot đổi tên/giá/dịp sau đặt, cỡ sai parent/tắt/ID sai kiểu, payload giá giả và metadata đều qua. Mutation gộp key các cỡ làm test fail; khôi phục rồi focused tests xanh. Backup/retention qua tới migration 008.
+- Review sửa form SKU tương thích HTML pattern hiện tại, khóa form quản lý cỡ khi phần sản phẩm đang lưu/upload; chưa có UI thật để nghiệm thu.
+- [PRODUCT-VARIANTS.md](../PRODUCT-VARIANTS.md) ghi contract/rollout. Chưa cài migrations 006–008 trên hosting trong bước này; backend báo capability để frontend mới không truy vấn bảng chưa có. BU-08/09 chưa tick, tiến độ nghiệm thu **1/32**.
+- Code commit `acfe25463631a9519e918673916d77d58324e4ea` đã push; Vercel xác nhận `dpl_9QD9ScUzG5HJQKia4MH7hru15snF` READY đúng project/branch/SHA, target preview và alias staging cố định. PR #1 vẫn draft và Vercel check SUCCESS; không merge production.
+
+### BU-26a — Chuẩn bị bộ sưu tập theo hướng thiết kế đã gọi
+
+- Chủ shop gọi `design-taste-frontend` và `ponytail`; áp dụng vào storefront trong phạm vi mã nguồn staging. [DESIGN-AUDIT.md](../DESIGN-AUDIT.md) ghi audit trước sửa, dials 7/5/3 và những phần cần giữ từ mẫu gốc. Skill marketing không dùng để thiết kế lại admin/checkout.
+- Giá card ghi rõ Tiêu chuẩn theo contract cỡ hiện có; không đổi giá, lựa chọn cỡ hoặc payload. Metadata/tên dài được wrap; tăng cỡ chữ, vùng chạm collection tối thiểu 44 px, search 16 px và focus nút ảnh nằm trong khung. Giữ frame vòm/hero/motion/reduced motion, đường dẫn, nội dung pháp lý và navigation.
+- Chỉ thay markup tĩnh/CSS, không thêm dependency hoặc logic JS; không cần tests mới. Diff check và build staging qua. Tính tương phản màu đặc thấp nhất 4.76:1; chưa chứng minh contrast khi render thực tế. Cảnh báo JS chunk khoảng 683 kB vẫn còn.
+- Chưa tick BU-26 và không đổi cổng phát hành hay thứ tự nghiệm thu. Browser/mobile/keyboard/Lighthouse, hosted migrations 006–008 và các cổng bản A/B vẫn còn mở. Tiến độ task lớn **1/32**, production tiếp tục đóng nhận đơn.
+- Code commit `7f05e7318106493bcf3a86c4f75f466dfb42365d` đã push; Vercel xác nhận `dpl_DHs6uxhLQsAMjRKnyeRsyR2ARRSx` READY đúng project/branch/SHA, target preview và alias staging cố định. [Preview của thay đổi](https://garden-dreams-florist-jq6a0x0eo-dhas-projects-901181f4.vercel.app); PR #1 vẫn draft.
+
+### Skills — Cài đặt và đánh giá kiến trúc theo tài liệu chủ shop
+
+- Đã cài 4 skill upstream Vercel vào user skills qua installer có sẵn của Codex, pinned commit `063bee94c3f4df8453406c830b0a7df0f2860278`. Đã đọc entrypoints/rules cần dùng; không chạy script deploy bên thứ ba. Các hướng dẫn React/deploy có chồng lấp với plugin hiện tại; không xóa hoặc ghi đè plugin, không áp dụng máy móc quy tắc chỉ dành Next/RSC vào Vite.
+- Tạo 10 skill nghiệp vụ trong `.agents/skills/`, cài junction vào user skills để chỉ duy trì một bản nguồn. Toàn bộ **14 SKILL.md qua validator**. Validator cần PyYAML; dependency này chỉ nằm trong tooling ngoài repo, không thêm vào ứng dụng. Tự nhận diện từ lượt tiếp theo; lượt này đã đọc và áp dụng trực tiếp các skill phù hợp.
+- [FLOWER-COMMERCE-ROADMAP.md](../FLOWER-COMMERCE-ROADMAP.md) có đánh giá stack/capabilities, inventory skill, proposal schema, milestones, dependencies và test strategy. Tồn kho/công thức/loyalty/chi nhánh/lợi nhuận mới là proposal, chưa xây hoặc nghiệm thu.
+- Không cài `ce-*`: tài liệu nêu chỉ dùng khi chọn Commerce Engine; dự án đang dùng Supabase/PostgreSQL. Không đổi backend/framework, đăng ký gói trả phí hoặc kết nối dịch vụ mới.
+- Hoàn thành việc cài/tạo skill, không cộng vào 32 task nghiệp vụ. Giữ thứ tự và các cổng nghiệm thu đã được chốt.
+
+### BU-26b / BU-09 — Chi tiết hoa, tạm tính và cỡ ngừng bán
+
+- Màn chi tiết có đơn giá mỗi bó, tổng tạm tính từ helper giỏ hiện có, số lượng/cỡ và ghi rõ chưa gồm phí giao. Tổng dẫn xuất từ catalog/state hiện tại, không thêm price state hay đổi logic server.
+- Không hiển thị giá Tiêu chuẩn thay cho cỡ đã ngừng bán. Select còn hiện khi cỡ đang chọn biến mất, kể cả cỡ bổ sung cuối cùng; có option báo trạng thái và cho chọn lại Tiêu chuẩn. Nút thêm vẫn bị khóa khi lựa chọn không hợp lệ.
+- Chữ mô tả 14 px, select 16 px, nút số lượng 44 px, action wrap ở vùng hẹp; native dialog có scroll containment. Review theo guideline Vercel mới, giữ native semantics/focus và theme gốc.
+- **39 tests qua**, gồm 3 tests render SSR mới, không listen HTTP hoặc truy cập backend hosted; build staging và diff check qua. Mutation phục hồi fallback giá sai làm test fail đúng kỳ vọng, đã khôi phục và chạy xanh. Diễn tập backup/retention với dữ liệu giả cũng qua trong full suite.
+- Chưa kiểm chứng đổi cỡ/số lượng/refresh catalog hoặc layout trong browser. Không tick BU-09/26, hosted migrations vẫn chưa cài; bundle khoảng 684 kB vẫn cần tối ưu. Tiến độ nghiệm thu task lớn **1/32**.
+- Đã push skill/roadmap commit `28cfc12` và source commit `8e92a752816a0404cf4bee04e89cbe7149d6bb20`. Vercel xác nhận `dpl_7M2HqqM1jU3RivPYf8nkts1bxHpH` READY đúng project/branch/SHA, target preview và alias staging; PR #1 vẫn draft, Vercel check SUCCESS. [Preview của lát cắt](https://garden-dreams-florist-n4yyot35o-dhas-projects-901181f4.vercel.app). Production chưa merge/mở bán.
+
+### Production — Phát hành giao diện tương thích
+
+- Chủ shop yêu cầu deploy sau khi preview chuyển sang Vercel login. Kiểm tra API public production chỉ đọc xác nhận shop đóng và RPC runtime chưa tồn tại (`PGRST202`); không chạy SQL hoặc đổi quyền/protection để vượt hạn chế dashboard.
+- Nhánh `release/storefront-ui` lấy từ main và port các phần UI/helper tương thích từ staging. Giữ nguyên backend/Store/Auth/admin và migrations production 001–004; không phát hành runtime/migration 005 hay quản trị upload/cỡ. Product cũ vẫn dùng ảnh bìa và cỡ Tiêu chuẩn; checkout/helper/hiển thị snapshot cỡ optional được nối đầy đủ để không làm rơi payload.
+- **26 tests qua** trên nhánh production release (khác bộ 39 tests staging); build production qua. Bundle xác nhận đúng endpoint production, không có ref staging; cảnh báo JS khoảng 671 kB. Bổ sung ignore `.backups/`; không ship environment hoặc archive giả.
+- [PRODUCTION-UI-RELEASE.md](../PRODUCTION-UI-RELEASE.md) ghi phạm vi và rollback. Cửa hàng tiếp tục đóng; nghiệm thu toàn bộ BU-09/26/backend/email/browser vẫn còn mở. Đây là phát hành UI theo yêu cầu, không phải mở bán hoặc nghiệm thu toàn bộ big update.

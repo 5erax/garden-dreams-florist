@@ -272,10 +272,11 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
         <section>
           <h3>Những đóa hoa đã chọn</h3>
           {order.items.map((item) => (
-            <div className="history-item" key={item.id}>
+            <div className="history-item" key={`${item.id}:${item.variantId ?? "base"}`}>
               <img src={item.image} alt={item.name} />
               <div>
                 <strong>{item.name}</strong>
+                {item.sizeName && <p>Cỡ {item.sizeName} · {item.sku}</p>}
                 <p>
                   {item.quantity} bó · {money(item.price * item.quantity)}
                 </p>

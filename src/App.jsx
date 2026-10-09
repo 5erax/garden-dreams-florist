@@ -6,7 +6,7 @@ import {
   useTransform,
 } from "motion/react";
 import { occasions, money } from "./catalog.js";
-import { normalizeCart } from "./order.js";
+import { normalizeCart, cartKey } from "./order.js";
 import {
   CartDialog,
   CheckoutDialog,
@@ -172,6 +172,7 @@ export default function App() {
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [selected, setSelected] = useState(null);
+  const selectedProduct = products.find(p => p.id === selected?.id);
   const [panel, setPanel] = useState(null);
   const [notice, setNotice] = useState("");
   const [scrolled, setScrolled] = useState(false);
@@ -201,25 +202,26 @@ export default function App() {
     window.addEventListener("scroll", scroll, { passive: true });
     return () => window.removeEventListener("scroll", scroll);
   }, []);
-  function changeCart(id, quantity) {
+  function changeCart(id, quantity, variantId) {
+    const key = cartKey({ id, variantId });
     setCart((current) =>
       normalizeCart(
         quantity === 0
-          ? normalizeCart(current, products).filter((line) => line.id !== id)
+          ? normalizeCart(current, products).filter((line) => cartKey(line) !== key)
           : [
               ...normalizeCart(current, products).filter(
-                (line) => line.id !== id,
+                (line) => cartKey(line) !== key,
               ),
-              { id, quantity },
+              { id, quantity, variantId },
             ],
         products,
       ),
     );
   }
-  function add(id, quantity = 1) {
+  function add(id, quantity = 1, variantId) {
     setCart((current) =>
       normalizeCart(
-        [...normalizeCart(current, products), { id, quantity }],
+        [...normalizeCart(current, products), { id, quantity, variantId }],
         products,
       ),
     );
@@ -453,10 +455,10 @@ export default function App() {
                     </button>
                     <button
                       className="quick-add"
-                      onClick={() => add(product.id)}
-                      aria-label={`Thêm ${product.name} vào giỏ`}
+                      onClick={() => product.variants?.length ? setSelected(product) : add(product.id)}
+                      aria-label={product.variants?.length ? `Chọn cỡ ${product.name}` : `Thêm ${product.name} vào giỏ`}
                     >
-                      Thêm vào giỏ <Icon name="plus" />
+                      {product.variants?.length ? "Chọn cỡ bó" : "Thêm vào giỏ"} <Icon name="plus" />
                     </button>
                   </div>
                   <div className="product-copy">
@@ -469,9 +471,12 @@ export default function App() {
                         {product.name}
                       </button>
                     </h3>
-                    <div>
+                    <div className="product-details">
                       <span>{product.stems}</span>
-                      <strong>{money(product.price)}</strong>
+                      <div className="product-price">
+                        <span>Tiêu chuẩn</span>
+                        <strong>{money(product.price)}</strong>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -687,9 +692,10 @@ export default function App() {
           Xem giỏ
         </button>
       </div>
-      {selected && (
+      {selectedProduct && (
         <ProductDialog
-          product={selected}
+          key={selectedProduct.id}
+          product={selectedProduct}
           onClose={() => setSelected(null)}
           onAdd={add}
           favorite={favorites.includes(selected.id)}
