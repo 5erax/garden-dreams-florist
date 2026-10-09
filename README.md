@@ -5,12 +5,13 @@ Web bán hoa React + Vite, tiếng Việt, video nền, hoa rơi, parallax và c
 - Repo private: [5erax/garden-dreams-florist](https://github.com/5erax/garden-dreams-florist).
 - Website: [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app/). Push `main` tự deploy qua GitHub.
 - **Cài backend:** [SUPABASE-SETUP.md](SUPABASE-SETUP.md). SQL chạy một lần trên project mới: [supabase/setup.sql](supabase/setup.sql).
+- **Big update:** [kế hoạch](BIG-UPDATE-PLAN.md), [checklist](tasks/todo.md) và [tiến độ sau từng task](tasks/progress.md). BU-01 tách staging đã hoàn thành; chuẩn bị email Auth ở BU-02.
 
 ## Chạy local
 
 Node.js 24: `npm ci`, rồi `npm run dev`. Kiểm tra bằng `npm test`, `npm run build`, `npm audit`.
 
-Không có cấu hình Supabase thì website ở chế độ xem thử, không lưu đơn hoặc báo giả đã nhận đơn. Để nối backend, sao chép `.env.example` thành `.env.local`, điền Project URL + publishable key và cài migrations. Cửa hàng vẫn đóng nhận đơn cho đến khi admin cấu hình và bật.
+Không có cấu hình Supabase thì website ở chế độ xem thử, không lưu đơn hoặc báo giả đã nhận đơn. Cấu hình production/staging/local được kiểm tra trước build và trước thao tác dữ liệu; xem [STAGING.md](STAGING.md). Project dùng frontend mới phải có migration 005; database production hiện tại chưa áp dụng migration này. Cửa hàng vẫn đóng nhận đơn cho đến khi admin cấu hình và nghiệm thu.
 
 ## Chức năng đã viết
 

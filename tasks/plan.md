@@ -14,6 +14,8 @@ Các files/spec giữ theo module id trong CAPABILITY-MAP. Không nâng gói tr�
 
 ## Đề xuất big update — 09/10/2026
 
+Chủ shop đã yêu cầu triển khai lần lượt và cập nhật sau mỗi task ngày 09/10/2026. Trạng thái/bằng chứng nằm trong [progress.md](progress.md); giữ các cổng nghiệm thu, không tick dựa vào code/build đơn thuần.
+
 Chủ shop yêu cầu lập kế hoạch mở rộng và chọn thứ tự: vận hành/bán hoa thật → vườn kỉ niệm → hoàn thiện trải nghiệm toàn website. Kế hoạch chi tiết: [BIG-UPDATE-PLAN.md](../BIG-UPDATE-PLAN.md). Đây là đề xuất để review, chưa bắt đầu triển khai tính năng mới.
 
 Backlog `BU-01` tới `BU-32` được bổ sung trong todo.md. Các việc chưa nghiệm thu của bản hiện tại vẫn còn nguyên và là đầu vào giai đoạn 0. Từng task là một lát cắt có dữ liệu/API/UI và kiểm chứng; chưa đổi stack, hosting hoặc gói trả phí khi lập kế hoạch.

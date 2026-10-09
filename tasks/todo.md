@@ -28,13 +28,15 @@ Quy ước kiểm chứng:
 
 ### BU-01 — Môi trường thử và dữ liệu thử — M
 
-Trạng thái: BU-01a/b đã kiểm chứng; schema staging thật và cấu hình preview đã nối, chờ xác nhận preview deployment READY. Theo dõi bằng chứng tại [progress.md](progress.md).
+Trạng thái: hoàn thành theo tiêu chí SQL/SDK/Build/Ops của task. Preview READY tại commit `9a2014a`; UI và Auth/SMTP thật vẫn thuộc BU-02–04. Theo dõi bằng chứng tại [progress.md](progress.md).
 
-- [ ] Preview/staging dùng cấu hình riêng; có cờ test không tính vào doanh thu/kỉ niệm mua thật.
+- [x] Preview/staging dùng cấu hình riêng; có cờ test không tính vào doanh thu/kỉ niệm mua thật.
 - [x] Fixture và script không thể vô tình đổ dữ liệu giả vào production.
       Phụ thuộc: không. File: migration mới, config mẫu, seed test, hướng dẫn deploy. Kiểm: SQL, SDK, Build, Ops.
 
 ### BU-02 — Email xác thực và callback — M
+
+Trạng thái: đã chuẩn bị hướng dẫn SMTP/callback và template tại [AUTH-EMAIL-SETUP.md](../AUTH-EMAIL-SETUP.md). Chưa chọn/cấu hình người gửi và chưa nghiệm thu email thật; chưa tick task.
 
 - [ ] Đăng ký/xác nhận/khôi phục chạy được với email khách được phép; link trả về đúng trang, lỗi rõ và không tiết lộ tài khoản người khác.
 - [ ] Secret SMTP chỉ ở server; phiên giữ theo quyết định hiện tại, đăng xuất không còn quyền đọc đơn.
