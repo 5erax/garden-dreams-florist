@@ -11,6 +11,7 @@ let server, ProductDialog;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../", import.meta.url)),
+    cacheDir: fileURLToPath(new URL("../node_modules/.vite/tests/product-dialog", import.meta.url)),
     configFile: false,
     envDir: false,
     plugins: [react()],

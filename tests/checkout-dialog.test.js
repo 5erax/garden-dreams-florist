@@ -11,6 +11,7 @@ let server, Checkout, BankPayment, DeliveryPicker, selectedDelivery;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../",import.meta.url)),configFile:false,envDir:false,
+    cacheDir:fileURLToPath(new URL("../node_modules/.vite/tests/checkout-dialog",import.meta.url)),
     plugins:[{
       name:"checkout-test-store",enforce:"pre",
       load(id) { if (id.replaceAll('\\','/').endsWith('/src/Store.jsx')) return "export const useStore = () => globalThis.checkoutTestStore;"; },

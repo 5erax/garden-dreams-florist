@@ -12,6 +12,7 @@ export default defineConfig(({ mode, command }) => {
   );
   return {
     plugins: [react()],
+    build: { manifest: true },
     define: {
       "import.meta.env.VITE_APP_ENV": JSON.stringify(config.environment),
     },
