@@ -1,5 +1,11 @@
 export default function Icon({ name, ...props }) {
   const paths = {
+    user: (
+      <>
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 21v-2a7 7 0 0 1 14 0v2" />
+      </>
+    ),
     bag: (
       <>
         <path d="M6 7h12l1 14H5L6 7Z" />

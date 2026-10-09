@@ -1,0 +1,11 @@
+- [x] identity: đã viết đăng nhập/đăng ký/khôi phục và kiểm tra role/RLS; chờ kiểm thử email Supabase thật.
+- [x] shop-store: shop/catalog động, chỉnh sửa admin, validation và giá snapshot.
+- [x] fulfillment: dịch vụ/khu vực/phí/khung giờ, kiểm tra dịch vụ hoạt động.
+- [x] orders: idempotency, giá máy chủ, tiến trình và lịch sử riêng theo khách; kiểm thử local.
+- [x] payments: COD/VietQR, admin xác nhận/audit, khách không sửa paid; chờ quét QR ngân hàng thật.
+- [x] memories: một dấu mỗi đơn đã giao/paid, link, opt-in, revoke; đã thử một triệu dấu giả.
+- [x] portals: đã viết quản trị, lịch sử/tracking, vườn và thiệp; CSS responsive/accessibility.
+- [x] release checks: SQL/shared helpers tests, SDK local integration, build, dependency audit; hướng dẫn Supabase và SQL setup.
+- [ ] release external: push/deploy bản mới và xác nhận commit trên GitHub/Vercel.
+- [ ] real backend: tạo/nối project Supabase, cấp admin, cấu hình SMTP/Cron và kiểm tra luồng thật.
+- [ ] browser QA: kiểm tra UI desktop/mobile sau khi quyền truy cập được mở lại.

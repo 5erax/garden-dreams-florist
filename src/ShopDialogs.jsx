@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { products, money } from "./catalog.js";
+import { money } from "./catalog.js";
 import { subtotal, validateOrder, vietnamDate } from "./order.js";
 import Icon from "./Icons.jsx";
-
-export const liveOrders = import.meta.env.VITE_SHOP_ORDERS_ENABLED === "true";
+import { useStore } from "./Store.jsx";
 
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
@@ -123,6 +122,7 @@ function Quantity({ value, onChange, name }) {
 }
 
 export function CartDialog({ cart, onClose, onChange, onCheckout }) {
+  const { products } = useStore();
   const count = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <Modal title="Giỏ hoa của bạn" onClose={onClose} className="cart-dialog">
@@ -171,7 +171,7 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
           </div>
           <div className="cart-total">
             <span>Tạm tính</span>
-            <strong>{money(subtotal(cart))}</strong>
+            <strong>{money(subtotal(cart, products))}</strong>
           </div>
           <p className="fineprint">
             Phí giao và thời gian nhận hoa sẽ được xác nhận riêng.
@@ -191,12 +191,13 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
   );
 }
 
-export function CheckoutDialog({ cart, onClose, onComplete }) {
+export function CheckoutDialog({ cart, onClose }) {
+  const { products } = useStore();
   const [state, setState] = useState("form");
   const [error, setError] = useState("");
   const [receipt, setReceipt] = useState(null);
   const [requestId] = useState(() => crypto.randomUUID());
-  const [busy, setBusy] = useState(false);
+  const busy = false;
   const [copyStatus, setCopyStatus] = useState("");
   async function copyOrder() {
     const summary = [
@@ -229,43 +230,22 @@ export function CheckoutDialog({ cart, onClose, onComplete }) {
     const fields = Object.fromEntries(new FormData(e.currentTarget));
     let order;
     try {
-      order = validateOrder({
-        ...fields,
-        requestId,
-        items: cart,
-        consent: fields.consent === "on",
-      });
+      order = validateOrder(
+        {
+          ...fields,
+          requestId,
+          items: cart,
+          consent: fields.consent === "on",
+        },
+        new Date(),
+        products,
+      );
     } catch (err) {
       setError(err.message);
       return;
     }
-    if (!liveOrders) {
-      setReceipt(order);
-      setState("preview");
-      return;
-    }
-    setBusy(true);
-    try {
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(order),
-      });
-      const result = await response.json();
-      if (!response.ok || result.received !== true)
-        throw new Error(
-          result.error || "Chưa gửi được yêu cầu. Vui lòng thử lại.",
-        );
-      setReceipt({ ...order, reference: result.reference });
-      setState("received");
-      onComplete();
-    } catch (err) {
-      setError(
-        err.message || "Kết nối bị gián đoạn. Giỏ hoa của bạn vẫn được giữ.",
-      );
-    } finally {
-      setBusy(false);
-    }
+    setReceipt(order);
+    setState("preview");
   }
   return (
     <Modal
@@ -281,12 +261,12 @@ export function CheckoutDialog({ cart, onClose, onComplete }) {
           <h2>
             Gửi hoa, <em>gửi thương.</em>
           </h2>
-          {!liveOrders && (
+          {
             <p className="demo-note">
               Bản trải nghiệm · bạn có thể xem trước đơn hoa. Thông tin chưa
               được gửi đến cửa hàng.
             </p>
-          )}
+          }
           <form onSubmit={submit} aria-busy={busy}>
             <fieldset disabled={busy}>
               <div className="form-grid">
@@ -385,7 +365,7 @@ export function CheckoutDialog({ cart, onClose, onComplete }) {
                 ))}
                 <div className="cart-total">
                   <span>Tạm tính</span>
-                  <strong>{money(subtotal(cart))}</strong>
+                  <strong>{money(subtotal(cart, products))}</strong>
                 </div>
                 <small>Thanh toán khi nhận · phí giao xác nhận sau</small>
               </div>
@@ -407,11 +387,7 @@ export function CheckoutDialog({ cart, onClose, onComplete }) {
                 </p>
               )}
               <button className="button primary checkout-button" type="submit">
-                {busy
-                  ? "Đang gửi yêu cầu…"
-                  : liveOrders
-                    ? "Gửi yêu cầu đặt hoa"
-                    : "Xem trước đơn hoa"}
+                Xem trước đơn hoa
                 <Icon name="arrow" />
               </button>
               <p className="fineprint">

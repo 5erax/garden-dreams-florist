@@ -5,16 +5,22 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { products, occasions, money } from "./catalog.js";
+import { occasions, money } from "./catalog.js";
 import { normalizeCart } from "./order.js";
 import {
   CartDialog,
   CheckoutDialog,
   Modal,
   ProductDialog,
-  liveOrders,
 } from "./ShopDialogs.jsx";
 import Icon from "./Icons.jsx";
+import { useStore } from "./Store.jsx";
+import { PortalShell } from "./PortalShell.jsx";
+import CustomerPortal from "./CustomerPortal.jsx";
+import AdminPortal from "./AdminPortal.jsx";
+import Garden, { SharedMemory } from "./Garden.jsx";
+import LiveCheckout from "./LiveCheckout.jsx";
+import "./portal.css";
 
 function readStored(key, fallback) {
   try {
@@ -39,6 +45,8 @@ function Reveal({ children, className = "" }) {
 }
 
 function Hero() {
+  const { shop } = useStore();
+  const [first, ...rest] = shop.name.split(/\s+/);
   const ref = useRef(null),
     video = useRef(null);
   const reduced = useReducedMotion();
@@ -104,9 +112,9 @@ function Hero() {
       >
         <p className="eyebrow">Hoa mang lời thương</p>
         <h1>
-          Garden
+          {first}
           <br />
-          <em>Dreams</em>
+          <em>{rest.join(" ")}</em>
           <span className="hero-star">✳</span>
         </h1>
         <p className="hero-subtitle">
@@ -137,14 +145,26 @@ function Hero() {
 }
 
 export default function App() {
-  const [cart, setCart] = useState(() =>
-    normalizeCart(readStored("gd-cart", [])),
-  );
+  const {
+    products,
+    shop,
+    connected,
+    session,
+    isAdmin,
+    loading,
+    error: storeError,
+  } = useStore();
+  const [storedCart, setCart] = useState(() => readStored("gd-cart", []));
+  const cart = normalizeCart(storedCart, products);
+  const [route, setRoute] = useState(location.hash);
+  useEffect(() => {
+    const changed = () => setRoute(location.hash);
+    window.addEventListener("hashchange", changed);
+    return () => window.removeEventListener("hashchange", changed);
+  }, []);
   const [favorites, setFavorites] = useState(() => {
     const ids = readStored("gd-favorites", []);
-    return Array.isArray(ids)
-      ? ids.filter((id) => products.some((p) => p.id === id))
-      : [];
+    return Array.isArray(ids) ? ids.filter((id) => Number.isInteger(id)) : [];
   });
   const [occasion, setOccasion] = useState("Tất cả");
   const [query, setQuery] = useState("");
@@ -157,11 +177,12 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     try {
-      localStorage.setItem("gd-cart", JSON.stringify(cart));
+      if (!loading && !storeError)
+        localStorage.setItem("gd-cart", JSON.stringify(cart));
     } catch {
       /* Shopping still works when browser storage is unavailable. */
     }
-  }, [cart]);
+  }, [storedCart, products, loading, storeError]);
   useEffect(() => {
     try {
       localStorage.setItem("gd-favorites", JSON.stringify(favorites));
@@ -184,13 +205,24 @@ export default function App() {
     setCart((current) =>
       normalizeCart(
         quantity === 0
-          ? current.filter((line) => line.id !== id)
-          : [...current.filter((line) => line.id !== id), { id, quantity }],
+          ? normalizeCart(current, products).filter((line) => line.id !== id)
+          : [
+              ...normalizeCart(current, products).filter(
+                (line) => line.id !== id,
+              ),
+              { id, quantity },
+            ],
+        products,
       ),
     );
   }
   function add(id, quantity = 1) {
-    setCart((current) => normalizeCart([...current, { id, quantity }]));
+    setCart((current) =>
+      normalizeCart(
+        [...normalizeCart(current, products), { id, quantity }],
+        products,
+      ),
+    );
     setNotice(`Đã thêm ${products.find((p) => p.id === id).name} vào giỏ hoa`);
   }
   function favorite(id) {
@@ -219,6 +251,25 @@ export default function App() {
     filtered = [...filtered].sort((a, b) => b.price - a.price);
   const shown = showAll ? filtered : filtered.slice(0, 8);
   const count = cart.reduce((sum, line) => sum + line.quantity, 0);
+  if (
+    route === "#account" ||
+    route === "#admin" ||
+    route === "#garden" ||
+    route.startsWith("#memory/")
+  )
+    return (
+      <PortalShell>
+        {route === "#account" ? (
+          <CustomerPortal />
+        ) : route === "#admin" ? (
+          <AdminPortal />
+        ) : route === "#garden" ? (
+          <Garden />
+        ) : (
+          <SharedMemory key={route} token={route.slice(8)} />
+        )}
+      </PortalShell>
+    );
 
   return (
     <>
@@ -232,16 +283,23 @@ export default function App() {
           aria-label="Garden Dreams — về đầu trang"
         >
           <Icon name="flower" />
-          <span>
-            garden<em>dreams</em>
-          </span>
+          <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng chính">
           <a href="#collection">Bộ sưu tập</a>
           <a href="#story">Câu chuyện</a>
-          <a href="#care">Chăm hoa</a>
+          <a href="#garden">Vườn kỉ niệm</a>
         </nav>
         <div className="header-actions">
+          <a
+            href="#account"
+            className="icon-button account-link"
+            aria-label={
+              session ? "Góc kỉ niệm của tôi" : "Tài khoản & lịch sử mua"
+            }
+          >
+            <Icon name="user" />
+          </a>
           <button
             className={`icon-button ${onlyFavorites ? "is-favorite" : ""}`}
             aria-label="Xem hoa yêu thích"
@@ -269,6 +327,11 @@ export default function App() {
       </header>
       <main>
         <Hero />
+        {(loading || storeError) && (
+          <p className="store-status" role={storeError ? "alert" : "status"}>
+            {storeError || "Đang tải bộ sưu tập của cửa hàng…"}
+          </p>
+        )}
         <div className="service-strip">
           <span>
             <Icon name="flower" /> Hoa, trong sắc màu tự nhiên
@@ -566,20 +629,14 @@ export default function App() {
         <div className="footer-top">
           <a className="brand" href="#home">
             <Icon name="flower" />
-            <span>
-              garden<em>dreams</em>
-            </span>
+            <span>{shop.name}</span>
           </a>
-          <p>
-            Hoa mang lời thương.
-            <br />
-            Được chọn bằng cả tấm lòng.
-          </p>
+          <p>{shop.about}</p>
           <div className="footer-contact">
-            <a href="tel:0832345780">0832 345 780</a>
+            <a href={`tel:${shop.phone}`}>{shop.phone}</a>
             <a
               className="text-link"
-              href="https://zalo.me/0832345780"
+              href={`https://zalo.me/${shop.phone.replace(/^\+84/, "0")}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -591,7 +648,12 @@ export default function App() {
           </a>
         </div>
         <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} Garden Dreams</span>
+          <span>
+            © {new Date().getFullYear()} {shop.name}
+          </span>
+          <a href="#account">Góc của tôi</a>
+          <a href="#garden">Vườn kỉ niệm</a>
+          {isAdmin && <a href="#admin">Quản trị</a>}
           <div>
             <button onClick={() => setPanel("privacy")}>
               Thông tin & riêng tư
@@ -601,8 +663,10 @@ export default function App() {
             </button>
           </div>
           <span>
-            {liveOrders
-              ? "Made with love, on Earth."
+            {connected
+              ? shop.accepting_orders
+                ? "Made with love, on Earth."
+                : "Cửa hàng chưa mở nhận đơn"
               : "Bản trải nghiệm · giá & bộ sưu tập mẫu"}
           </span>
         </div>
@@ -640,13 +704,20 @@ export default function App() {
           onCheckout={() => setPanel("checkout")}
         />
       )}
-      {panel === "checkout" && (
-        <CheckoutDialog
-          cart={cart}
-          onClose={() => setPanel(null)}
-          onComplete={() => setCart([])}
-        />
-      )}
+      {panel === "checkout" &&
+        (connected ? (
+          <LiveCheckout
+            cart={cart}
+            onClose={() => setPanel(null)}
+            onComplete={() => setCart([])}
+          />
+        ) : (
+          <CheckoutDialog
+            cart={cart}
+            onClose={() => setPanel(null)}
+            onComplete={() => setCart([])}
+          />
+        ))}
       {["privacy", "terms"].includes(panel) && (
         <Modal
           title={
@@ -655,7 +726,7 @@ export default function App() {
           onClose={() => setPanel(null)}
           className="info-dialog"
         >
-          <span className="eyebrow">Garden Dreams</span>
+          <span className="eyebrow">{shop.name}</span>
           <h2>
             {panel === "privacy" ? "Một chút riêng tư." : "Về đơn hoa của bạn."}
           </h2>
@@ -663,7 +734,8 @@ export default function App() {
             <>
               <p>
                 Giỏ hàng và hoa yêu thích được lưu trong trình duyệt của bạn.
-                Chúng tôi không dùng công cụ theo dõi hay yêu cầu tạo tài khoản.
+                Tài khoản được dùng cho lịch sử mua và theo dõi đơn. Phiên đăng
+                nhập giữ trong bộ nhớ, không lưu token vào localStorage.
               </p>
               <p>
                 Trong chế độ xem thử, tên, số điện thoại, địa chỉ và lời nhắn
@@ -675,17 +747,27 @@ export default function App() {
                 tư để liên hệ xác nhận và giao hoa. Cửa hàng không công khai
                 thông tin người nhận.
               </p>
+              <p>
+                Lời nhắn trên thiệp mặc định giữ riêng. Bạn có thể chia sẻ chính
+                lời nhắn sau khi đơn hoàn tất; chỉ lời nhắn, hình hoa và chữ ký
+                bạn chọn được công khai. Có thể rút chia sẻ bất cứ lúc nào.
+                Thông tin giao hàng được xóa sau 90 ngày kể từ cập nhật cuối của
+                đơn đã hoàn tất/hủy.
+              </p>
             </>
           ) : (
             <>
               <p>
-                Website hiện dùng bộ sưu tập, hình ảnh và giá mẫu. Bản xem trước
-                chưa phải đơn giao hoa và không thu tiền.
+                {connected
+                  ? "Đơn đặt được lưu riêng vào lịch sử của bạn. Cửa hàng kiểm tra hoa và địa chỉ giao trước khi xác nhận."
+                  : "Website hiện dùng bộ sưu tập, hình ảnh và giá mẫu. Bản xem trước chưa phải đơn giao hoa và không thu tiền."}
               </p>
               <p>
                 Khi nhận đơn thật, cửa hàng cần xác nhận tình trạng hoa, giá
                 cuối cùng, khu vực giao, phí giao và khung giờ trước khi thực
-                hiện. Thanh toán khi nhận hoa; không thu thông tin thẻ.
+                hiện. Thanh toán bằng COD hoặc chuyển khoản khi được bật; admin
+                kiểm tra tiền nhận rồi mới ghi nhận đã trả. Không thu thông tin
+                thẻ.
               </p>
               <p>
                 Hoa theo mùa có thể khác ảnh. Mọi thay đổi và yêu cầu hủy cần

@@ -1,16 +1,16 @@
 # Garden Dreams — sơ đồ hệ thống để duyệt
 
-Ngày: 09/10/2026. Trạng thái: đề xuất ranh giới module, chưa triển khai backend mới.
+Ngày: 09/10/2026. Trạng thái: chủ cửa hàng đã xác nhận; đã viết và kiểm thử local; chờ nối project Supabase và kiểm thử trình duyệt. Hướng dẫn: [SUPABASE-SETUP.md](SUPABASE-SETUP.md).
 
-| Module id | Trách nhiệm | Phụ thuộc |
-|---|---|---|
-| identity | Đăng nhập khách, phiên đăng nhập, quyền chủ shop/admin; khách chỉ xem đơn của mình | — |
-| shop-store | Thông tin cửa hàng, catalog, giá, cấu hình COD/tài khoản nhận VietQR; admin chỉnh sửa | identity |
-| fulfillment | Dịch vụ giao hoa, vùng giao, phí, khung giờ; lưu cấu hình được dùng tại lúc đặt đơn | identity, shop-store |
-| orders | Đặt đơn, giá máy chủ, lịch sử trạng thái, lịch sử mua và theo dõi; retry không tạo đơn trùng | identity, shop-store, fulfillment |
-| payments | COD, VietQR đúng tổng tiền/mã đơn; admin xác nhận tiền đã nhận và ghi lịch sử thay đổi | identity, shop-store, orders |
-| memories | Một dấu ấn cho mỗi đơn hoàn tất và đã thanh toán; khách tự nguyện công khai lời nhắn, không chờ duyệt | identity, orders, payments |
-| portals | Giao diện quản trị, tài khoản khách/theo dõi đơn, vườn kỉ niệm trong thiết kế Garden Dreams | identity, shop-store, fulfillment, orders, payments, memories |
+| Module id   | Trách nhiệm                                                                                           | Phụ thuộc                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| identity    | Đăng nhập khách, phiên đăng nhập, quyền chủ shop/admin; khách chỉ xem đơn của mình                    | —                                                             |
+| shop-store  | Thông tin cửa hàng, catalog, giá, cấu hình COD/tài khoản nhận VietQR; admin chỉnh sửa                 | identity                                                      |
+| fulfillment | Dịch vụ giao hoa, vùng giao, phí, khung giờ; lưu cấu hình được dùng tại lúc đặt đơn                   | identity, shop-store                                          |
+| orders      | Đặt đơn, giá máy chủ, lịch sử trạng thái, lịch sử mua và theo dõi; retry không tạo đơn trùng          | identity, shop-store, fulfillment                             |
+| payments    | COD, VietQR đúng tổng tiền/mã đơn; admin xác nhận tiền đã nhận và ghi lịch sử thay đổi                | identity, shop-store, orders                                  |
+| memories    | Một dấu ấn cho mỗi đơn hoàn tất và đã thanh toán; khách tự nguyện công khai lời nhắn, không chờ duyệt | identity, orders, payments                                    |
+| portals     | Giao diện quản trị, tài khoản khách/theo dõi đơn, vườn kỉ niệm trong thiết kế Garden Dreams           | identity, shop-store, fulfillment, orders, payments, memories |
 
 Thứ tự xây: identity → shop-store → fulfillment → orders → payments → memories → portals. Giao diện được nối vào từng module khi module đó có dữ liệu thật.
 
@@ -18,8 +18,8 @@ Thứ tự xây: identity → shop-store → fulfillment → orders → payments
 
 - Ưu tiên miễn phí trong giai đoạn xây dựng, chưa mở bán thật.
 - COD và chuyển khoản VietQR. Chỉ admin được đánh dấu đã thu tiền sau khi kiểm tra ngân hàng/tiền COD. Quét QR, bấm “đã chuyển” hoặc ảnh chụp không phải bằng chứng tự động thanh toán thành công.
-- Khách tự chọn chia sẻ **đoạn thông điệp công khai**. Không có bước admin duyệt trước.
-- Lời nhắn riêng trên thiệp và thông điệp công khai là hai trường riêng. Không tự sao chép lời nhắn riêng lên vườn kỉ niệm.
+- Khách tự chọn chia sẻ chính thông điệp trên thiệp sau khi xem trước. Không có bước admin duyệt trước.
+- Lời nhắn riêng chỉ được sao chép sang bản chia sẻ sau khi khách chọn rõ ràng. Khách chọn chia sẻ bằng link hoặc đưa thêm vào vườn; mặc định giữ riêng.
 - Công khai ngay khi đơn đã giao hoàn tất, thanh toán được xác nhận và khách đã đồng ý. Khách có thể rút chia sẻ; bản kỉ niệm riêng vẫn tồn tại.
 - Đơn thử, hủy hoặc chưa trả tiền không được tính vào số đơn mua thật. Hoàn tiền có lịch sử riêng và cập nhật dấu ấn tương ứng; không xóa dấu vết đối soát.
 - Public API chỉ trả nội dung được phép chia sẻ; không trả mã đơn nội bộ, tên, email, điện thoại hay địa chỉ. Một thông điệp khách tự viết vẫn có thể chứa thông tin cá nhân, nên form sẽ nhắc khách kiểm tra trước khi công khai.
@@ -30,11 +30,11 @@ Thứ tự xây: identity → shop-store → fulfillment → orders → payments
 
 Vercel tiếp tục phục vụ bản trải nghiệm hiện có. Kết nối repo đã được chấp thuận và thực hiện. Khi mở bán, có thể dùng Cloudflare Workers Static Assets cho frontend miễn phí; việc chuyển frontend là lựa chọn triển khai riêng, chưa thực hiện.
 
-| Lựa chọn | Phần miễn phí hiện tại | Đánh đổi |
-|---|---|---|
-| Supabase Free — đề xuất | PostgreSQL 500 MB/project, 50.000 MAU, 1 GB file storage, 5 GB egress | Có Auth/RLS sẵn; project có thể bị pause sau 7 ngày ít hoạt động; phải tự xuất backup trong giai đoạn free |
+| Lựa chọn                | Phần miễn phí hiện tại                                                                | Đánh đổi                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Supabase Free — đề xuất | PostgreSQL 500 MB/project, 50.000 MAU, 1 GB file storage, 5 GB egress                 | Có Auth/RLS sẵn; project có thể bị pause sau 7 ngày ít hoạt động; phải tự xuất backup trong giai đoạn free                 |
 | Cloudflare Workers + D1 | Workers 100.000 request/ngày; D1 tổng 5 GB, 5 triệu dòng đọc và 100.000 dòng ghi/ngày | Phải tự làm thêm lớp tài khoản; mỗi database Free giới hạn riêng, cần tính dung lượng từng DB; dùng SQLite thay PostgreSQL |
-| PostgreSQL tự host | Phần mềm miễn phí | VPS, backup, email, domain và vận hành không được mặc định là miễn phí |
+| PostgreSQL tự host      | Phần mềm miễn phí                                                                     | VPS, backup, email, domain và vận hành không được mặc định là miễn phí                                                     |
 
 Nguồn đã kiểm tra ngày 09/10/2026:
 

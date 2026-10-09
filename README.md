@@ -1,66 +1,46 @@
 # Garden Dreams
 
-Website hoa bằng React + Vite, giao diện tiếng Việt, video nền, hoa rơi, parallax và chuyển động khi cuộn. Dùng bảng màu, hình ảnh và video từ mẫu Flowers Are My Friend để phát triển storefront có mã nguồn chỉnh sửa được.
+Web bán hoa React + Vite, tiếng Việt, video nền, hoa rơi, parallax và chuyển động khi cuộn. Backend độc lập với Vercel bằng Supabase PostgreSQL + Auth + RLS/RPC. Đơn hàng và thanh toán không dùng Vercel Blob/Functions.
+
+- Repo private: [5erax/garden-dreams-florist](https://github.com/5erax/garden-dreams-florist).
+- Website: [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app/). Push `main` tự deploy qua GitHub.
+- **Cài backend:** [SUPABASE-SETUP.md](SUPABASE-SETUP.md). SQL chạy một lần trên project mới: [supabase/setup.sql](supabase/setup.sql).
 
 ## Chạy local
 
-Yêu cầu Node.js 24.
+Node.js 24: `npm ci`, rồi `npm run dev`. Kiểm tra bằng `npm test`, `npm run build`, `npm audit`.
 
-```sh
-npm ci
-npm run dev
-```
+Không có cấu hình Supabase thì website ở chế độ xem thử, không lưu đơn hoặc báo giả đã nhận đơn. Để nối backend, sao chép `.env.example` thành `.env.local`, điền Project URL + publishable key và cài migrations. Cửa hàng vẫn đóng nhận đơn cho đến khi admin cấu hình và bật.
 
-```sh
-npm test
-npm run build
-npm run preview
-```
+## Chức năng đã viết
 
-## Những gì đã có
+- 20 bó hoa mẫu, giá VNĐ, tìm kiếm/lọc/sắp xếp, chi tiết, yêu thích và giỏ hàng; admin thêm/sửa/ẩn hoa, chỉnh thông tin cửa hàng.
+- Tài khoản email, đăng ký/đăng nhập/khôi phục; lịch sử riêng, tiến trình đơn và lời nhắn trên thiệp. Khách không tự nâng quyền admin.
+- Admin quản lý khu vực/dịch vụ/phí giao, COD và thông tin ngân hàng VietQR; sửa trạng thái đơn, ghi nhận thu/hoàn tiền với ghi chú đối soát và nhật ký.
+- Máy chủ tính lại giá/phí, kiểm tra ngày/số lượng/consent, chặn retry khác dữ liệu và giới hạn tần suất đặt. Đơn giữ snapshot hoa, giá, phí ship và tài khoản nhận tiền.
+- Mỗi đơn đã giao + đã trả tạo đúng một kỉ niệm, mặc định riêng tư. Khách chọn chia sẻ chính lời nhắn qua link hoặc cả Vườn kỉ niệm, không cần admin duyệt. Người khác xem link không cần đăng nhập; rút chia sẻ làm link cũ mất hiệu lực.
+- Thiệp công khai chỉ gồm thông điệp, chữ ký tự chọn, hình/tên hoa và tháng/năm. Không có tài khoản, số điện thoại, địa chỉ người nhận, giá hay trạng thái đơn. Khách cần tránh tự đưa thông tin cá nhân vào thông điệp chia sẻ.
+- Vườn và lịch sử dùng cursor; không tải một triệu kỉ niệm lên trình duyệt cùng lúc. Không tạo dữ liệu đơn/kỉ niệm giả trên website.
+- QR sinh local; admin đối soát tiền thủ công, ghi nhận hoàn tiền không tự chuyển tiền. Chưa tự gọi hãng vận chuyển.
 
-- 20 bó hoa, giá VNĐ, tìm kiếm, lọc theo dịp và sắp xếp giá.
-- Chi tiết hoa, yêu thích, thêm/xóa/tăng/giảm số lượng và giỏ hàng lưu trong trình duyệt.
-- Form người nhận, số điện thoại Việt Nam, địa chỉ, ngày giao, khung giờ và lời nhắn.
-- Bản xem trước, sao chép nội dung đơn và liên kết Zalo/điện thoại `0832345780`. Khách tự gửi nội dung qua Zalo; website không tự gửi tin nhắn.
-- Giao diện mobile, dialog có focus trap, phím Escape, reduced motion và trạng thái trống/lỗi.
-- API Vercel `/api/orders` kiểm tra dữ liệu, tính tiền bằng giá máy chủ, lưu đơn riêng tư vào Blob khi được bật và chỉ báo thành công sau khi lưu.
+## Kiểm chứng
 
-## Trạng thái triển khai
+Tests dùng PostgreSQL nhúng PGlite chạy SQL thật với anon, hai khách và admin: RLS/truy cập chéo, giá/phí, idempotency, trạng thái/version, quyền ghi nhận tiền, chia sẻ/rút chia sẻ, xóa thông tin giao hàng, audit, rate limit; kiểm tra payload/CRC VietQR và cursor giữ microsecond. Không thay thế kiểm thử Supabase Auth/email hay ứng dụng ngân hàng thật.
 
-Mặc định là **bản trải nghiệm**, với bộ sưu tập và giá mẫu. Form không gửi/lưu thông tin người nhận, không thu tiền và không báo giả rằng cửa hàng đã nhận đơn. Giỏ hàng được giữ khi xem trước hoặc gặp lỗi.
+Tích hợp Supabase JS SDK đã kiểm tra với SQL/RLS/RPC thật và transport giả chỉ chạy local. Chạy `node scripts/e2e-server.mjs`, rồi ở terminal khác chạy `node scripts/check-flow.mjs`. Test server chỉ bind `127.0.0.1`; tài khoản/key/password trong script là dữ liệu giả, không dùng trên production. Không triển khai test server thành backend.
 
-GitHub repository: `5erax/garden-dreams-florist` (private).
-Vercel project: `garden-dreams-florist`.
+Chạy benchmark bằng `node scripts/benchmark-memories.mjs`. [Kết quả một triệu kỉ niệm giả](benchmarks/memories.json): trang 24 dấu dùng index/cursor, không trùng dấu; link trả đúng thông điệp. Table + index khoảng 497 MB với thông điệp ngắn, chưa gồm đơn hàng. Đây là số đo PGlite local, không phải SLA Supabase hay cam kết Free chứa đủ một triệu đơn. Cần đo dung lượng, backup và tải trên hosting thật khi mở rộng.
 
-URL: https://garden-dreams-florist.vercel.app/ (deploy trực tiếp đã thành công).
+## Trạng thái và giới hạn
 
-Kết nối GitHub với Vercel đã thực hiện sau khi chủ cửa hàng xác nhận ngày 09/10/2026. Push commit `421b703` đã tự tạo deployment production `READY`, GitHub status Vercel là `success`; vẫn có thể deploy thủ công bằng Vercel CLI.
+Đã viết backend/frontend và kiểm thử local; **chưa tạo/nối project Supabase thật** vì quyền dashboard đang chờ được mở lại. UI mới chưa kiểm thử bằng trình duyệt do quyền truy cập bị từ chối. Cần kiểm tra luồng thật, SMTP/xác nhận email, QR bằng app ngân hàng và Cron xóa thông tin giao hàng sau 90 ngày. Phiên đăng nhập giữ trong bộ nhớ tab; tải lại cần đăng nhập lại. Thiệp chưa có preview mạng xã hội riêng.
 
-Hướng phát triển mới: backend lưu đơn/thanh toán độc lập với Vercel, quản trị shop, theo dõi đơn và vườn kỉ niệm. Xem [CAPABILITY-MAP.md](./CAPABILITY-MAP.md) để duyệt ranh giới module trước khi viết backend. Website hiện tại vẫn là bản trải nghiệm; các chức năng mới chưa triển khai.
-
-Tài khoản Vercel hiện là Hobby; gói này chỉ cho mục đích phi thương mại. Cần gói phù hợp trước khi dùng website để bán thật: https://vercel.com/docs/plans/hobby.
-
-Kho Blob riêng tư `garden-dreams-orders` đã tạo ở Singapore và chưa kết nối; không có thông tin khách hàng trong kho. Theo yêu cầu backend độc lập mới, hướng phát triển dùng PostgreSQL thay vì Blob. API Blob hiện có chỉ là mã cũ chưa bật, sẽ được thay khi backend mới triển khai.
-
-## Luồng Blob cũ — chưa bật, được thay trong hướng phát triển mới
-
-1. Xác nhận giá, ảnh sản phẩm, khu vực/chi phí giao, chính sách và quyền sử dụng thương mại của tài nguyên mẫu.
-2. Chuyển hosting sang gói phù hợp cho kinh doanh.
-3. Cho phép nối kho `garden-dreams-orders` vào đúng project Vercel bằng OIDC. Không để credential trong mã nguồn hoặc biến `VITE_`.
-4. Đặt `VITE_SHOP_ORDERS_ENABLED=true` và `SHOP_ORDERS_ENABLED=true` rồi redeploy. `BLOB_STORE_ID` được thêm khi kết nối kho; SDK tự dùng OIDC.
-5. Kiểm thử gửi yêu cầu với dữ liệu giả, lưu thành công và retry; cấu hình chống spam trước khi mở cho công chúng.
-
-Đơn ở trạng thái `pending_confirmation`, thanh toán khi nhận và chưa có phí giao. Chủ shop xem đơn trong Vercel Storage; chưa có trang quản trị, email/SMS tự động, tồn kho hoặc thanh toán online. Không trả dữ liệu người nhận qua API công khai. Đơn cùng request ID được trả cùng mã tham chiếu để tránh tạo bản sao khi retry.
-
-## Kiểm thử
-
-`npm test` kiểm tra tổng tiền theo catalog, dữ liệu giỏ hỏng, sản phẩm/số lượng không hợp lệ, số điện thoại, consent, ngày giao theo giờ Việt Nam, phương thức/origin/body của API và việc chế độ demo không nhận đơn.
+Website hiện vẫn là bản trải nghiệm. Vercel Hobby dành cho mục đích phi thương mại; chọn hosting phù hợp trước khi bán. Không bật gói trả phí hoặc gửi tiền/tin nhắn tự động. Phone/Zalo `0832345780` do chủ shop cung cấp.
 
 ## Nguồn tài nguyên
 
-- Mẫu tham khảo: https://21st.dev/@rockgaming755/templates/flowers-are-my-friend
-- Demo gốc do Rock Gaming đăng: https://floweraremyfriend.netlify.app/
-- Ảnh story được demo dùng từ Unsplash. Video nền và ảnh bó hoa được lấy từ demo công khai theo yêu cầu người dùng.
+- [Flowers Are My Friend](https://21st.dev/@rockgaming755/templates/flowers-are-my-friend).
+- [Demo tác giả](https://floweraremyfriend.netlify.app/).
+- Ảnh story từ Unsplash; video nền và ảnh hoa lấy từ demo công khai theo yêu cầu chủ shop.
 
-Mã ứng dụng trong `src/` và `api/` được viết mới. Không có mã React gốc của template và không kèm giấy phép thương mại cho ảnh/video của tác giả. Repository được tạo private; cần xác minh quyền dùng ảnh/video trước khi vận hành thương mại.
+Mã ứng dụng viết mới; không có mã React gốc của template. Chưa có giấy phép thương mại ảnh/video tác giả; cần xác minh quyền sử dụng trước khi vận hành bán hoa.
