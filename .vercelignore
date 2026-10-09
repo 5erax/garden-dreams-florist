@@ -1,0 +1,5 @@
+scripts/
+tests/
+supabase/
+tasks/
+benchmarks/

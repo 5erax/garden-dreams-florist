@@ -8,12 +8,12 @@ export const vietnamDate = (now = new Date()) =>
     day: "2-digit",
   }).format(now);
 
-export function normalizeCart(value) {
+export function normalizeCart(value, catalog = products) {
   if (!Array.isArray(value)) return [];
   const quantities = new Map();
   for (const line of value) {
     if (
-      !products.some((p) => p.id === line?.id) ||
+      !catalog.some((p) => p.id === line?.id) ||
       !Number.isInteger(line?.quantity) ||
       line.quantity < 1
     )
@@ -26,14 +26,14 @@ export function normalizeCart(value) {
   return [...quantities].map(([id, quantity]) => ({ id, quantity }));
 }
 
-export const subtotal = (cart) =>
-  normalizeCart(cart).reduce(
+export const subtotal = (cart, catalog = products) =>
+  normalizeCart(cart, catalog).reduce(
     (sum, line) =>
-      sum + products.find((p) => p.id === line.id).price * line.quantity,
+      sum + catalog.find((p) => p.id === line.id).price * line.quantity,
     0,
   );
 
-export function validateOrder(input, now = new Date()) {
+export function validateOrder(input, now = new Date(), catalog = products) {
   if (!input || typeof input !== "object" || Array.isArray(input))
     throw new Error("Thông tin đặt hoa không hợp lệ.");
   if (
@@ -67,7 +67,7 @@ export function validateOrder(input, now = new Date()) {
     throw new Error("Giỏ hoa đang trống hoặc có quá nhiều sản phẩm.");
   const seen = new Set();
   const items = input.items.map((line) => {
-    const product = products.find((p) => p.id === line?.id);
+    const product = catalog.find((p) => p.id === line?.id);
     if (
       !product ||
       seen.has(line.id) ||
@@ -115,7 +115,7 @@ export function validateOrder(input, now = new Date()) {
     deliveryDate: date,
     deliveryTime: input.deliveryTime,
     items,
-    subtotal: subtotal(items),
+    subtotal: subtotal(items, catalog),
     payment: "COD",
     status: "pending_confirmation",
   };

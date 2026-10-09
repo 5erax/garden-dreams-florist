@@ -1,0 +1,9 @@
+{
+  "rows": 1000000,
+  "totalSeconds": 61.38,
+  "pageSize": 24,
+  "secondPageMs": 4.56,
+  "tableAndIndexBytes": 497483776,
+  "plan": "Limit  (cost=0.42..3.05 rows=24 width=167) (actual time=0.109..0.262 rows=24.00 loops=1)\n  Buffers: shared hit=4\n  ->  Index Scan using gd_memories_garden_cursor on gd_memories  (cost=0.42..109483.43 rows=999900 width=167) (actual time=0.095..0.145 rows=24.00 loops=1)\n        Index Cond: (ROW(created_at, id) < ROW('2026-01-01 07:00:00.999977+07'::timestamp with time zone, 'f3ad20cf-d2b4-7ad8-c1c2-1b45cd1424c5'::uuid))\n        Index Searches: 1\n        Buffers: shared hit=4\nPlanning:\n  Buffers: shared hit=3\nPlanning Time: 0.545 ms\nExecution Time: 0.464 ms",
+  "scope": "Local PGlite, short synthetic messages, actual schema/index/RPC; excludes orders, Auth, network, concurrency and Supabase Free capacity."
+}

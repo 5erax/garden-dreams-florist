@@ -9,12 +9,14 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@vercel/blob": "2.8.1",
+    "@supabase/supabase-js": "2.117.3",
     "motion": "14.0.0",
+    "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@vitejs/plugin-react": "6.1.2",
     "vite": "8.3.4"
   }
