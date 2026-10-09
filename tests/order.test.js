@@ -98,6 +98,28 @@ test("accepts the Vietnam +84 format and trims submitted text", () => {
   assert.equal(order.name, "Khách thử nghiệm");
 });
 
+test("cart keeps sizes separate, calculates catalog prices and drops unavailable sizes without substituting", () => {
+  const catalog = [{ id: 1, name: "Hoa thử", price: 390000, variants: [
+    { id: 101, size_name: "Bó lớn", sku: "TEST-L", price: 700000, active: true },
+    { id: 102, size_name: "Bó vừa", sku: "TEST-M", price: 500000, active: true },
+    { id: 103, size_name: "Cỡ tắt", price: 1000000, active: false },
+  ] }];
+  const cart = normalizeCart([{ id: 1, quantity: 1 }, { id: 1, variantId: 101, quantity: 1, price: 1 },
+    { id: 1, variantId: 101, quantity: 2 }, { id: 1, variantId: 102, quantity: 1 },
+    { id: 1, variantId: 103, quantity: 1 }, { id: 1, variantId: "101", quantity: 1 },
+    { id: 1, variantId: 999, quantity: 1 }], catalog);
+  assert.deepEqual(cart, [{ id: 1, quantity: 1 }, { id: 1, variantId: 101, quantity: 3 }, { id: 1, variantId: 102, quantity: 1 }]);
+  assert.equal(subtotal(cart, catalog), 2990000);
+  const order = validateOrder({ ...input, items: cart }, now, catalog);
+  assert.equal(order.items[1].price, 700000);
+  assert.equal(order.items[1].sizeName, "Bó lớn");
+  assert.equal(order.items[1].sku, "TEST-L");
+  for (const items of [[{ id: 1, variantId: 103, quantity: 1 }], [{ id: 1, variantId: 999, quantity: 1 }],
+    [{ id: 1, variantId: 101, quantity: 1 }, { id: 1, variantId: 101, quantity: 2 }]])
+    assert.throws(() => validateOrder({ ...input, items }, now, catalog), /Số lượng/);
+  assert.deepEqual(normalizeCart(cart, [{ ...catalog[0], variants: [] }]), [{ id: 1, quantity: 1 }]);
+});
+
 function response() {
   return {
     headers: {},
