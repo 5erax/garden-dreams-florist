@@ -32,11 +32,13 @@ Giữ email confirmation bật và mật khẩu tối thiểu 12 ký tự. Khôn
 
 ## URL Configuration
 
-- Staging Site URL: URL preview hiện đang dùng; cập nhật khi chọn một alias staging ổn định.
-- Staging redirect cho preview hiện tại: `https://garden-dreams-florist-8k1qq8aha-dhas-projects-901181f4.vercel.app/#account`.
+- Staging Site URL: `https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app`. Đây là alias cố định của branch staging hiện tại, đã được Vercel trả về; dùng URL này để thử tài khoản.
+- Staging redirect: `https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app/#account`.
 - Staging redirect local: `http://127.0.0.1:5175/#account`; chạy dev với `--port 5175 --strictPort --mode staging` nếu dùng URL này.
 - Nếu cần hỗ trợ các preview mới, chỉ thêm pattern của project/team staging: `https://garden-dreams-florist-*-dhas-projects-901181f4.vercel.app/**`. Không thêm pattern rộng cho mọi `vercel.app`.
 - Production giữ Site URL `https://garden-dreams-florist.vercel.app` và redirect chính xác `https://garden-dreams-florist.vercel.app/#account`. Project production không nhận callback staging/local.
+
+Nếu đã điền URL preview cũ, thêm alias/redirect trên và cập nhật Site URL trước khi thử email. Mở ứng dụng bằng alias này; không cần dùng URL deployment riêng thay đổi sau mỗi push. Bản sửa callback tại commit `c969382` đã có deployment READY; alias trỏ theo các lần deploy tiếp của branch.
 
 AuthPanel lấy callback từ origin đang mở; signup và reset gửi về `/#account`. SDK nhận session từ URL; ứng dụng đưa callback về Góc của tôi sau khi SDK đọc URL, xóa token/tham số lỗi và báo lỗi chung với link hết hạn/đã dùng. Handler `PASSWORD_RECOVERY` mở form đổi mật khẩu. Phiên giữ trong bộ nhớ; reload phải đăng nhập lại. [Supabase redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
 

@@ -46,4 +46,5 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Chủ shop chọn Gmail riêng để thử staging và sẽ tự điền App Password trong Supabase. Không yêu cầu hoặc lưu SMTP secret trong chat/repo/frontend.
 - Nhận diện callback trước khi SDK xóa fragment; sau khi khởi tạo Auth, đưa khách về Góc của tôi, bỏ token/tham số lỗi khỏi URL và giữ query không liên quan. Link lỗi/hết hạn có thông báo chung, không hiển thị lỗi/token do provider gửi. Đăng nhập hoặc khôi phục thành công xóa thông báo cũ.
 - Kiểm chứng: 27 tests qua, gồm 2 tests nhận diện callback/làm sạch URL; build staging qua. Chưa kiểm chứng callback trực tiếp trong trình duyệt hoặc gửi/nhận email thật.
+- Đã push commit `c969382df3ae39ebe6cb2e87e197465375526a5a`; Vercel xác nhận `dpl_G6tgnuDBwABzjCrD97vYYaEkffFu` READY, đúng project/branch/commit, Vercel check trên PR SUCCESS. [Alias staging cố định](https://garden-dreams-florist-git-feature-ed38b9-dhas-projects-901181f4.vercel.app) được trả về từ metadata deployment; hướng dẫn SMTP đã cập nhật Site URL/redirect tương ứng.
 - Tiến độ vẫn **1/32 task**. BU-02 chưa tick; BU-03 chờ Auth/SMTP thật và dữ liệu kiểm thử của chủ shop.
