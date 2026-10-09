@@ -11,12 +11,15 @@ import {
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import { PortalShell } from "./PortalShell.jsx";
-import CustomerPortal from "./CustomerPortal.jsx";
-import AdminPortal from "./AdminPortal.jsx";
-import Garden, { SharedMemory } from "./Garden.jsx";
+import RouteBoundary from "./RouteBoundary.jsx";
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
 import "./portal.css";
+
+const loadCustomer = () => import("./CustomerPortal.jsx");
+const loadAdmin = () => import("./AdminPortal.jsx");
+const loadGarden = () => import("./Garden.jsx");
+const loadMemory = () => import("./Garden.jsx").then(module => ({ default: module.SharedMemory }));
 
 function readStored(key, fallback) {
   try {
@@ -250,15 +253,12 @@ export default function App() {
     return (
       <PortalShell>
         {pendingNotice}
-        {route === "#account" ? (
-          <CustomerPortal key={session?.user.id || "signed-out"} />
-        ) : route === "#admin" ? (
-          <AdminPortal />
-        ) : route === "#garden" ? (
-          <Garden />
-        ) : (
-          <SharedMemory key={route} token={route.slice(8)} />
-        )}
+        <RouteBoundary
+          key={`${route}:${session?.user.id || "signed-out"}`}
+          load={route === "#account" ? loadCustomer : route === "#admin" ? loadAdmin : route === "#garden" ? loadGarden : loadMemory}
+          title={route === "#account" ? "Góc của bạn" : route === "#admin" ? "Quản trị cửa hàng" : "Vườn kỉ niệm"}
+          pageProps={route.startsWith("#memory/") ? { token: route.slice(8) } : {}}
+        />
       </PortalShell>
     );
 
