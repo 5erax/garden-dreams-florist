@@ -195,3 +195,8 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Kiểm caller Store/AdminPortal/OrderDetail và effect cleanup. 3 regressions: kết quả quyền đến muộn, logout/đổi chủ, mất/lấy lại quyền và giao diện tài khoản chưa xác thực. Mutation bỏ so khớp ID bị bắt, đã khôi phục. 137 staging tests/build và 71 production tests/build qua.
 - LOC canonical 14.566 (+3.779 từ baseline 10.787), còn 11.221 để đạt mục tiêu thêm 15.000. Task toàn bộ/90% và hosted acceptance chưa được xác nhận. Không đổi trạng thái nhận đơn hoặc cài migration production mới.
 - PR #8 đã merge head `2ba84cd643b2a39c4fdb7c5eb45d1b2b7004cfc7`; main `ae826d81ed1a70265033c9b848b58fc61d0fefbb`. Vercel `dpl_GhkUhkr2cq6NPAWBxFFXZA5AWWkR` READY, đúng production/SHA và alias garden-dreams-florist.vercel.app. Nguồn staging `fad76bd`; schema/auth backend và nhận đơn giữ nguyên.
+
+### Nâng cấp staging thủ công — kết quả chủ project, 10/10/2026
+
+- Chủ project chạy truy vấn kiểm tra chỉ đọc và gửi ảnh: projectRef tgvozhrkolcpszyyrgth, environment staging, variants/delivery/payments NULL. Sau hướng dẫn chạy staging-upgrade-005-to-012.sql, gửi ảnh kết quả upgraded_environment với productAlbum, orderRequests và variantOrders true. Kết quả cuối của file nằm sau COMMIT; ảnh JSON bị cắt nên chưa xác nhận đủ mọi feature/projectRef sau nâng cấp hoặc luồng SDK/Auth/UI.
+- Bước tiếp theo: Gmail App Password và Custom SMTP chỉ trên staging, sau đó URL callback/template/đăng ký-khôi phục và ca thử. Không yêu cầu gửi secret qua chat. Production không được nâng cấp hoặc mở nhận đơn bởi thao tác staging này.
