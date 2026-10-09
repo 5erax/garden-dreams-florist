@@ -4,6 +4,12 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Cập nhật mới nhất 10/10/2026:** bản commerce main 4d55f05 đã deploy production READY tại dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ; xác minh exact SHA/alias. Backend production đã nâng cấp atomic 004→012 qua Supabase MCP được chủ shop cấp quyền. Một đơn cũ, 20 sản phẩm, ba dịch vụ giao active và trạng thái nhận đơn true có sẵn được giữ; không ghi nhận khoản thu, mọi bảng Garden Dreams có RLS.
+- **Kiểm chứng:** 143 tests/build production qua; SQL acceptance hosted staging qua COD 0/30k/50k, VietQR UNPAID, idempotency, quyền khách/admin, fulfillment, kỉ niệm opt-in/revoke; toàn bộ dữ liệu thử rollback. Có regression migration thất bại rollback, giữ snapshot đơn/shop/catalog và không chạy lại nhầm.
+- **Retention:** phát hiện production thiếu pg_cron/job; đã cài retention.sql hiện có. Job active=true, 03:00 Việt Nam, không có liên hệ quá hạn. Chưa có scheduled-run history và backup/restore hosted.
+- **Chưa nghiệm thu:** browser bị saved permission block cho cả hai trang; Auth production/template recovery, UI và QR app ngân hàng còn mở. Không tick toàn bộ BU-02/03/04/05 hoặc khẳng định 90%. Hosted DB đã có album/cỡ/lịch/bàn vận hành/yêu cầu/sổ tiền; nhận đơn bằng tài khoản email vẫn cần nghiệm thu đầu-cuối.
+- **LOC canonical:** 14.743 (+3.956 từ baseline 10.787), còn 11.044 tới mục tiêu thêm 15.000; SQL bundle trùng không được tính. Ưu tiên release chức năng hữu ích theo chỉ đạo chủ shop, không padding.
+
 - **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Đến BU-19a đạt **14.515** (+3.728, còn 11.272). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
 - **BU-19a: mua lại từ lịch sử đã có mã/local**, dùng mẫu/cỡ/giá hiện tại, giữ giỏ, báo phần không còn bán hoặc vượt giới hạn; không chép PII/thiệp/lịch cũ. 12 helper + 3 SSR tests qua, toàn bộ staging 134 tests/build qua. Chưa kiểm browser/hosted, cổng BU-19 tổng vẫn mở.
 - **BU-14: mã nguồn/local sổ đối soát đã xong.** Thu/hoàn toàn phần, số dư owner, chứng từ admin, retry/version/reference, báo cáo ngày Việt Nam và LEGACY riêng. 10 SQL + 8 helper tests, kiểm upgrade/rollback qua; staging build qua. Xem [PAYMENT-LEDGER.md](../PAYMENT-LEDGER.md). Migration 012 chưa cài hosted; không tick nghiệm thu toàn task.

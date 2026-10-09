@@ -1,5 +1,15 @@
 # Garden Dreams — first sales release
 
+## Current release — 10/10/2026 (supersedes historical closed/schema notes below)
+
+Commerce source is released directly on main: a212b37, followed by template-directory correction 4d55f0596a54a7b149c4a8fe3a27aa0e9ad9ed30. Vercel dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ is READY, target production, with the exact SHA and garden-dreams-florist.vercel.app alias verified through deployment metadata. Admin albums/variants, delivery calendar, operations, customer requests and manual reconciliation now use the corresponding hosted schema.
+
+Authorized official Supabase MCP applied the guarded atomic production upgrade 004→012. Verified runtime production/ztzpipgptticvliotbsc, one retained order, 20 products, three active shipping services, zero payment ledger rows and all Garden Dreams tables with RLS. The shop was already accepting_orders=true before this release; that state was preserved. Hosted staging transaction acceptance passed COD fees, unpaid VietQR, deduplication, admin boundaries, fulfillment and opt-in/revoke memories, with test data rolled back. 143 production tests/build passed.
+
+Production had no cron.job despite the earlier owner-reported retention setup. The existing retention.sql was applied via MCP: garden-dreams-expire-contacts active=true, schedule 0 20 * * *, GMT (03:00 Vietnam), zero overdue contacts. This is scheduling evidence, not a successful scheduled-run history (currently zero runs).
+
+Browser retries still reject both the logged-in Supabase dashboard and public storefront under saved permission policy. Production signup/recovery/callback, visual desktop/mobile acceptance and a banking-app QR scan remain unverified; do not claim full launch acceptance. MCP currently exposes database operations, not Auth SMTP/template editing. Vercel Hobby commercial-use restrictions also require an appropriate hosting plan before commercial use. See OPERATIONS-START.md in the production branch for daily procedures.
+
 10/10/2026 admin-session release: PR #8 merged into main `ae826d81ed1a70265033c9b848b58fc61d0fefbb`; Vercel `dpl_GhkUhkr2cq6NPAWBxFFXZA5AWWkR` READY on the main shop alias. Frontend admin authority now belongs to the verified account, and management state is discarded when the account or admin permission changes. Three regressions and an identity-check mutation cover the change; 71 production / 137 staging tests and both builds pass. This does not change database permissions, SMTP, hosted schema or accepting_orders. Real browser/auth launch acceptance remains pending.
 
 10/10/2026: owner requested a usable release and replacement of framework imagery. Replaced the default build-tool favicon with the store's existing flower mark, including a new filename to avoid the old icon cache. Generated decorative brand photography for the hero (158,882-byte WebP) and social sharing (259,359-byte JPEG); approved catalog photos are unchanged. The hero no longer downloads/autoplays the old background video. Share metadata uses an absolute public image URL and describes the image. The generated hero is brand decoration, not a representation of a specific purchasable bouquet.
