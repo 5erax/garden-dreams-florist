@@ -87,6 +87,9 @@ const messages = {
   REQUEST_RATE_LIMIT: "Bạn vừa gửi nhiều yêu cầu. Chờ một chút rồi thử lại; yêu cầu đã lưu vẫn có trong đơn.",
   ADDRESS_REQUOTE_REQUIRED: "Đổi địa chỉ cần kiểm tra lại vùng giao, phí và ca. Biểu mẫu này chỉ sửa tên và điện thoại tại địa chỉ hiện có.",
   PAYMENT_UNAVAILABLE: "Phương thức thanh toán này chưa khả dụng.",
+  INVALID_RECONCILIATION: "Kiểm tra thao tác thu/hoàn, nội dung đối soát và mã tham chiếu.",
+  PAYMENT_REFERENCE_USED: "Mã giao dịch này đã được dùng để đối soát một đơn khác. Kiểm tra chứng từ trước khi tiếp tục.",
+  INVALID_REPORT_PERIOD: "Chọn khoảng ngày hợp lệ, tối đa 92 ngày, theo giờ Việt Nam.",
   PRICE_CHANGED:
     "Giá hoặc phí giao đã thay đổi. Cập nhật giá và kiểm tra tổng tiền trước khi gửi lại.",
   IDEMPOTENCY_CONFLICT:

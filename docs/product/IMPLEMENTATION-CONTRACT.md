@@ -23,11 +23,11 @@ DEC-04–10 còn thiếu các ngưỡng/chính sách cụ thể: phí hủy sau 
 | Checkout | Order intent UUID và hash | Retry cùng intent không tạo đơn mới; kết quả mất ACK có đường khôi phục. |
 | OMS | gd_orders, gd_order_events, gd_order_requests | Request không tự hủy; chấp thuận kiểm tra current state trong transaction. |
 | Delivery | Rules, closures, order calendar snapshot | Asia/Ho_Chi_Minh, cutoff/capacity; managed mode tắt cho đến khi shop cấu hình. |
-| Payment | Manual payment state hiện tại | Delivered độc lập paid; cancel không tự refund; chưa có partial refund ledger. |
+| Payment | Manual payment state + gd_payment_ledger | Delivered độc lập paid; cancel không tự refund; chưa có partial refund ledger. |
 | Memories | gd_memories | One/order, exact card opt-in, public payload không PII người nhận. |
 | Inventory/BOM | Chưa triển khai | Không coi active catalog là ATP; reservation cần ledger/FEFO/expiry/QC. |
 | Branch/staff | Chưa triển khai | Phân quyền theo branch tại server trước khi mở staff portal. |
-| Finance | Tổng trạng thái đơn hiện tại | Gắn kỳ/ngày và định nghĩa; không gọi tiền đã thu là doanh thu/lợi nhuận. |
+| Finance | Sổ thu/hoàn theo ngày đối soát + queue bounded | Gắn kỳ/ngày và định nghĩa; không gọi tiền đã thu là doanh thu/lợi nhuận. |
 
 Không đổi tên trạng thái đã có trên đơn production hoặc phá client cũ để giống hình state machine trong tài liệu. Chuỗi hiện tại `PENDING → CONFIRMED → PREPARING → SHIPPING → DELIVERED`, có CANCELLED và payment độc lập. PENDING là yêu cầu chờ shop, không tự đồng nghĩa PENDING_PAYMENT. Chuỗi chuẩn bổ sung ALLOCATED/READY/FAILED qua fulfillment/work order/shipment và migration có tương thích; chỉ tuyên bố đã đạt khi guard production/QC/POD thực sự được nối.
 

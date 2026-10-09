@@ -9,6 +9,7 @@ import ProductPhotosEditor from "./ProductPhotosEditor.jsx";
 import AdminVariants from "./AdminVariants.jsx";
 import AdminDelivery from "./AdminDelivery.jsx";
 import OperationsDesk from "./OperationsDesk.jsx";
+import ReconciliationDesk from "./ReconciliationDesk.jsx";
 
 const newProduct = {
   name: "",
@@ -35,7 +36,7 @@ export default function AdminPortal() {
     [filter, setFilter] = useState("");
   async function load(append = false) {
     if (!store.isAdmin) return;
-    if (tab === "calendar" || tab === "desk") return;
+    if (["calendar", "desk", "reconciliation"].includes(tab)) return;
     setBusy(true);
     setError("");
     try {
@@ -190,6 +191,7 @@ export default function AdminPortal() {
           ["shop", "Cửa hàng & thanh toán"],
           ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
           ...(store.features.operationsDesk ? [["desk", "Bàn xử lý đơn"]] : []),
+          ...(store.features.reconciliationLedger ? [["reconciliation", "Đối soát tiền"]] : []),
         ].map(([key, name]) => (
           <button
             key={key}
@@ -201,7 +203,7 @@ export default function AdminPortal() {
           </button>
         ))}
       </nav>
-      {tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : <>
+      {tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
       <div className="portal-section-heading">
         <h2>
           {tab === "orders"

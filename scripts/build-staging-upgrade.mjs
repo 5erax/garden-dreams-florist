@@ -39,7 +39,17 @@ $$;`];
   pieces.push('commit;\nselect public.gd_environment() as upgraded_environment;');
   return pieces.join('\n\n') + '\n';
 }
+export async function buildStagingPaymentUpgrade() {
+  const source = await readFile(new URL('../supabase/migrations/202610100012_payment_ledger.sql', import.meta.url), 'utf8');
+  if (!/^begin;\s*\n/i.test(source) || !/\ncommit;\s*$/i.test(source)) throw new Error('Payment migration transaction wrapper changed');
+  const previous = await buildStagingUpgrade();
+  const closing = 'commit;\nselect public.gd_environment() as upgraded_environment;\n';
+  if (!previous.endsWith(closing)) throw new Error('Staging upgrade closing transaction changed');
+  return previous.slice(0, -closing.length) + '-- 202610100012_payment_ledger.sql\n' +
+    source.replace(/^begin;\s*\n/i, '').replace(/\ncommit;\s*$/i, '') + '\n\n' + closing;
+}
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   await writeFile(new URL('../supabase/staging-upgrade-005-to-011.sql', import.meta.url), await buildStagingUpgrade());
-  console.log('Prepared staging-upgrade-005-to-011.sql; no database connection or execution.');
+  await writeFile(new URL('../supabase/staging-upgrade-005-to-012.sql', import.meta.url), await buildStagingPaymentUpgrade());
+  console.log('Prepared staging upgrades 005-to-011 and 005-to-012; no database connection or execution.');
 }

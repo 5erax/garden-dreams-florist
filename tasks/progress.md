@@ -1,10 +1,12 @@
 # Tiến độ big update
 
-Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lần lượt 32 task; thứ tự vận hành → vườn kỉ niệm → toàn trải nghiệm. Cập nhật sau mỗi task/lát cắt được kiểm chứng. Chỉ tick task lớn khi đạt cả tiêu chí nghiệm thu và kiểm chứng môi trường thật.
+Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lần lượt 32 task; thứ tự vận hành → vườn kỉ niệm → toàn trải nghiệm. Cập nhật sau mỗi task/lát cắt được kiểm chứng. Chỉ tick task lớn khi đạt cả tiêu chí nghiệm thu và kiểm chứng môi trường thật.
 
 ## Hiện tại
 
-- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Sau các lát cắt đầu đạt **13.128** (+2.341, còn 12.659). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **Đợt mở rộng thêm 15.000 LOC đang triển khai.** Baseline staging 10.787 dòng, mục tiêu tổng 25.787. Đến BU-14 đạt **14.160** (+3.373, còn 11.627). `npm run loc` loại thư viện, docs/build và SQL setup trùng; chưa đạt mốc.
+- **BU-14: mã nguồn/local sổ đối soát đã xong.** Thu/hoàn toàn phần, số dư owner, chứng từ admin, retry/version/reference, báo cáo ngày Việt Nam và LEGACY riêng. 10 SQL + 8 helper tests, kiểm upgrade/rollback qua; staging build qua. Xem [PAYMENT-LEDGER.md](../PAYMENT-LEDGER.md). Migration 012 chưa cài hosted; không tick nghiệm thu toàn task.
+- **Production UI đã phát hành qua PR #5**, main d7de806514f3c9cbd93c4f11b8e227070c6b64dc. Vercel dpl_CmTbr4o3fNQGGmngfUhj3DhqU5o8 READY đúng SHA/target/alias garden-dreams-florist.vercel.app. 53 production tests/build qua; chỉ history/lazy routes tương thích 001–004, chưa phát hành backend mới hay mở nhận đơn.
 - **Đã nhận và đối chiếu tài liệu Word nghiệp vụ v1**: lưu nguyên bản/SHA-256 và traceability đủ 95 chức năng tại docs/product. Nguồn điều chỉnh backlog BU/FC, không tự chốt các DEC còn mở hoặc thay quyết định COD/VietQR/kỉ niệm của chủ shop.
 - **BU-13: mã nguồn/local correction tên/điện thoại và yêu cầu hủy đã xong.** Khách gửi/rút/theo dõi; admin duyệt theo trạng thái hiện tại, UUID/version/audit không PII. Đổi địa chỉ cần re-quote nên chưa áp trực tiếp. Hủy không tự hoàn tiền. Review đã phát hiện và sửa free-text retention/rate-limit race; 8 SQL và 8 helper tests qua, mutation bỏ guard địa chỉ bị test bắt. Migration 011 chưa cài hosted.
 - **ACC-F03 / BU-32: lịch sử mua và tách tải route đã xong local.** Owner scope explicit, tìm/lọc phần đã tải, phân trang 20/cap 200, focus trở lại đơn. Route retry giữ session/cart. 8 history + 2 route tests qua; JS ban đầu 678,58 kB, chưa đo Core Web Vitals/browser thật.
@@ -160,3 +162,9 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Browser thử truy cập đúng production bị saved preference từ chối. Không đổi surface/cổng/CDP hoặc dùng private API để vượt chặn. Auth public cho thấy signup bật nhưng bắt xác nhận email; cấu hình SMTP/email thật và browser/payment acceptance vẫn chưa hoàn tất. Đây chưa phải tuyên bố cửa hàng nhận được đơn online thật.
 - PR #3 đã merge đúng head đã kiểm tra; main commit `5aa7ab4098df4c00d429c90ef8fb479abbd261d3`. Vercel production `dpl_AsntM9NEjZ4JUdK2DizsaBprpTcY` **READY**, đúng project/target/branch/SHA và alias [garden-dreams-florist.vercel.app](https://garden-dreams-florist.vercel.app). Không thay bảo vệ preview hoặc mở nhận đơn. Giữ hướng dùng web để chọn hoa và liên hệ shop trong lúc hoàn tất email/QA.
 - Đồng bộ release về staging, giữ đủ runtime/capability/auth guards và quản trị album/cỡ. **48 tests staging qua** sau merge, gồm backup/restore/retention dữ liệu giả; build staging qua, bundle khoảng 688 kB. Không coi backup local hoặc SSR là nghiệm thu môi trường hosted/browser. PR #1 vẫn draft.
+
+### BU-14 — Sổ đối soát trên mã nguồn staging
+
+- 117 tests và staging build qua; review độc lập không có blocker. Mutation amount=1 và đảo guard tham chiếu bị bắt; đã khôi phục. Ranh giới 00:00 giờ Việt Nam được kiểm thu/hoàn tại trước/đúng/sau cutoff ngày.
+- Bundle staging 005→012 giữ transaction/guard, thử lỗi cuối rollback cả schema trung gian; backfill không giả ngày thu. Production vẫn ở release UI PR #5, không phát hành backend mới.
+- LOC canonical 14.160 (+3.373), còn 11.627 để đạt thêm 15.000; chưa hosted/browser/concurrency đa connection. Tiến độ nghiệm thu toàn task vẫn 1/32.

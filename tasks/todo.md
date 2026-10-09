@@ -102,7 +102,7 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 ### BU-10 — Cấu hình lịch và năng lực giao — M
 
-Đợt mở rộng 15.000 LOC: được chủ shop yêu cầu tiếp tục phát triển mã nguồn và giao diện trên staging; các cổng nghiệm thu/phát hành phía trên vẫn giữ. `npm run loc` đo theo policy trong plan.md, chờ xác định mục tiêu là tổng hay tăng thêm.
+Đợt mở rộng thêm 15.000 LOC: chủ shop đã xác nhận tăng thêm, mục tiêu tổng 25.787 dòng theo policy trong plan.md; các cổng nghiệm thu/phát hành phía trên vẫn giữ.
 
 Đã chuẩn bị migration 009, AdminDelivery và DeliveryPicker, tương thích qua capability. 65 tests/build staging qua; chưa cài migration trên hosting, chưa nghiệm thu browser. Lịch mặc định thủ công; không tự áp ca/ngày nghỉ/sức chứa giả lên shop thật.
 
@@ -137,6 +137,8 @@ Mã/local: migration 011 và OrderRequests cho CANCEL / correction tên-điện 
       Phụ thuộc: BU-12, chính sách đã chốt. File: migration/RPC yêu cầu, OrderDetail, admin yêu cầu và test. Kiểm: SQL, SDK, UI, Build.
 
 ### BU-14 — Sổ đối soát COD/VietQR — M
+
+Mã/local hoàn thành: migration 012, Reconciliation/Desk, thu-hoàn toàn phần, evidence admin, số dư owner, retry/version/reference, báo cáo ngày Việt Nam và LEGACY riêng. Xem PAYMENT-LEDGER.md; migration/SDK/browser hosted còn chờ, chưa tick acceptance.
 
 - [ ] Có danh sách cần thu/đã thu/hoàn toàn phần, người/thời điểm/tham chiếu; chỉ vai trò phù hợp được xác nhận.
 - [ ] Tổng báo cáo khớp các khoản đã ghi nhận; thông báo của khách không tự chuyển PAID, ghi nhận hoàn không chuyển tiền.

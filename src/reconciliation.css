@@ -1,0 +1,51 @@
+.reconciliation { padding-top: 32px; margin-top: 36px; border-top: 1px solid var(--line); }
+.reconciliation-heading { display: flex; justify-content: space-between; gap: 24px; align-items: start; }
+.reconciliation h3 { font-size: 30px; margin: 12px 0 20px; }
+.reconciliation p, .reconciliation label, .reconciliation legend { font-size: 14px; }
+.reconciliation-explanation { max-width: 76ch; line-height: 1.8; }
+.reconciliation .text-button { min-height: 44px; }
+.reconciliation-balances { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(170px,100%),1fr)); gap: 12px; margin: 24px 0; }
+.reconciliation-balances > div { padding: 20px 16px; background: var(--paper); border: 1px solid var(--line); }
+.reconciliation-balances dt { color: var(--muted); font-size: 12px; }
+.reconciliation-balances dd { font-size: 21px; font-variant-numeric: tabular-nums; margin: 14px 0 0; }
+.reconciliation-notice, .reconciliation-recovery { padding: 20px; margin: 20px 0; border-left: 2px solid var(--rose); background: #eee8df; }
+.reconciliation-recovery p { margin: 14px 0; }
+.reconciliation code { font-size: 12px; overflow-wrap: anywhere; }
+.reconciliation-legacy { padding: 14px 0; color: var(--muted); border-bottom: 1px solid var(--line); }
+.reconciliation-form { padding: 24px; margin: 24px 0; background: var(--paper); border: 1px solid var(--line); }
+.reconciliation fieldset { border: 0; padding: 0; min-width: 0; margin: 0; }
+.reconciliation fieldset:disabled { opacity: .7; }
+.reconciliation legend { font-weight: 600; margin-bottom: 18px; }
+.reconciliation form label { display: block; margin: 20px 0; }
+.reconciliation input:not([type="checkbox"]), .reconciliation textarea { font-size: 16px; width: 100%; }
+.reconciliation-action-summary { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; margin-bottom: 14px; }
+.reconciliation-action-summary span { font-size: 14px; }
+.reconciliation-action-summary strong { font-size: 25px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.reconciliation .reconciliation-checkbox { display: flex; align-items: start; gap: 12px; line-height: 1.8; margin: 20px 0; }
+.reconciliation-checkbox input { width: 18px; height: 18px; margin-top: 4px; flex-shrink: 0; accent-color: var(--rose); }
+.reconciliation-history { margin-top: 28px; }
+.reconciliation-history h4 { font-size: 25px; font-weight: 400; margin: 20px 0; }
+.reconciliation-history ol { list-style: none; padding: 0; display: grid; gap: 16px; }
+.reconciliation-history article { border: 1px solid var(--line); background: var(--paper); padding: 24px; }
+.reconciliation-history article > header { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.reconciliation-history header strong { font-weight: 500; font-size: 18px; }
+.reconciliation-history header p { color: var(--muted); margin-top: 8px; }
+.reconciliation-history header > span { font-size: 23px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reconciliation-source, .reconciliation-history time { font-size: 12px !important; color: var(--muted); display: block; margin: 8px 0; }
+.reconciliation-unknown-date { padding: 10px 14px; background: var(--cream); }
+.reconciliation-history details { margin-top: 20px; border-top: 1px solid var(--line); }
+.reconciliation-history summary { min-height: 44px; padding-top: 14px; font-size: 14px; cursor: pointer; }
+.reconciliation-history summary:focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
+.reconciliation-history details dl { margin: 16px 0 0; font-size: 14px; }
+.reconciliation-history details dl div { display: grid; grid-template-columns: 140px minmax(0,1fr); gap: 16px; margin: 16px 0; }
+.reconciliation-history details dt { color: var(--muted); }
+.reconciliation-history details dd { margin: 0; }
+.reconciliation-evidence { white-space: pre-wrap; }
+@media (max-width: 767px) {
+  .reconciliation-heading { flex-direction: column; gap: 0; }
+  .reconciliation h3 { font-size: 26px; margin-bottom: 8px; }
+  .reconciliation-form, .reconciliation-history article { padding: 20px 16px; }
+  .reconciliation-action-summary, .reconciliation-history article > header { flex-wrap: wrap; gap: 12px; }
+  .reconciliation-history details dl div { grid-template-columns: 1fr; gap: 6px; }
+  .reconciliation-form .button { width: 100%; justify-content: center; }
+}

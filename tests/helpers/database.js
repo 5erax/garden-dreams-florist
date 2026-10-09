@@ -8,7 +8,7 @@ export const actors = {
   bob: '22222222-2222-4222-8222-222222222222',
   admin: '33333333-3333-4333-8333-333333333333',
 };
-export async function database() {
+export async function database({ through } = {}) {
   const db = new PGlite();
   await db.exec(`create role anon; create role authenticated; create schema auth;
     create table auth.users(id uuid primary key);
@@ -17,7 +17,7 @@ export async function database() {
       select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid
     $$;`);
   const directory = new URL('../../supabase/migrations/', import.meta.url);
-  for (const file of (await readdir(directory)).filter(file => file.endsWith('.sql')).sort())
+  for (const file of (await readdir(directory)).filter(file => file.endsWith('.sql') && (!through || file<=through)).sort())
     await db.exec(await readFile(new URL(file, directory), 'utf8'));
   await db.query('insert into auth.users values($1),($2),($3)', Object.values(actors));
   await db.query('insert into gd_admins values($1)', [actors.admin]);

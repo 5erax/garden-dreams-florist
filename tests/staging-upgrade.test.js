@@ -2,7 +2,8 @@ import { before, after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { buildStagingUpgrade } from '../scripts/build-staging-upgrade.mjs';
+import { buildStagingUpgrade, buildStagingPaymentUpgrade } from '../scripts/build-staging-upgrade.mjs';
+import { database, actors } from './helpers/database.js';
 import { vietnamDate } from '../src/order.js';
 
 let db, sql, order;
@@ -61,4 +62,31 @@ test('upgrading existing staging preserves old orders/prices and enables capabil
   assert.equal(runtime.features.deliveryCalendar, true);
   await rejected(sql, /UPGRADE_REQUIRES_BASELINE_005/);
   assert.equal((await db.query('select count(*)::int count from gd_orders')).rows[0].count, 1);
+});
+
+test('005-to-012 upgrades payments atomically with opening balances and refuses production or reruns', async () => {
+  const existing = await database({ through: '202610090005_environment.sql' });
+  try {
+    const upgrade = await buildStagingPaymentUpgrade();
+    await assert.rejects(existing.db.exec(upgrade), /UPGRADE_REQUIRES_EXACT_STAGING_PROJECT/);
+    await existing.db.exec('rollback;');
+    await existing.db.exec("update gd_private.runtime set environment='staging',project_ref='tgvozhrkolcpszyyrgth'");
+    let paid = await existing.order();
+    paid = await existing.as(actors.admin, () => existing.rpc('gd_update_order', [paid.id, paid.version, 'CONFIRMED', 'PAID', 'Existing verified payment']));
+    await existing.db.exec('update gd_shop set accepting_orders=false');
+    const broken = upgrade.replace('-- 202610100012_payment_ledger.sql', () => "do $$begin raise exception 'PAYMENT_UPGRADE_FAILURE'; end$$;\n-- 202610100012_payment_ledger.sql");
+    await assert.rejects(existing.db.exec(broken), /PAYMENT_UPGRADE_FAILURE/);
+    await existing.db.exec('rollback;');
+    assert.equal((await existing.db.query("select to_regclass('gd_product_variants') value")).rows[0].value, null);
+    await existing.db.exec(upgrade);
+    const current = (await existing.db.query('select * from gd_orders where id=$1', [paid.id])).rows[0];
+    for (const key of ['owner_id','total','items','shipping','card_message','status','payment_status','version']) assert.deepEqual(current[key], paid[key]);
+    const ledger = (await existing.db.query('select source,effective_at,amount from gd_payment_ledger')).rows;
+    assert.equal(ledger.length, 1);assert.equal(ledger[0].source, 'LEGACY');assert.equal(ledger[0].effective_at, null);
+    assert.equal(Number(ledger[0].amount), Number(paid.total));
+    assert.equal((await existing.rpc('gd_environment')).features.reconciliationLedger, true);
+    assert.equal((await existing.db.query('select accepting_orders from gd_shop')).rows[0].accepting_orders, false);
+    await assert.rejects(existing.db.exec(upgrade), /UPGRADE_REQUIRES_BASELINE_005/);
+    await existing.db.exec('rollback;');
+  } finally { await existing.close(); }
 });

@@ -168,7 +168,7 @@ test("a disk backup restores orders, memories, permissions and retention without
     assert.deepEqual(await rpc("gd_environment"), {
       environment: "local",
       projectRef: null,
-      features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true },
+      features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true, reconciliationLedger: true },
     });
     assert.deepEqual(await counts(), expectedCounts);
     assert.deepEqual(
