@@ -94,3 +94,10 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Review sửa form SKU tương thích HTML pattern hiện tại, khóa form quản lý cỡ khi phần sản phẩm đang lưu/upload; chưa có UI thật để nghiệm thu.
 - [PRODUCT-VARIANTS.md](../PRODUCT-VARIANTS.md) ghi contract/rollout. Chưa cài migrations 006–008 trên hosting trong bước này; backend báo capability để frontend mới không truy vấn bảng chưa có. BU-08/09 chưa tick, tiến độ nghiệm thu **1/32**.
 - Code commit `acfe25463631a9519e918673916d77d58324e4ea` đã push; Vercel xác nhận `dpl_9QD9ScUzG5HJQKia4MH7hru15snF` READY đúng project/branch/SHA, target preview và alias staging cố định. PR #1 vẫn draft và Vercel check SUCCESS; không merge production.
+
+### BU-26a — Chuẩn bị bộ sưu tập theo hướng thiết kế đã gọi
+
+- Chủ shop gọi `design-taste-frontend` và `ponytail`; áp dụng vào storefront trong phạm vi mã nguồn staging. [DESIGN-AUDIT.md](../DESIGN-AUDIT.md) ghi audit trước sửa, dials 7/5/3 và những phần cần giữ từ mẫu gốc. Skill marketing không dùng để thiết kế lại admin/checkout.
+- Giá card ghi rõ Tiêu chuẩn theo contract cỡ hiện có; không đổi giá, lựa chọn cỡ hoặc payload. Metadata/tên dài được wrap; tăng cỡ chữ, vùng chạm collection tối thiểu 44 px, search 16 px và focus nút ảnh nằm trong khung. Giữ frame vòm/hero/motion/reduced motion, đường dẫn, nội dung pháp lý và navigation.
+- Chỉ thay markup tĩnh/CSS, không thêm dependency hoặc logic JS; không cần tests mới. Diff check và build staging qua. Tính tương phản màu đặc thấp nhất 4.76:1; chưa chứng minh contrast khi render thực tế. Cảnh báo JS chunk khoảng 683 kB vẫn còn.
+- Chưa tick BU-26 và không đổi cổng phát hành hay thứ tự nghiệm thu. Browser/mobile/keyboard/Lighthouse, hosted migrations 006–008 và các cổng bản A/B vẫn còn mở. Tiến độ task lớn **1/32**, production tiếp tục đóng nhận đơn.

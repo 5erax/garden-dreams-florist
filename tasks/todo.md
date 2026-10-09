@@ -228,6 +228,8 @@ Trạng thái: đang làm phần độc lập với SMTP (chỉ phụ thuộc BU
 
 ### BU-26 — Giao diện dùng chung và mobile — M
 
+Trạng thái: chuẩn bị lát cắt storefront theo hai skill chủ shop vừa gọi. Bộ sưu tập có nhãn giá Tiêu chuẩn, chữ/vùng chạm/focus và nội dung dài được sửa ở mã nguồn; xem [DESIGN-AUDIT.md](../DESIGN-AUDIT.md). Build/contrast màu đặc đã qua; chưa nghiệm thu trình duyệt, admin/account hoặc task BU-26. Phụ thuộc bản B vẫn giữ nguyên.
+
 - [ ] Các phần storefront/account/admin dùng cùng quy tắc font/màu/nút/form; tách component khi sửa, mỗi lượt tối đa khoảng 5 file.
 - [ ] Không overflow, focus nhìn thấy được, contrast và reduced motion dùng được.
       Phụ thuộc: bản B. File: shared UI/styles, App, PortalShell, màn hình đang nâng cấp. Kiểm: UI, Build.

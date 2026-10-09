@@ -471,9 +471,12 @@ export default function App() {
                         {product.name}
                       </button>
                     </h3>
-                    <div>
+                    <div className="product-details">
                       <span>{product.stems}</span>
-                      <strong>{money(product.price)}</strong>
+                      <div className="product-price">
+                        <span>Tiêu chuẩn</span>
+                        <strong>{money(product.price)}</strong>
+                      </div>
                     </div>
                   </div>
                 </article>
