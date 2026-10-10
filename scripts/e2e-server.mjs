@@ -92,6 +92,7 @@ const tables = new Set([
   "gd_admin_audit",
 ]);
 const functions = {
+  gd_business_dashboard: ["p_from", "p_to"],
   gd_environment: [],
   gd_create_order: ["p_request"],
   gd_update_order: ["p_id", "p_version", "p_status", "p_payment", "p_note"],

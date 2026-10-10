@@ -246,3 +246,7 @@ Cold product snapshot/inline callback/root links/header repaired. BloomLoader, 2
 ## Verified rollout — 10/10/2026
 
 Production code 28157991aceb6af916f93d1ff6c0daf4aebc6d09 / dpl_Cfzt1i8jGacpPhBMDTVKdGGYyLYn READY, exact garden-dreams-florist.vercel.app alias and SHA verified via Vercel metadata. Staging c3af8015dca773a077687e5ddf30ff4b334e5a48 / dpl_9RRyZAYiBuxZgz3SMYW5AGTostHi READY, fixed preview alias verified. Both catalogs seeded only after corresponding assets were READY. Post-seed DB reads: 40 catalog models = 20 active sale + 20 inactive public references, 20 distinct reference image paths; production retains 2 existing orders and accepting_orders=true; staging has 0 orders and accepting_orders=false; inventory=false in both. Local compiled-template handler passed root/product/sitemap/404/HEAD/405. Hosted browsing/checkout/Google indexing were not tested. This evidence describes the code release; a subsequent documentation-only commit records it.
+
+## Business dashboard / bouquet comparison — 10/10/2026
+Synced schema015, admin aggregate reports and CSV, budget filters, three-bouquet comparison. Production tests 161/161; local mobile filter/comparison/choice tested. See docs/product/BUSINESS-DASHBOARD.md. Both hosted schemas applied; no user data changed. Stage keeps separate environment. READY evidence pending push.
+

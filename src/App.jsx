@@ -13,6 +13,8 @@ import { useStore } from "./Store.jsx";
 import { PortalShell } from "./PortalShell.jsx";
 import RouteBoundary from "./RouteBoundary.jsx";
 import BloomLoader from "./BloomLoader.jsx";
+import FlowerComparison from './FlowerComparison.jsx';
+import { withinBudget, toggleComparison } from './flower-selection.js';
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
@@ -155,6 +157,10 @@ export default function App() {
   const [occasion, setOccasion] = useState("Tất cả");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
+  const [budget, setBudget] = useState(0);
+  const [saleOnly, setSaleOnly] = useState(false);
+  const [comparison, setComparison] = useState([]);
+  const compared = products.filter(p => comparison.includes(p.id));
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [animateCollection, setAnimateCollection] = useState(false);
@@ -251,6 +257,7 @@ export default function App() {
     (p) =>
       (occasion === "Tất cả" || p.occasion === occasion) &&
       (!onlyFavorites || favorites.includes(p.id)) &&
+      withinBudget(p, budget, saleOnly) &&
       normalizeSearch(`${p.name} ${p.stems}`).includes(normalizeSearch(query)),
   );
   if (sort === "low")
@@ -439,6 +446,17 @@ export default function App() {
               </select>
             </label>
           </div>
+          <details className="flower-finder">
+            <summary>Tìm hoa vừa ý — chọn theo ngân sách</summary>
+            <div className="flower-finder-fields">
+              <label>Ngân sách bó hoa<select aria-label="Ngân sách bó hoa" value={budget} onChange={e => { setBudget(Number(e.target.value)); setShowAll(true); }}>
+                <option value="0">Mọi mức giá</option>{[300000,500000,800000,1500000].map(value => <option key={value} value={value}>Tối đa {money(value)}</option>)}
+              </select></label>
+              <label><input type="checkbox" checked={saleOnly} onChange={e => { setSaleOnly(e.target.checked); setShowAll(true); }} />Chỉ mẫu đang nhận đặt</label>
+              <button className="text-button" onClick={() => { setBudget(0); setSaleOnly(false); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>
+            </div>
+            <p>Chọn dịp tặng ở phía trên, rồi so sánh các bó hoa bên dưới. Ngân sách chưa gồm phí giao; mẫu tham khảo dùng giá dự kiến và chưa nhận đặt.</p>
+          </details>
           <div className="product-grid" data-motion={animateCollection}>
             {shown.map((product, index) => (
               <div key={product.id} className="product-reveal" style={{ transitionDelay: `${Math.min(index, 2) * 40}ms` }}>
@@ -491,6 +509,9 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+                  <button className="compare-choice" aria-pressed={comparison.includes(product.id)} disabled={!comparison.includes(product.id) && comparison.length >= 3} onClick={() => setComparison(ids => toggleComparison(ids, product.id))}>
+                    {comparison.includes(product.id) ? 'Đã chọn so sánh' : 'So sánh bó hoa'}<span className="sr-only"> {product.name}</span>
+                  </button>
                 </article>
               </div>
             ))}
@@ -506,6 +527,7 @@ export default function App() {
                   setQuery("");
                   setOccasion("Tất cả");
                   setOnlyFavorites(false);
+                  setBudget(0); setSaleOnly(false);
                 }}
               >
                 Xem tất cả hoa
@@ -523,6 +545,7 @@ export default function App() {
               </button>
             </div>
           )}
+          {compared.length > 0 && <div className="comparison-bar"><span>{compared.length}/3 bó hoa để so sánh{compared.length === 3 ? ' · Bỏ một mẫu để chọn mẫu khác' : ''}</span><button className="button primary" onClick={() => setPanel('compare')}>So sánh ngay</button><button className="text-button" onClick={() => setComparison([])}>Bỏ chọn tất cả</button></div>}
         </section>
         <section className="story" id="story">
           <div className="section-shell">
@@ -719,6 +742,7 @@ export default function App() {
           onCheckout={() => setPanel("checkout")}
         />
       )}
+      {panel === 'compare' && <FlowerComparison products={compared} onClose={() => setPanel(null)} onChoose={p => { setPanel(null); setSelected(p); }} onRemove={id => setComparison(ids => toggleComparison(ids, id))} />}
       {panel === "checkout" &&
         (connected ? (
           <LiveCheckout
