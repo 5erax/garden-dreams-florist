@@ -1,3 +1,4 @@
+import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useInView } from "motion/react";
 import { occasions, money } from "./catalog.js";
@@ -435,7 +436,7 @@ export default function App() {
             </span>
             <label>
               Sắp xếp{" "}
-              <select
+              <BloomSelect
                 aria-label="Sắp xếp hoa"
                 value={sort}
                 onChange={event => { setAnimateCollection(false); setSort(event.target.value); }}
@@ -443,15 +444,15 @@ export default function App() {
                 <option value="featured">Theo bộ sưu tập</option>
                 <option value="low">Giá thấp đến cao</option>
                 <option value="high">Giá cao đến thấp</option>
-              </select>
+              </BloomSelect>
             </label>
           </div>
           <details className="flower-finder">
             <summary>Tìm hoa vừa ý — chọn theo ngân sách</summary>
             <div className="flower-finder-fields">
-              <label>Ngân sách bó hoa<select aria-label="Ngân sách bó hoa" value={budget} onChange={e => { setBudget(Number(e.target.value)); setShowAll(true); }}>
+              <label>Ngân sách bó hoa<BloomSelect aria-label="Ngân sách bó hoa" value={budget} onChange={e => { setBudget(Number(e.target.value)); setShowAll(true); }}>
                 <option value="0">Mọi mức giá</option>{[300000,500000,800000,1500000].map(value => <option key={value} value={value}>Tối đa {money(value)}</option>)}
-              </select></label>
+              </BloomSelect></label>
               <label><input type="checkbox" checked={saleOnly} onChange={e => { setSaleOnly(e.target.checked); setShowAll(true); }} />Chỉ mẫu đang nhận đặt</label>
               <button className="text-button" onClick={() => { setBudget(0); setSaleOnly(false); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>
             </div>

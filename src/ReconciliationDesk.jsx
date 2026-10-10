@@ -1,3 +1,5 @@
+import BloomDate from "./BloomDate.jsx";
+import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, call, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
@@ -217,8 +219,8 @@ function ReconciliationWorkspace() {
       <section className="reconciliation-report" aria-labelledby="reconciliation-period-heading" aria-busy={reportBusy}>
         <div className="reconciliation-report-heading"><div><h3 id="reconciliation-period-heading">Thu và hoàn trong kỳ</h3><p>Theo ngày thực thu / thực hoàn, giờ Việt Nam. Kỳ tối đa 92 ngày.</p></div><div className="reconciliation-quick-period"><button type="button" className="text-button" onClick={() => applyPeriod(today, today)}>Hôm nay</button><button type="button" className="text-button" onClick={() => applyPeriod(monthStart, today)}>Tháng này</button></div></div>
         <form className="reconciliation-period-form" onSubmit={event => { event.preventDefault(); applyPeriod(draftFrom, draftTo); }}>
-          <label>Từ ngày<input type="date" value={draftFrom} max={draftTo || undefined} required onChange={event => setDraftFrom(event.target.value)} /></label>
-          <label>Đến ngày<input type="date" value={draftTo} min={draftFrom || undefined} required onChange={event => setDraftTo(event.target.value)} /></label>
+          <label>Từ ngày<BloomDate  value={draftFrom} max={draftTo || undefined} required onChange={event => setDraftFrom(event.target.value)} /></label>
+          <label>Đến ngày<BloomDate  value={draftTo} min={draftFrom || undefined} required onChange={event => setDraftTo(event.target.value)} /></label>
           <button className="button outline" disabled={reportBusy}>Xem kỳ này</button>
         </form>
         {reportError && <div className="reconciliation-error" role="alert"><p>{reportError}</p><button type="button" className="text-button" disabled={reportBusy} onClick={() => setReportRevision(value => value + 1)}>Tải lại kỳ đã chọn</button>{report && <p>Số liệu dưới đây là lần tải trước; chưa phải bản cập nhật.</p>}</div>}
@@ -238,8 +240,8 @@ function ReconciliationWorkspace() {
         <div className="reconciliation-queue-heading"><h3 ref={queueHeading} tabIndex={-1} id="reconciliation-queue-heading">Đơn cần kiểm tra</h3><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Tải lại danh sách</button></div>
         <p className="reconciliation-definition">Danh sách theo trạng thái tiền và phương thức, độc lập với kỳ báo cáo phía trên. Mở từng đơn để xem chứng cứ và ghi nhận tiền. Ngày sắp xếp là ngày tạo đơn.</p>
         <div className="reconciliation-queue-filters">
-          <label>Trạng thái tiền<select value={filter} onChange={event => setFilter(event.target.value)}>{paymentFilters.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label>
-          <label>Phương thức<select value={method} onChange={event => setMethod(event.target.value)}><option value="ALL">COD và chuyển khoản</option><option value="COD">COD</option><option value="VIETQR">Chuyển khoản VietQR</option></select></label>
+          <label>Trạng thái tiền<BloomSelect value={filter} onChange={event => setFilter(event.target.value)}>{paymentFilters.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</BloomSelect></label>
+          <label>Phương thức<BloomSelect value={method} onChange={event => setMethod(event.target.value)}><option value="ALL">COD và chuyển khoản</option><option value="COD">COD</option><option value="VIETQR">Chuyển khoản VietQR</option></BloomSelect></label>
           <form onSubmit={event => { event.preventDefault(); setQuery(search.trim().toUpperCase()); }}><label>Mã đơn<input value={search} maxLength={40} pattern="GD-[A-Z0-9-]*" onChange={event => setSearch(event.target.value.toUpperCase())} placeholder="GD-…" aria-describedby="reconciliation-search-hint" /></label><button className="button outline">Tìm</button>{query && <button type="button" className="text-button" onClick={() => { setSearch(""); setQuery(""); }}>Xóa mã</button>}</form>
         </div>
         <p id="reconciliation-search-hint" className="reconciliation-definition">Tìm theo mã bắt đầu bằng GD-. Danh sách không hiển thị số điện thoại, địa chỉ, người nhận hoặc lời nhắn.</p>

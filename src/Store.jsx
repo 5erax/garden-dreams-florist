@@ -80,7 +80,7 @@ export function StoreProvider({ children }) {
       data: { subscription },
     } = backend.auth.onAuthStateChange((event, next) => {
       setSession(next);
-      setAdminUserId(null);
+      setAdminUserId(current => sessionIsAdmin(next, current) ? current : null);
       if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY")
         setAuthError("");
       if (event === "PASSWORD_RECOVERY") {

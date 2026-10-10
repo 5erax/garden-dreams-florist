@@ -1,3 +1,5 @@
+import BloomDate from "./BloomDate.jsx";
+import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
 import { money } from "./catalog.js";
 import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
@@ -57,6 +59,7 @@ export function ProductDialog({
 }) {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState(null);
+  const [shareNotice, setShareNotice] = useState('');
   const choice = cartChoice({ id: product.id, variantId }, [product]);
   const Wrapper = inline ? 'section' : Modal;
   return (
@@ -67,15 +70,14 @@ export function ProductDialog({
           Một món quà cho {(product.occasion || "người bạn thương").toLocaleLowerCase("vi")}
         </span>
         <h2>{product.name}</h2>
-        {!inline && <a className="text-link" href={productUrl(product)}>Mở trang riêng của bó hoa ↗</a>}
         {choice && <p className="detail-price">{money(choice.price)} <span>/ bó</span></p>}
         {(product.variants?.length > 0 || variantId !== null) && <label className="variant-choice">
           Cỡ bó hoa
-          <select name="variantId" aria-invalid={!choice} value={variantId ?? ""} onChange={(e) => setVariantId(e.target.value ? Number(e.target.value) : null)}>
+          <BloomSelect name="variantId" aria-invalid={!choice} value={variantId ?? ""} onChange={(e) => setVariantId(e.target.value ? Number(e.target.value) : null)}>
             {!choice && variantId !== null && <option value={variantId} disabled>Cỡ đã ngừng nhận đặt</option>}
             <option value="">Tiêu chuẩn · {money(product.price)}</option>
             {product.variants?.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
-          </select>
+          </BloomSelect>
         </label>}
         {product.reference_only ? <p className="reference-note">Mẫu tham khảo · Giá dự kiến {money(product.price)}. Shop đang xác nhận nguồn hoa, quy cách và giá bán trước khi nhận đặt mẫu này.</p> : !choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
         <p>{product.description}</p>
@@ -122,6 +124,14 @@ export function ProductDialog({
           <Icon name="heart" />
           {favorite ? "Đã lưu vào yêu thích" : "Lưu bó hoa này"}
         </button>
+        <div className="product-share">
+          <button className="text-button" onClick={async () => {
+            try { await navigator.clipboard.writeText(new URL(productUrl(product), location.origin).href); setShareNotice('Đã sao chép liên kết bó hoa.'); }
+            catch { setShareNotice('Chưa sao chép được. Bạn có thể mở liên kết và sao chép địa chỉ.'); }
+          }}>Sao chép liên kết bó hoa</button>
+          {!inline && <a href={productUrl(product)}>Mở liên kết ↗</a>}
+          {shareNotice && <p role="status">{shareNotice}</p>}
+        </div>
       </div>
     </Wrapper>
   );
@@ -340,9 +350,9 @@ export function CheckoutDialog({ cart, onClose }) {
               <div className="form-grid">
                 <label>
                   Ngày mong muốn
-                  <input
+                  <BloomDate
                     name="deliveryDate"
-                    type="date"
+
                     min={vietnamDate()}
                     max={vietnamDate(new Date(Date.now() + 90 * 86400000))}
                     defaultValue={receipt?.deliveryDate}
@@ -351,7 +361,7 @@ export function CheckoutDialog({ cart, onClose }) {
                 </label>
                 <label>
                   Khung giờ
-                  <select
+                  <BloomSelect
                     name="deliveryTime"
                     required
                     defaultValue={receipt?.deliveryTime || "Chiều · 13–17h"}
@@ -359,7 +369,7 @@ export function CheckoutDialog({ cart, onClose }) {
                     <option>Sáng · 9–12h</option>
                     <option>Chiều · 13–17h</option>
                     <option>Tối · 18–20h</option>
-                  </select>
+                  </BloomSelect>
                 </label>
               </div>
               <label>

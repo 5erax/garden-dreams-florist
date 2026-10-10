@@ -1,3 +1,4 @@
+import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
 import { backend, result, orderColumns, orderStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
@@ -12,6 +13,7 @@ import OperationsDesk from "./OperationsDesk.jsx";
 import ReconciliationDesk from "./ReconciliationDesk.jsx";
 import AdminInventory from './AdminInventory.jsx';
 import BusinessDashboard from './BusinessDashboard.jsx';
+import { readAdminTab } from './admin-navigation.js';
 
 const newProduct = {
   name: "",
@@ -27,10 +29,13 @@ const newProduct = {
 const newShipping = { name: "", area: "", fee: 0, active: false };
 export default function AdminPortal() {
   const store = useStore();
-  return <AdminWorkspace key={`${store.session?.user.id || "signed-out"}:${Boolean(store.isAdmin)}`} store={store} />;
+  return <AdminWorkspace key={`${store.session?.user.id || "signed-out"}:${Boolean(store.isAdmin)}:${Boolean(store.connected)}`} store={store} />;
 }
 function AdminWorkspace({ store }) {
-  const [tab, setTab] = useState("orders"),
+  const [tab, setTab] = useState(() => {
+    try { return readAdminTab(store.session?.user.id, store.features, globalThis.sessionStorage); }
+    catch { return 'orders'; }
+  }),
     [rows, setRows] = useState([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -39,6 +44,11 @@ function AdminWorkspace({ store }) {
     [selected, setSelected] = useState(null),
     [more, setMore] = useState(false),
     [filter, setFilter] = useState("");
+  useEffect(() => {
+    if (store.isAdmin && store.connected) {
+      try { sessionStorage.setItem(`gd-admin-tab:${store.session.user.id}`, tab); } catch {}
+    }
+  }, [tab, store.isAdmin, store.connected, store.session?.user.id]);
   async function load(append = false) {
     if (!store.isAdmin) return;
     if (["dashboard", "calendar", "desk", "reconciliation", "inventory"].includes(tab)) return;
@@ -225,7 +235,7 @@ function AdminWorkspace({ store }) {
           {tab === "orders" && (
             <label className="inline-label">
               Trạng thái
-              <select
+              <BloomSelect
                 disabled={busy}
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -236,7 +246,7 @@ function AdminWorkspace({ store }) {
                     {name}
                   </option>
                 ))}
-              </select>
+              </BloomSelect>
             </label>
           )}
           <button
@@ -395,11 +405,11 @@ function AdminWorkspace({ store }) {
                   </label>
                   <label>
                     Dịp tặng
-                    <select name="occasion" defaultValue={item.occasion}>
+                    <BloomSelect name="occasion" defaultValue={item.occasion}>
                       {occasions.slice(1).map((o) => (
                         <option key={o}>{o}</option>
                       ))}
-                    </select>
+                    </BloomSelect>
                   </label>
                   <label>
                     Giá VNĐ

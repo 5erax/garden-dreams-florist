@@ -66,13 +66,13 @@ test("unavailable product shows no fallback price or subtotal and cannot be adde
   assert.match(html, /class="button primary" disabled=""/);
 });
 
-test("additional sizes keep Standard selected and display separate catalog prices", () => {
+test("additional sizes keep Standard selected in the accessible size control", () => {
   const html = render({ ...products[0], variants: [
     { id: 101, active: true, size_name: "Bó lớn", price: 700000, sku: "TEST-L" },
   ] });
   assert.match(html, /Cỡ bó hoa/);
-  assert.match(html, /value="" selected=""/);
-  assert.match(html, /value="101"/);
-  assert.ok(html.includes(`Bó lớn · ${money(700000)}`));
+  assert.match(html, /role="combobox"/);
+  assert.match(html, /name="variantId"[^>]*value=""/);
+  assert.ok(html.includes(`Tiêu chuẩn · ${money(products[0].price)}`));
   assert.match(html, /1 bó · Tiêu chuẩn/);
 });
