@@ -188,3 +188,14 @@ Owner received staging recovery mail, establishing reported email delivery, but 
 - Dialog pointer entry is 200ms; keyboard entry and dismissal stay immediate with native focus/Escape handling. Hover image feedback shortened to 240ms. Navigation underline animates scale instead of width; cart badge and toast use interruptible transitions.
 - Verification: production build and 10 focused product/route/SEO tests passed. Local demo browser assertions passed for pointer/keyboard filters, keyboard/pointer dialogs, Escape, add-to-cart feedback, hero offscreen pause, reduced-motion, 390px no overflow and CTA within viewport. No real backend connected to demo.
 - Animation review: Approve for this diff. Desktop native timeline and mobile fallback checked; real-device FPS, older-browser rendering and hosted order/payment acceptance not measured.
+
+## 10/10/2026 — cold product repair, BloomLoader and 20 reference flowers
+
+- Corrected missing occasion in public SSR snapshot, optional inline onClose, product-path home/catalog links and light-page header. Added root/cold-product regressions and verified local actual UI add-to-cart, root return and 390px layout.
+- Reused BloomLoader across lazy pages and data panes; retained public snapshot on refresh, preloaded account/garden on intent; empty shipping after completion reports retry rather than endless loading. Accessible status and reduced-motion static petals.
+- Prepared 20 distinct licensed image concepts, full descriptions and proposed prices, per-image attribution, public reference policy and non-purchasable UI/RPC. Seed is idempotent and preserves sale catalog/orders; admin explicitly activates reference models. No fake stock/recipes.
+- Applied schema014 via official MCP to staging then production; hosted staging activation checked in a rollback transaction. Security advisor no ERROR, existing WARN documented. Production audit: 2 preserved orders, 20 active sale models, 5 placeholder photos, inventory false/zero recipes and batches.
+- 155-test suite passed; added empty-shipping and root/product regression checks passed separately. Production build and npm audit production dependencies pass. Full final suite/deploy/seed outcome recorded below when complete.
+- Wrote LAUNCH-AUDIT-2026-10-10.md: 95 Word requirements remain 40 partial/55 unimplemented. Vercel API verified Hobby plan; no commercial plan purchase, SMTP change, hosted browser access workaround or real purchase performed.
+
+- Final validation: full suite 158/158, production/staging builds, 0 production dependency audit vulnerabilities, whitespace diff check pass. Reference photos inspected visually; runtime read before seed found two existing production orders, unchanged by DDL.

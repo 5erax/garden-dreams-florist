@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, call, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
@@ -221,7 +222,7 @@ function ReconciliationWorkspace() {
           <button className="button outline" disabled={reportBusy}>Xem kỳ này</button>
         </form>
         {reportError && <div className="reconciliation-error" role="alert"><p>{reportError}</p><button type="button" className="text-button" disabled={reportBusy} onClick={() => setReportRevision(value => value + 1)}>Tải lại kỳ đã chọn</button>{report && <p>Số liệu dưới đây là lần tải trước; chưa phải bản cập nhật.</p>}</div>}
-        {reportBusy && <p className="reconciliation-loading" role="status">Đang tải sổ thu và hoàn…</p>}
+        {reportBusy && <BloomLoader compact label="Sổ thu & hoàn tiền" />}
         {report && <>
           <p className="reconciliation-period-caption">Kỳ {dateLabel.format(new Date(period.from + "T12:00:00+07:00"))} — {dateLabel.format(new Date(period.to + "T12:00:00+07:00"))}{reportTime && ` · Tải lúc ${stampLabel.format(reportTime)}`}{reportBusy ? " · Đang cập nhật" : ""}</p>
           <dl className="reconciliation-metrics">
@@ -245,7 +246,7 @@ function ReconciliationWorkspace() {
         {queueError && <div className="reconciliation-error" role="alert"><p>{queueError}</p><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Thử tải lại danh sách</button>{visibleRows.length > 0 && <p>Các đơn bên dưới là lần tải trước, số dư có thể đã thay đổi.</p>}</div>}
         {detailError && <p className="form-error" role="alert">{detailError}</p>}
         {queueBusy && <p className="reconciliation-loading" role="status">Đang cập nhật danh sách đối soát…</p>}
-        {openingId && <p className="reconciliation-loading" role="status">Đang mở chi tiết đơn…</p>}
+        {openingId && <BloomLoader compact label="Chi tiết đơn hoa" />}
         {loadedQueue === queueFilter && !queueBusy && !queueError && !visibleRows.length && <div className="portal-empty"><h4>Chưa có đơn phù hợp.</h4><p>Đổi trạng thái tiền, phương thức hoặc mã đơn để kiểm tra.</p></div>}
         {!!visibleRows.length && <>
           <p className="reconciliation-period-caption">Đã tải {visibleRows.length} đơn{queueTime && ` · ${stampLabel.format(queueTime)}`}{queueBusy ? " · Đang cập nhật" : ""}. Số liệu từng đơn gồm toàn bộ bút toán của đơn đó.</p>

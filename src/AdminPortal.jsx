@@ -379,6 +379,7 @@ function AdminWorkspace({ store }) {
             {tab === "products" && (
               <>
                 <h3>{edit.id ? "Chỉnh sửa bó hoa" : "Thêm bó hoa"}</h3>
+                  {edit.reference_only && <p className="reference-note">Mẫu tham khảo: xác nhận hoa thực tế, ảnh, quy cách và giá trước khi bật nhận đặt. Bật bán sẽ chuyển mẫu này sang danh mục bán chính thức.</p>}
                 <div className="form-grid">
                   <label>
                     Tên hoa

@@ -24,7 +24,8 @@ test("a pending route announces loading while its module stays unresolved", () =
   assert.match(html, /role="status"/);
   assert.match(html, /aria-busy="true"/);
   assert.match(html, /Góc của bạn/);
-  assert.match(html, /Chờ một chút/);
+  assert.match(html, /bloom-loader-flower/);
+  assert.doesNotMatch(html, /Chờ một chút|Đang tải/);
 });
 
 test("recovery offers retry and collection without exposing internal errors or reloading the session", () => {
@@ -33,7 +34,7 @@ test("recovery offers retry and collection without exposing internal errors or r
   const html = renderToStaticMarkup(boundary.render());
   assert.match(html, /role="alert"/);
   assert.match(html, /Thử tải lại/);
-  assert.match(html, /href="#collection"/);
+  assert.match(html, /href="\/#collection"/);
   assert.match(html, /phiên hiện tại vẫn được giữ/);
   assert.doesNotMatch(html, /secret-token|private customer address/);
   const rejectedPage = boundary.state.Page;

@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { useStore } from "./Store.jsx";
 import { call } from "./backend.js";
@@ -106,7 +107,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
           <a className="button outline" href={`https://zalo.me/${shop.phone}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
         </div>
       ) : !session ? (
-        loading || storeError || !shipping.length ? <p role="status">{storeError || "Đang tải dịch vụ giao hoa…"}</p> : guestEnabled ? <GuestCheckout /> : <AuthPanel />
+        loading ? <BloomLoader label="Giao hoa & thanh toán" /> : storeError || !shipping.length ? <div role="alert"><p>{storeError || "Shop chưa có dịch vụ giao hoa đang nhận đơn. Vui lòng thử lại hoặc liên hệ cửa hàng."}</p><button className="text-button" onClick={refresh}>Kiểm tra lại</button></div> : guestEnabled ? <GuestCheckout /> : <AuthPanel />
       ) : receipt ? (
         <div className="receipt">
           <span className="eyebrow">ĐÃ LƯU VÀO LỊCH SỬ CỦA BẠN</span>

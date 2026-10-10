@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { call } from "./backend.js";
 import { useStore } from "./Store.jsx";
@@ -111,7 +112,7 @@ export default function Garden() {
           Gặp thêm những lời thương
         </button>
       )}
-      {busy && <p role="status">Đang mở khu vườn…</p>}
+      {busy && <BloomLoader label="Vườn kỉ niệm" />}
       {error && (
         <p className="form-error" role="alert">
           {error}
@@ -154,7 +155,7 @@ export function SharedMemory({ token }) {
       active = false;
     };
   }, [token, connected]);
-  if (busy) return <p role="status">Đang mở một lời thương…</p>;
+  if (busy) return <BloomLoader label="Một lời thương" />;
   if (!memory)
     return (
       <div className="portal-empty">

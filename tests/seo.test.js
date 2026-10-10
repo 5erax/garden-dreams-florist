@@ -5,7 +5,7 @@ import { normalizeSearch, productFromPath, productUrl } from '../src/product-url
 import { renderStorefront, renderSitemap } from '../src/storefront-html.js';
 import { publicCatalog } from '../api/storefront.js';
 const shop={name:'Garden Dreams',phone:'0832345780',address:'665L, Long Phước, Long Thành, Đồng Nai'};
-const product={id:6,slug:'bo-hoa-6',name:'Giấc mơ mẫu đơn',stems:'Mẫu đơn hồng',price:890000,image:'/flowers/bouquet_6.webp',description:'Lời thương </script><script>alert(1)</script>'};
+const product={id:6,slug:'bo-hoa-6',name:'Giấc mơ mẫu đơn',occasion:'Tình yêu',active:true,reference_only:false,stems:'Mẫu đơn hồng',price:890000,image:'/flowers/bouquet_6.webp',description:'Lời thương </script><script>alert(1)</script>'};
 const template=await readFile(new URL('../index.html',import.meta.url),'utf8');
 test('Vietnamese search folds diacritics, đ, combining marks and case',()=>{
   assert.ok(normalizeSearch(product.name).includes(normalizeSearch(' MAU DON ')));
@@ -38,5 +38,18 @@ test('SEO fetch only sends public key, only selects public fields, and fails clo
   assert.equal(result.products.length,1);assert.equal(requests.length,2);
   assert.ok(requests.every(({options})=>!options.headers.Authorization && options.headers.apikey==='sb_publishable_fixture'));
   assert.ok(requests.every(({url})=>!url.includes('/gd_orders?')&&!url.includes('owner_id')));
+  assert.ok(requests.find(({url})=>url.includes('gd_products?')).url.includes('occasion'));
+  assert.equal(result.products[0].occasion,'Tình yêu');
   await assert.rejects(publicCatalog(env,async()=>({ok:false})),/CATALOG_UNAVAILABLE/);
+});
+
+test('reference pages disclose their state without advertising a purchasable Offer',()=>{
+  const reference={...product,active:false,reference_only:true,image:'/flowers/reference-01.jpg'};
+  const html=renderStorefront({template,shop,products:[reference],product:reference});
+  const graph=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];
+  assert.ok(!Object.hasOwn(graph[1],'offers'));
+  assert.match(html,/Giá dự kiến/);
+  assert.match(html,/chưa nhận đặt/);
+  assert.match(html,/Suyash Dwivedi/);
+  assert.doesNotMatch(html,/Chọn cỡ và đặt hoa/);
 });

@@ -1,5 +1,6 @@
 import { Component, createRef, lazy, Suspense } from "react";
 import Icon from "./Icons.jsx";
+import BloomLoader from "./BloomLoader.jsx";
 import "./route-boundary.css";
 
 export default class RouteBoundary extends Component {
@@ -29,19 +30,14 @@ export default class RouteBoundary extends Component {
         <p>Kết nối có thể bị gián đoạn. Thử lại để tiếp tục; giỏ hoa và phiên hiện tại vẫn được giữ.</p>
         <div className="route-actions">
           <button className="button primary" onClick={this.retry}>Thử tải lại</button>
-          <a className="button outline" href="#collection">Về bộ sưu tập</a>
+          <a className="button outline" href="/#collection">Về bộ sưu tập</a>
         </div>
       </section>
     );
     const Page = this.state.Page;
     return (
       <Suspense fallback={
-        <section className="route-state" role="status" aria-live="polite" aria-busy="true">
-          <Icon name="flower" />
-          <span className="eyebrow">{title}</span>
-          <h1>Đang mở <em>góc nhỏ của bạn.</em></h1>
-          <p>Chờ một chút, trang đang được tải.</p>
-        </section>
+        <BloomLoader label={title} />
       }>
         <Page {...pageProps} />
       </Suspense>

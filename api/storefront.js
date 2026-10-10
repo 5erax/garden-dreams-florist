@@ -11,7 +11,7 @@ export async function publicCatalog(env, fetcher = fetch) {
     if (!response.ok) throw new Error('CATALOG_UNAVAILABLE');
     return response.json();
   };
-  const [shops, products] = await Promise.all([read('gd_shop?select=name,phone,address,accepting_orders&id=eq.1'), read('gd_products?select=id,slug,name,stems,description,image,price&active=eq.true&order=id.asc')]);
+  const [shops, products] = await Promise.all([read('gd_shop?select=name,phone,address,accepting_orders&id=eq.1'), read('gd_products?select=id,slug,name,occasion,stems,description,image,price,active,reference_only&or=(active.eq.true,reference_only.eq.true)&order=id.asc')]);
   if (shops.length !== 1 || !Array.isArray(products) || products.some(item => !Number.isSafeInteger(item.price) || item.price < 0 || !/^bo-hoa-\d+$/.test(item.slug))) throw new Error('CATALOG_INVALID');
   return { shop: shops[0], products };
 }
