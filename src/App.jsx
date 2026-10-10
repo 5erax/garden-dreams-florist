@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, useInView } from "motion/react";
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartKey, removeOrderedItems } from "./order.js";
 import {
@@ -16,6 +16,7 @@ import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
 import { normalizeSearch, productUrl, productFromPath } from "./product-url.js";
+import "./styles.css";
 import "./portal.css";
 import './commerce-upgrade.css';
 
@@ -36,10 +37,10 @@ function Reveal({ children, className = "" }) {
   return (
     <motion.div
       className={className}
-      initial={reduced ? false : { y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduced ? false : { transform: "translateY(12px)" }}
+      whileInView={{ transform: "translateY(0px)" }}
       viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
     >
       {children}
     </motion.div>
@@ -50,9 +51,13 @@ function Hero() {
   const { shop } = useStore();
   const [first, ...rest] = shop.name.split(/\s+/);
   const reduced = useReducedMotion();
+  const heroRef = useRef(null);
+  const inView = useInView(heroRef, { amount: 0.05 });
   return (
     <section
       className="hero"
+      ref={heroRef}
+      data-in-view={inView}
       id="home"
       aria-label="Garden Dreams — Hoa mang lời thương"
     >
@@ -77,7 +82,7 @@ function Hero() {
         alt=""
       />
       <div className="petals" aria-hidden="true">
-        {Array.from({ length: 12 }, (_, i) => (
+        {Array.from({ length: 6 }, (_, i) => (
           <i
             key={i}
             style={{
@@ -90,11 +95,11 @@ function Hero() {
       </div>
       <motion.div
         className="hero-copy"
-        initial={reduced ? false : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        initial={reduced ? false : { opacity: 0, transform: "translateY(12px)" }}
+        animate={{ opacity: 1, transform: "translateY(0px)" }}
+        transition={{ duration: 0.65, ease: [0.23, 1, 0.32, 1] }}
       >
-        <p className="eyebrow">Hoa mang lời thương</p>
+        <p className="eyebrow">Hoa tươi · Long Thành, Đồng Nai</p>
         <h1>
           {first}
           <br />
@@ -108,7 +113,6 @@ function Hero() {
         <a className="button hero-cta" href="#collection">
           Chọn một bó hoa <Icon name="arrow" />
         </a>
-        <p className="hero-local">Hoa tươi tại Long Thành, Đồng Nai</p>
       </motion.div>
     </section>
   );
@@ -151,6 +155,7 @@ export default function App() {
   const [sort, setSort] = useState("featured");
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [showAll, setShowAll] = useState(false);
+  const [animateCollection, setAnimateCollection] = useState(false);
   const [selected, setSelected] = useState(null);
   const selectedProduct = products.find(p => p.id === selected?.id);
   const [panel, setPanel] = useState(null);
@@ -309,6 +314,7 @@ export default function App() {
             aria-label="Xem hoa yêu thích"
             onClick={() => {
               setOnlyFavorites(!onlyFavorites);
+              setAnimateCollection(false);
               setShowAll(true);
               setOccasion("Tất cả");
               document
@@ -319,7 +325,7 @@ export default function App() {
             <Icon name="heart" />
           </button>
           <button
-            className="cart-trigger"
+            className={`cart-trigger ${notice ? "has-new-items" : ""}`}
             onClick={() => setPanel("cart")}
             aria-label={`Mở giỏ hoa, ${count} bó`}
           >
@@ -386,7 +392,7 @@ export default function App() {
                     occasion === value && !onlyFavorites ? "active" : ""
                   }
                   aria-pressed={occasion === value && !onlyFavorites}
-                  onClick={() => selectOccasion(value)}
+                  onClick={event => { setAnimateCollection(event.detail > 0); selectOccasion(value); }}
                 >
                   {value}
                 </button>
@@ -401,6 +407,7 @@ export default function App() {
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
+                  setAnimateCollection(false);
                   setShowAll(true);
                 }}
               />
@@ -425,7 +432,7 @@ export default function App() {
               <select
                 aria-label="Sắp xếp hoa"
                 value={sort}
-                onChange={(e) => setSort(e.target.value)}
+                onChange={event => { setAnimateCollection(false); setSort(event.target.value); }}
               >
                 <option value="featured">Theo bộ sưu tập</option>
                 <option value="low">Giá thấp đến cao</option>
@@ -433,9 +440,9 @@ export default function App() {
               </select>
             </label>
           </div>
-          <div className="product-grid">
+          <div className="product-grid" data-motion={animateCollection}>
             {shown.map((product, index) => (
-              <Reveal key={product.id}>
+              <div key={product.id} className="product-reveal" style={{ transitionDelay: `${Math.min(index, 2) * 40}ms` }}>
                 <article className="product-card">
                   <div className={`product-image tone-${index % 4}`}>
                     <button
@@ -486,7 +493,7 @@ export default function App() {
                     </div>
                   </div>
                 </article>
-              </Reveal>
+              </div>
             ))}
           </div>
           {!filtered.length && (
@@ -510,7 +517,7 @@ export default function App() {
             <div className="collection-more">
               <button
                 className="button outline"
-                onClick={() => setShowAll(true)}
+                onClick={event => { setAnimateCollection(event.detail > 0); setShowAll(true); }}
               >
                 Khám phá cả bộ sưu tập <span>{filtered.length}</span>
                 <Icon name="arrow" />

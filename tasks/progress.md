@@ -232,3 +232,7 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Shared checkbox/radio sizing, order request confirmation layout, readable admin controls, compact florist hero and visible collection reveal synchronized.
 - Production validation: build and 26 focused tests passed; local browser fixture controls 20x20px, no horizontal overflow at 390px and successful checkbox interaction.
 - Anonymous Sign-Ins production activation reported by owner, not independently verified. Stock still requires actual quantities and recipes.
+
+## 2026-10-10 — Motion refinement synchronized
+- Production motion changes synchronized: correct stylesheet order, progressive native hero depth, finite/offscreen-paused petals, pointer-only new-card entries and responsive cart/dialog feedback.
+- Production build and 10 targeted tests passed; local demo browser checked keyboard/pointer, reduced motion and mobile width 390px. No hosted checkout or real-device FPS claim.
