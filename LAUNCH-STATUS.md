@@ -1,5 +1,9 @@
 # Garden Dreams — first sales release
 
+## Business dashboard and flower selection — 10/10/2026
+
+Schema015 applied to production/staging. Admin now has period reports for orders, ledger collections/refunds, current receivables, repeat buyer sessions, payment methods, top flowers, catalog quality and aggregate CSV. Customers have budget filters and three-bouquet comparison. 161 tests pass, mobile comparison verified locally. SEO search performance/visitors remain unconnected, profit unavailable, inventory still disabled. See docs/product/BUSINESS-DASHBOARD.md; launch gates below still apply.
+
 ## Latest storefront repair — 10/10/2026
 
 Cold product-page crash, inline cart callback and readable header fixed. BloomLoader replaces loading text; snapshot catalog stays visible during refresh. Schema 014 applied to staging and production; 20 licensed reference flower concepts seeded after READY, inactive until shop approval, no invented inventory. Code 2815799 / dpl_Cfzt1i8jGacpPhBMDTVKdGGYyLYn verified READY on the main alias; 158 tests pass. See LAUNCH-AUDIT-2026-10-10.md for verified business/SEO state and launch gates. Production currently has two orders, preserved. Vercel team plan is Hobby: commercial hosting, hosted purchase/email/QR acceptance and real stock/photos remain gates. Historical release notes below describe older states.
