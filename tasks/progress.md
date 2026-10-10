@@ -179,3 +179,12 @@ Owner received staging recovery mail, establishing reported email delivery, but 
 - Compact hero, readable local-service information, consistent mobile service strip and gentle hover states respecting reduced motion. Reveal content stays visible before intersection instead of leaving a blank collection.
 - Validation: production build passed; 26 focused payment/request/guest/product tests passed. Local browser fixture verified controls 20x20px, 390px layout without horizontal overflow, and successful checkbox interaction. Fixture removed before commit.
 - No production order or payment mutation. Hosted guest checkout, SMTP recovery, real stock and concurrent-order acceptance remain unverified.
+
+## 2026-10-10 — Florist motion refinement
+- Applied design-taste-frontend, animate, emil-design-eng and review-animations. Reused installed Motion and native CSS; no new dependency or customer data mutation.
+- Fixed stylesheet cascade: base styles now load before portal and commerce overrides. Mobile service rows and upgraded hero spacing actually take effect.
+- Hero uses native CSS scroll timeline on supported desktop fine-pointer browsers; static fallback on older browsers/mobile/reduced-motion. Intro uses a full transform string. Six finite petals pause outside the viewport; continuous star/frame loops removed.
+- New cards enter only after pointer-driven occasion/show-more actions, 200ms with at most 80ms stagger. Search, sort and keyboard filtering remain instant. Product content remains visible when starting-style is unsupported.
+- Dialog pointer entry is 200ms; keyboard entry and dismissal stay immediate with native focus/Escape handling. Hover image feedback shortened to 240ms. Navigation underline animates scale instead of width; cart badge and toast use interruptible transitions.
+- Verification: production build and 10 focused product/route/SEO tests passed. Local demo browser assertions passed for pointer/keyboard filters, keyboard/pointer dialogs, Escape, add-to-cart feedback, hero offscreen pause, reduced-motion, 390px no overflow and CTA within viewport. No real backend connected to demo.
+- Animation review: Approve for this diff. Desktop native timeline and mobile fallback checked; real-device FPS, older-browser rendering and hosted order/payment acceptance not measured.

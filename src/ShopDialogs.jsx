@@ -12,6 +12,7 @@ export function Modal({ title, children, onClose, className = "" }) {
     const previous = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    dialog.current.dataset.motion = previous?.matches?.(":focus-visible") ? "none" : "enter";
     dialog.current.showModal();
     return () => {
       document.body.style.overflow = previousOverflow;
