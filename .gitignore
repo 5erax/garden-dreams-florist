@@ -7,3 +7,5 @@ dist/
 supabase/.temp/
 supabase/.branches/
 .backups/
+server/storefront-*
+.vercel

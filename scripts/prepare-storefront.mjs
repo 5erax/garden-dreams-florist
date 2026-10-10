@@ -1,0 +1,11 @@
+import { mkdir, rename, writeFile } from 'node:fs/promises';
+import { loadEnv } from 'vite';
+import { publicCatalog } from '../api/storefront.js';
+import { checkEnvironment } from '../src/environment.js';
+const env = { ...loadEnv('production', process.cwd(), ''), ...process.env };
+const config = checkEnvironment(env);
+const catalog = await publicCatalog(env);
+await mkdir(new URL('../server/', import.meta.url), { recursive: true });
+await writeFile(new URL('../server/storefront-catalog.json', import.meta.url), JSON.stringify({ projectRef: config.projectRef, environment: config.environment, capturedAt: new Date().toISOString(), catalog }));
+await rename(new URL('../dist/index.html', import.meta.url), new URL('../server/storefront-template.html', import.meta.url));
+console.log(`Prepared private SEO template and public catalog snapshot (${catalog.products.length} models).`);
