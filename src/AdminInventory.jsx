@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from 'react';
 import { call } from './backend.js';
 import { useStore } from './Store.jsx';
@@ -32,7 +33,7 @@ export default function AdminInventory() {
     event.preventDefault(); const form = event.currentTarget;
     save(action, map(Object.fromEntries(new FormData(form))), form);
   };
-  if (!data) return <div role="status">{error || 'Đang tải kho…'}<button className="text-button" onClick={load}>Tải lại</button></div>;
+  if (!data) return <div>{error ? <p role="alert">{error}</p> : <BloomLoader label="Kho hoa" />}<button className="text-button" onClick={load}>Tải lại</button></div>;
   const product = products.find(item => item.id === Number(productId));
   const ingredientName = id => data.ingredients.find(item => item.id === id)?.name || `#${id}`;
   return <section className="inventory-panel">

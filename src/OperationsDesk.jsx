@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, call, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
 import { vietnamDate } from "./order.js";
@@ -61,7 +62,7 @@ export default function OperationsDesk() {
     <p className="fineprint">Tổng theo ngày giao {day || 'hôm nay'}, độc lập bộ lọc hàng đợi. Tiền đã ghi nhận không phải lợi nhuận; chỉ thay đổi khi admin đối soát. Môi trường thử chỉ hiển thị dữ liệu thử.</p>
     <nav className="operations-queues" aria-label="Hàng đợi công việc">{queues.map(([key,label])=><button key={key} aria-pressed={queue===key} onClick={()=>setQueue(key)}>{label}</button>)}</nav>
     {error && <p className="form-error" role="alert">{error}</p>}
-    {busy && <p role="status">Đang tải bàn xử lý đơn…</p>}
+    {busy && <BloomLoader compact label="Bàn xử lý đơn" />}
     {!busy && !error && !rows.length && <div className="portal-empty"><h3>Không có đơn trong hàng đợi này.</h3><p>Đổi ngày, bộ lọc hoặc mã đơn để tìm công việc cần xử lý.</p></div>}
     <div className="operations-orders">{(loadedKey===filterKey ? rows : []).map(order=><button className="operations-order" key={order.id} disabled={busy} onClick={async()=>{
       const key=filterKey,request=++sequence.current;setBusy(true);setError('');

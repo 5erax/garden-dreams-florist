@@ -79,7 +79,7 @@ function RequestPanel({ order, admin = false, onUpdated, ownerId }) {
   return <section className="order-requests" aria-label="Yêu cầu thay đổi đơn hoa" aria-busy={busy || loading}>
     <header className="order-requests-heading">
       <div><span className="eyebrow">CÙNG CHĂM CHÚT ĐƠN HOA</span><h3>{admin ? "Yêu cầu từ khách hàng" : "Cần điều chỉnh một chút?"}</h3></div>
-      <button type="button" className="text-button" onClick={refresh} disabled={busy || loading}>{loading ? "Đang tải…" : "Tải lại lịch sử"}</button>
+      <button type="button" className="text-button" onClick={refresh} disabled={busy || loading}>Làm mới lịch sử</button>
     </header>
     <p className="order-request-explanation">Yêu cầu được gửi trực tiếp đến cửa hàng. Đề nghị hủy chưa làm đơn bị hủy và chưa hoàn tiền. Shop xem xét trước khi cập nhật; nếu cần hoàn tiền, shop xử lý và đối soát riêng.</p>
     {notice && <p className="order-request-notice" role="status">{notice}</p>}

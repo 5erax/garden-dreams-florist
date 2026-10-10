@@ -64,7 +64,7 @@ export function ProductDialog({
       <ProductGallery key={product.id} product={product} />
       <div className="product-detail-copy">
         <span className="eyebrow">
-          Một món quà cho {product.occasion.toLocaleLowerCase("vi")}
+          Một món quà cho {(product.occasion || "người bạn thương").toLocaleLowerCase("vi")}
         </span>
         <h2>{product.name}</h2>
         {!inline && <a className="text-link" href={productUrl(product)}>Mở trang riêng của bó hoa ↗</a>}
@@ -77,7 +77,7 @@ export function ProductDialog({
             {product.variants?.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
           </select>
         </label>}
-        {!choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
+        {product.reference_only ? <p className="reference-note">Mẫu tham khảo · Giá dự kiến {money(product.price)}. Shop đang xác nhận nguồn hoa, quy cách và giá bán trước khi nhận đặt mẫu này.</p> : !choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
         <p>{product.description}</p>
         <dl>
           <dt>Trong bó hoa</dt>
@@ -94,7 +94,7 @@ export function ProductDialog({
           <span>{quantity} bó · {choice.sizeName || "Tiêu chuẩn"}</span>
           <small>Chưa gồm phí giao hoa</small>
         </div>}
-        <div className="detail-actions">
+        <div className="detail-actions" id={inline ? "buy" : undefined}>
           <Quantity
             value={quantity}
             onChange={setQuantity}
@@ -105,7 +105,7 @@ export function ProductDialog({
             disabled={!choice}
             onClick={() => {
               onAdd(product.id, quantity, variantId);
-              onClose();
+              onClose?.();
             }}
           >
             Thêm vào giỏ <Icon name="bag" />

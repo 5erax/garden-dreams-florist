@@ -23,12 +23,12 @@ export function PortalShell({ children }) {
   return (
     <div className="portal">
       <header className="portal-header">
-        <a className="brand" href="#home">
+        <a className="brand" href="/">
           <Icon name="flower" />
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng cửa hàng">
-          <a href="#collection">Chọn hoa</a>
+          <a href="/#collection">Chọn hoa</a>
           <a href="#garden">Vườn kỉ niệm</a>
           <a href="#account">Góc của tôi</a>
           {isAdmin && <a href="#admin">Quản trị</a>}
@@ -73,7 +73,7 @@ export function BackendNotice() {
         Tài khoản, đơn hoa và kỉ niệm sẽ khả dụng khi cửa hàng kết nối backend.
         Hiện chưa có dữ liệu khách hàng được lưu.
       </p>
-      <a className="button outline" href="#collection">
+      <a className="button outline" href="/#collection">
         Khám phá bộ sưu tập
       </a>
     </div>

@@ -236,3 +236,9 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 ## 2026-10-10 — Motion refinement synchronized
 - Production motion changes synchronized: correct stylesheet order, progressive native hero depth, finite/offscreen-paused petals, pointer-only new-card entries and responsive cart/dialog feedback.
 - Production build and 10 targeted tests passed; local demo browser checked keyboard/pointer, reduced motion and mobile width 390px. No hosted checkout or real-device FPS claim.
+
+## 10/10/2026 — storefront repair and reference catalog synchronized
+
+Cold product snapshot/inline callback/root links/header repaired. BloomLoader, 20 licensed reference images and descriptions, schema014/seed, SEO public fields and non-sale Offers handling match production source. Existing staging CLI config and owner-edited launch-shop.sql preserved. Production full test/rollout evidence appears in LAUNCH-AUDIT-2026-10-10.md; staging build must use --mode staging. No real sale photos/stock inferred.
+
+- Final validation: full suite 158/158, production/staging builds, 0 production dependency audit vulnerabilities, whitespace diff check pass. Reference photos inspected visually; runtime read before seed found two existing production orders, unchanged by DDL.

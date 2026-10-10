@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
@@ -225,7 +226,7 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
         <section className="customer-history" aria-labelledby="customer-history-title" aria-busy={busy}>
           <div className="portal-section-heading customer-history-heading">
             <div><h2 id="customer-history-title">Lịch sử mua hoa</h2><p>{loadedAt ? `Cập nhật lúc ${new Intl.DateTimeFormat("vi-VN", { timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(loadedAt)}` : "Đơn của bạn sẽ được lấy từ cửa hàng."}</p></div>
-            <button type="button" className="button outline" disabled={busy} onClick={() => load()}>{busy ? "Đang tải…" : "Tải lại từ đầu"}</button>
+            <button type="button" className="button outline" disabled={busy} onClick={() => load()}>Làm mới lịch sử</button>
           </div>
           {!!orders.length && <>
             <dl className="customer-history-summary" aria-label="Tóm tắt các đơn đã tải">
@@ -256,8 +257,8 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
             </div>
           )}
           {error && <div className="customer-history-error" role="alert"><p>{error}</p><button type="button" className="text-button" disabled={busy} onClick={() => load()}>Thử tải lại từ đầu</button>{orders.length > 0 && <p>Các đơn đang hiển thị vẫn là dữ liệu lần tải trước.</p>}</div>}
-          {busy && <p role="status" className="customer-history-loading">{orders.length ? "Đang lấy thêm thông tin từ shop…" : "Đang tải những bó hoa của bạn…"}</p>}
-          {!busy && !orders.length && !error && <div className="portal-empty customer-history-empty"><span aria-hidden="true">✳</span><h3>Câu chuyện đầu tiên đang chờ bạn.</h3><p>Khi đặt hoa, đơn xuất hiện ở đây cùng tiến trình giao và lời nhắn trên thiệp.</p><a className="button outline" href="#collection">Chọn một bó hoa</a></div>}
+          {busy && <BloomLoader compact={orders.length > 0} label="Những bó hoa của bạn" />}
+          {!busy && !orders.length && !error && <div className="portal-empty customer-history-empty"><span aria-hidden="true">✳</span><h3>Câu chuyện đầu tiên đang chờ bạn.</h3><p>Khi đặt hoa, đơn xuất hiện ở đây cùng tiến trình giao và lời nhắn trên thiệp.</p><a className="button outline" href="/#collection">Chọn một bó hoa</a></div>}
           {!!orders.length && !shown.length && <div className="portal-empty customer-history-empty"><h3>Chưa có đơn phù hợp trong phần đã tải.</h3><p>Thử tên hoa khác hoặc xóa bộ lọc{incomplete ? ", rồi tải thêm những đơn cũ hơn bên dưới" : ""}.</p><button type="button" className="button outline" onClick={resetFilters}>Xem các đơn đã tải</button></div>}
           {!!shown.length && <>
             <p className="customer-history-result" role="status">Hiển thị {shown.length} / {orders.length} đơn đã tải.</p>
@@ -268,7 +269,7 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
               }} />)}
             </ul>
           </>}
-          {more && !atLimit && <div className="customer-history-pagination"><button type="button" className="button outline" disabled={busy} onClick={() => load(orders.at(-1))}>{busy ? "Đang tải…" : "Tải thêm những lần mua trước"}</button><p>Mỗi lần tải tối đa {historyPageSize} đơn. Bộ lọc đang chọn áp dụng cả những đơn vừa tải.</p></div>}
+          {more && !atLimit && <div className="customer-history-pagination"><button type="button" className="button outline" disabled={busy} onClick={() => load(orders.at(-1))}>Xem thêm những lần mua trước</button><p>Mỗi lần tải tối đa {historyPageSize} đơn. Bộ lọc đang chọn áp dụng cả những đơn vừa tải.</p></div>}
           {atLimit && more && <p className="customer-history-scope">Đã tải {historyLimit} đơn gần nhất trong phiên này. Các đơn cũ hơn vẫn được giữ tại cửa hàng; tìm kiếm ở đây chưa bao gồm những đơn đó.</p>}
         </section>
       )}

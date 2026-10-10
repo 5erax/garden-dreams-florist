@@ -1,0 +1,342 @@
+[
+  {
+    "name": "Hoa hồng · Sắc thương",
+    "occasion": "Tình yêu",
+    "price": 490000,
+    "stems": "Hoa hồng, lá trang trí",
+    "description": "Một lời yêu gần gũi với những cánh hồng nhiều lớp. Gợi ý tặng người thương hoặc kỉ niệm ngày bên nhau. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-01.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Suyash Dwivedi",
+      "source": "https://commons.wikimedia.org/wiki/File:Rose_Flower_Bouquet_052.JPG",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Tulip · Ngày trong veo",
+    "occasion": "Sinh nhật",
+    "price": 690000,
+    "stems": "Tulip theo mùa",
+    "description": "Dáng hoa thanh thoát, phù hợp người thích sự giản dị và hiện đại. Gợi ý cho sinh nhật hoặc một lời cảm ơn. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-02.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Gábor Juhász juhg",
+      "source": "https://commons.wikimedia.org/wiki/File:Tulip-bouquet-vienna_(Unsplash).jpg",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Mẫu đơn · Mây mềm",
+    "occasion": "Tình yêu",
+    "price": 990000,
+    "stems": "Mẫu đơn theo mùa",
+    "description": "Cánh hoa xếp đầy, tạo cảm giác mềm mại và trang nhã. Gợi ý kỉ niệm và những dịp muốn gửi một món quà nổi bật. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-03.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Alexandra Seinet alexseinet",
+      "source": "https://commons.wikimedia.org/wiki/File:Peony_vase_(Unsplash).jpg",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Hướng dương · Nắng mới",
+    "occasion": "Chúc mừng",
+    "price": 450000,
+    "stems": "Hướng dương, lá xanh",
+    "description": "Một sắc nắng dành cho khởi đầu mới, tốt nghiệp hoặc chúc mừng thành công. Thiết kế gợi ý lấy hướng dương làm điểm nhấn. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-04.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Alabama Extension",
+      "source": "https://commons.wikimedia.org/wiki/File:Sunflowers_for_Sale_at_Farmers_Market.jpg",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Hoa ly · Hương dịu",
+    "occasion": "Sinh nhật",
+    "price": 590000,
+    "stems": "Hoa ly theo mùa",
+    "description": "Dáng cánh mở rộng và màu sắc thanh lịch. Gợi ý cho người yêu hoa có hương; shop cần xác nhận màu và độ nở khi nhận đặt. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-05.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "些細な日常",
+      "source": "https://commons.wikimedia.org/wiki/File:Two-pink-lilies-1.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Cẩm chướng · Lời cảm ơn",
+    "occasion": "Sinh nhật",
+    "price": 450000,
+    "stems": "Cẩm chướng phối hoa hồng",
+    "description": "Cánh cẩm chướng mềm kết hợp hoa hồng cho một món quà ấm áp. Gợi ý gửi lời cảm ơn hoặc tặng người thân. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-06.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Suyash Dwivedi",
+      "source": "https://commons.wikimedia.org/wiki/File:Rose_and_carnation_flower_bouquet_02.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Đồng tiền · Vui rạng rỡ",
+    "occasion": "Chúc mừng",
+    "price": 390000,
+    "stems": "Hoa đồng tiền, hoa phụ",
+    "description": "Những bông hoa rộng mặt, tạo điểm nhấn tươi vui. Gợi ý chúc mừng khai trương nhỏ hoặc một ngày đáng nhớ. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-07.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Vimukthi",
+      "source": "https://commons.wikimedia.org/wiki/File:Gerbera_arrangement.jpg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Cẩm tú cầu · Mây vườn",
+    "occasion": "Sinh nhật",
+    "price": 650000,
+    "stems": "Cẩm tú cầu theo mùa",
+    "description": "Những cụm cánh nhỏ mang cảm giác đầy đặn và dịu dàng. Gợi ý cho người thích bó hoa mềm, cần shop xác nhận màu thực tế. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-08.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Ruth Hartnup from Vancouver, Canada",
+      "source": "https://commons.wikimedia.org/wiki/File:Hydrangea_bouquet_(9580026536).jpg",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Hoa lan · Nét thanh",
+    "occasion": "Chúc mừng",
+    "price": 790000,
+    "stems": "Hoa lan phối cẩm tú cầu",
+    "description": "Dáng hoa thanh nhã cho một món quà trân trọng. Thiết kế gợi ý dùng lan làm trung tâm, quy cách do shop xác nhận trước khi bán. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-09.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Vimukthi",
+      "source": "https://commons.wikimedia.org/wiki/File:Phalaenopsis_Orchid_and_Hydrangea.jpg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Baby trắng · Lời thì thầm",
+    "occasion": "Tình yêu",
+    "price": 490000,
+    "stems": "Baby trắng phối hoa hồng",
+    "description": "Những chùm hoa nhỏ tạo khoảng thở quanh hoa hồng. Gợi ý lời nhắn nhẹ nhàng và một món quà không quá cầu kì. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-10.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "4028mdk09",
+      "source": "https://commons.wikimedia.org/wiki/File:Rosa_Rosen_mit_Schleierkraut.JPG",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Cúc nhỏ · Bình yên",
+    "occasion": "Sinh nhật",
+    "price": 350000,
+    "stems": "Cúc nhỏ, lá xanh",
+    "description": "Dáng hoa mộc mạc dành cho lời chúc bình an. Gợi ý tặng bạn bè hoặc mang một chút thiên nhiên vào góc bàn. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-11.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "D. Mulligan",
+      "source": "https://commons.wikimedia.org/wiki/File:Daisy_Bouquet_-_panoramio.jpg",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Thược dược · Vườn rực rỡ",
+    "occasion": "Chúc mừng",
+    "price": 590000,
+    "stems": "Thược dược theo mùa",
+    "description": "Nhiều lớp cánh tạo chiều sâu cho thiết kế. Gợi ý dịp chúc mừng hoặc người thích hoa có hình dáng nổi bật. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-12.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Dezidor",
+      "source": "https://commons.wikimedia.org/wiki/File:Dahlia_Gloriosa_(1).jpg",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Mao lương · Cánh lụa",
+    "occasion": "Tình yêu",
+    "price": 790000,
+    "stems": "Mao lương, eucalyptus",
+    "description": "Những lớp cánh mỏng phối lá xanh cho cảm giác mềm và hiện đại. Gợi ý món quà kỉ niệm, phụ thuộc nguồn hoa theo mùa. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-13.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Anbertin20",
+      "source": "https://commons.wikimedia.org/wiki/File:Vase_of_Ranunculus_and_Eucalyptus.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Freesia · Hương sớm",
+    "occasion": "Sinh nhật",
+    "price": 650000,
+    "stems": "Freesia theo mùa",
+    "description": "Những nhánh hoa nhỏ gợi một buổi sáng nhẹ nhàng. Gợi ý lời cảm ơn và các dịp tặng hoa thanh lịch. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-14.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Aw58",
+      "source": "https://commons.wikimedia.org/wiki/File:Bukiet_frezji_-_DSCF6897.jpg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Calla · Nét tối giản",
+    "occasion": "Cưới hỏi",
+    "price": 790000,
+    "stems": "Calla, lá trang trí",
+    "description": "Dáng hoa gọn, đường nét rõ, phù hợp phong cách tối giản. Gợi ý thiết kế cưới hoặc món quà cần vẻ trang nhã. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-15.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Anna.Massini",
+      "source": "https://commons.wikimedia.org/wiki/File:Calla_fiorita_-_Zantedeschia_aethiopica.jpg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Lavender · Góc tím",
+    "occasion": "Sinh nhật",
+    "price": 450000,
+    "stems": "Lavender dạng bó",
+    "description": "Sắc tím nhẹ cho người thích một góc nhỏ yên tĩnh. Shop cần xác nhận dùng hoa tươi hay hoa khô và quy cách trước khi bật bán. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-16.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Wisi eu",
+      "source": "https://commons.wikimedia.org/wiki/File:Lavande_lavender_bouquet.jpg",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Cúc · Mùa dịu êm",
+    "occasion": "Chúc mừng",
+    "price": 390000,
+    "stems": "Cúc theo mùa",
+    "description": "Các lớp cánh tạo một thiết kế đầy và gần gũi. Gợi ý chúc mừng hoặc tặng người thân; màu được xác nhận theo nguồn hoa. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-17.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "些細な日常",
+      "source": "https://commons.wikimedia.org/wiki/File:Chrysanthemum-1.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Cát tường · Lời chúc lành",
+    "occasion": "Sinh nhật",
+    "price": 550000,
+    "stems": "Cát tường, hoa phụ",
+    "description": "Cánh hoa mềm và thanh thoát cho lời chúc dịu dàng. Gợi ý sinh nhật, cảm ơn hoặc một ngày bình thường muốn gửi lời thương. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-18.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Downtowngal",
+      "source": "https://commons.wikimedia.org/wiki/File:White_Lisianthus_in_vase.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Hoa sen · Mộc an",
+    "occasion": "Sinh nhật",
+    "price": 490000,
+    "stems": "Hoa sen theo mùa",
+    "description": "Dáng hoa mộc, phù hợp người yêu vẻ tự nhiên. Thiết kế và độ nở cần shop xác nhận theo mùa, ảnh là tham khảo loài hoa. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-19.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "Hong Zhang (jennyzhh2008)",
+      "source": "https://commons.wikimedia.org/wiki/File:Lotus_flower_(978659).jpg",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  },
+  {
+    "name": "Hồng môn · Dấu ấn",
+    "occasion": "Chúc mừng",
+    "price": 590000,
+    "stems": "Hồng môn, lá xanh",
+    "description": "Đường nét nổi bật, gợi ý cho một món quà chúc mừng có cá tính. Shop cần xác nhận màu, số cành và quy cách thực tế. Ảnh minh họa tham khảo, chưa phải ảnh sản phẩm thực tế của shop. Số cành, kích thước, giấy gói và giá cuối cùng sẽ được công bố khi mẫu được mở bán. Chăm hoa: đặt nơi thoáng mát, tránh nắng trực tiếp; hoa cắt cành cần nước sạch và thay nước thường xuyên.",
+    "image": "/flowers/reference-20.jpg",
+    "active": false,
+    "reference_only": true,
+    "credit": {
+      "author": "René Hourdry",
+      "source": "https://commons.wikimedia.org/wiki/File:Anthurium_-_Bouquet_7_fleurs.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "note": "Ảnh tham khảo được lưu nguyên bản thumbnail Wikimedia; hiển thị cắt khung bằng CSS."
+    }
+  }
+]

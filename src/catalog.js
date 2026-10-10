@@ -1,3 +1,4 @@
+import referenceCatalog from './reference-catalog.json' with { type: 'json' };
 export const occasions = [
   "Tất cả",
   "Sinh nhật",
@@ -149,7 +150,7 @@ const flowers = [
   ],
 ];
 
-export const products = flowers.map(
+const saleProducts = flowers.map(
   ([name, occasion, price, stems, description], i) => ({
     id: i + 1,
     name,
@@ -161,6 +162,7 @@ export const products = flowers.map(
     featured: [1, 2, 6, 8].includes(i + 1),
   }),
 );
+export const products = [...saleProducts, ...referenceCatalog.map((product, i) => ({ ...product, id: 21 + i, slug: `bo-hoa-${21 + i}` }))];
 export const money = (value) =>
   new Intl.NumberFormat("vi-VN", {
     style: "currency",

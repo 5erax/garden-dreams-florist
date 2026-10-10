@@ -30,6 +30,24 @@ const render = product => renderToStaticMarkup(createElement(ProductDialog, {
   product, onClose() {}, onAdd() {}, onBuy() {}, favorite: false, onFavorite() {},
 }));
 
+test("a cold product snapshot without occasion renders instead of crashing", () => {
+  const { occasion, ...snapshot } = products[0];
+  const html = renderToStaticMarkup(createElement(ProductDialog, {
+    product: snapshot, inline: true, onAdd() {}, onBuy() {}, onFavorite() {},
+  }));
+  assert.match(html, /người bạn thương/);
+  assert.match(html, /id="buy"/);
+  assert.match(html, /Thêm vào giỏ/);
+});
+
+test("reference products disclose proposed pricing and cannot enter checkout", () => {
+  const html = render({ ...products[0], active: false, reference_only: true });
+  assert.match(html, /Mẫu tham khảo/);
+  assert.match(html, /Giá dự kiến/);
+  assert.match(html, /class="button primary" disabled=""/);
+  assert.doesNotMatch(html, /Cỡ này đã ngừng/);
+});
+
 test("product detail identifies the standard size and subtotal before adding", () => {
   const html = render(products[0]);
   assert.match(html, /Tạm tính/);

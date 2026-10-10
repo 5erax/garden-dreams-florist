@@ -73,6 +73,16 @@ test("guest checkout is available only when the provider actually enables it", (
   assert.match(unavailable,/name="email"/);
   assert.doesNotMatch(unavailable,/Không cần tạo tài khoản/);
 });
+
+test("checkout distinguishes waiting from a completed empty delivery catalog",()=>{
+  const waiting=render({session:null,loading:true,shipping:[]});
+  assert.match(waiting,/bloom-loader-flower/);
+  assert.doesNotMatch(waiting,/Đang tải/);
+  const empty=render({session:null,loading:false,shipping:[]});
+  assert.match(empty,/Shop chưa có dịch vụ giao hoa/);
+  assert.match(empty,/Kiểm tra lại/);
+  assert.doesNotMatch(empty,/bloom-loader-flower/);
+});
 test("VietQR provides account/reference copy actions only for unpaid active bank orders", () => {
   const order = {payment_method:"VIETQR",payment_status:"UNPAID",status:"PENDING",total:390000,reference:"GD-FIXTURE",bank:{bankName:"MB Bank",account:"0832345780",accountName:"Hà Văn Phước"}};
   const renderBank = changes => renderToStaticMarkup(createElement(BankPayment,{order:{...order,...changes}}));

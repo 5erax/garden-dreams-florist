@@ -11,7 +11,7 @@ export const vietnamDate = (now = new Date()) =>
 export const cartKey = (line) => `${line.id}:${line.variantId ?? "base"}`;
 export function cartChoice(line, catalog = products) {
   const product = catalog.find(p => p.id === line?.id);
-  if (!product || product.active === false) return null;
+  if (!product || product.active === false || product.reference_only) return null;
   if (line.variantId == null) return product;
   if (!Number.isSafeInteger(line.variantId) || line.variantId < 1) return null;
   const variant = product.variants?.find(v => v.id === line.variantId && v.active);

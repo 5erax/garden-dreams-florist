@@ -82,7 +82,7 @@ function PaymentPanel({ order, admin, onUpdated, ownerId }) {
   const disabled = loading || busy || Boolean(pendingView);
   return <section className="reconciliation" aria-label="Số dư và đối soát thanh toán" aria-busy={loading || busy}>
     <header className="reconciliation-heading"><div><span className="eyebrow">THANH TOÁN RÕ RÀNG</span><h3>{admin ? "Sổ đối soát của đơn" : "Khoản thanh toán của bạn"}</h3></div>
-      <button className="text-button" type="button" disabled={loading || busy} onClick={() => { setError(""); load(); }}>{loading ? "Đang tải số dư…" : "Tải lại số dư"}</button></header>
+      <button className="text-button" type="button" disabled={loading || busy} onClick={() => { setError(""); load(); }}>Làm mới số dư</button></header>
     <p className="reconciliation-explanation">Tiền thu và tiền hoàn chỉ được ghi nhận khi cửa hàng kiểm tra thực tế. Đã giao hoa hoặc đã hiển thị QR chưa có nghĩa là cửa hàng đã nhận tiền.</p>
     {error && <p className="form-error" role="alert">{error}{balance && " Số dư bên dưới là lần tải thành công trước; chưa dùng để đối soát thêm."}</p>}
     {notice && <p className="reconciliation-notice" role="status">{notice}</p>}

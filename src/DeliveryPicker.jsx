@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { call } from "./backend.js";
 import { vietnamDate } from "./order.js";
@@ -53,7 +54,7 @@ export default function DeliveryPicker({ shippingId, calendar = false, initialDa
         </select>
       </label>}
     </div>
-    {busy && <p role="status" className="fineprint">Đang kiểm tra lịch giao…</p>}
+    {busy && <BloomLoader compact label="Lịch giao hoa" />}
     {error && <div className="delivery-schedule-error">
       <p className="form-error" role="alert">{error} Địa chỉ và lời nhắn bạn đang nhập vẫn được giữ.</p>
       <button type="button" className="text-button" onClick={() => setRetry(value => value+1)}>Kiểm tra lịch lại</button>

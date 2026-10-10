@@ -12,6 +12,7 @@ import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import { PortalShell } from "./PortalShell.jsx";
 import RouteBoundary from "./RouteBoundary.jsx";
+import BloomLoader from "./BloomLoader.jsx";
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
@@ -131,6 +132,7 @@ export default function App() {
   const [storedCart, setCart] = useState(() => readStored("gd-cart", []));
   const cart = normalizeCart(storedCart, products);
   const [route, setRoute] = useState(location.hash);
+  const isProductPage = location.pathname.startsWith('/hoa/');
   const pageProduct = productFromPath(location.pathname, products);
   useEffect(() => {
     const changed = () => setRoute(location.hash);
@@ -282,26 +284,27 @@ export default function App() {
 
   return (
     <>
-      <a href="#collection" className="skip-link">
+      <a href={isProductPage ? '/#collection' : '#collection'} className="skip-link">
         Đến bộ sưu tập hoa
       </a>
-      <header className={`header ${scrolled ? "is-scrolled" : ""}`}>
+      <header className={`header ${scrolled || isProductPage ? "is-scrolled" : ""}`}>
         <a
           className="brand"
-          href="#home"
+          href={isProductPage ? '/#home' : '#home'}
           aria-label="Garden Dreams — về đầu trang"
         >
           <Icon name="flower" />
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng chính">
-          <a href="#collection">Bộ sưu tập</a>
-          <a href="#story">Câu chuyện</a>
-          <a href="#garden">Vườn kỉ niệm</a>
+          <a href={isProductPage ? '/#collection' : '#collection'}>Bộ sưu tập</a>
+          <a href={isProductPage ? '/#story' : '#story'}>Câu chuyện</a>
+          <a href="#garden" onPointerEnter={() => { loadGarden().catch(() => {}); }} onFocus={() => { loadGarden().catch(() => {}); }}>Vườn kỉ niệm</a>
         </nav>
         <div className="header-actions">
           <a
             href="#account"
+            onPointerEnter={() => { loadCustomer().catch(() => {}); }} onFocus={() => { loadCustomer().catch(() => {}); }}
             className="icon-button account-link"
             aria-label={
               session ? "Góc kỉ niệm của tôi" : "Tài khoản & lịch sử mua"
@@ -336,16 +339,12 @@ export default function App() {
         </div>
       </header>
       <main>
-        {location.pathname.startsWith('/hoa/') ? <section className="product-route section-shell">
+        {isProductPage ? <section className="product-route section-shell">
           <a className="text-link" href="/#collection">← Bộ sưu tập hoa</a>
-          {pageProduct ? <><h1>{pageProduct.name}</h1><ProductDialog key={pageProduct.id} inline product={pageProduct} onAdd={add} onBuy={buy} favorite={favorites.includes(pageProduct.id)} onFavorite={() => favorite(pageProduct.id)} /></> : <p role="status">{loading ? 'Đang tải bó hoa…' : 'Bó hoa này hiện không được bán.'}</p>}
+          {pageProduct ? <><h1>{pageProduct.name}</h1><ProductDialog key={pageProduct.id} inline product={pageProduct} onAdd={add} onBuy={buy} favorite={favorites.includes(pageProduct.id)} onFavorite={() => favorite(pageProduct.id)} /></> : loading ? <BloomLoader label="Bó hoa của bạn" /> : <p>Bó hoa này hiện không được bán.</p>}
         </section> : <Hero />}
         {panel !== "checkout" && pendingNotice}
-        {(loading || storeError) && (
-          <p className="store-status" role={storeError ? "alert" : "status"}>
-            {storeError || "Đang tải bộ sưu tập của cửa hàng…"}
-          </p>
-        )}
+        {storeError ? <p className="store-status" role="alert">{storeError}</p> : loading && !products.length && <BloomLoader />}
         <div className="service-strip">
           <span>
             <Icon name="flower" /> Miễn phí giao trong Long Thành
@@ -468,10 +467,10 @@ export default function App() {
                     </button>
                     <button
                       className="quick-add"
-                      onClick={() => product.variants?.length ? setSelected(product) : add(product.id)}
-                      aria-label={product.variants?.length ? `Chọn cỡ ${product.name}` : `Thêm ${product.name} vào giỏ`}
+                      onClick={() => product.reference_only || product.variants?.length ? setSelected(product) : add(product.id)}
+                      aria-label={product.reference_only ? `Xem mẫu tham khảo ${product.name}` : product.variants?.length ? `Chọn cỡ ${product.name}` : `Thêm ${product.name} vào giỏ`}
                     >
-                      {product.variants?.length ? "Chọn cỡ bó" : "Thêm vào giỏ"} <Icon name="plus" />
+                      {product.reference_only ? "Xem mẫu hoa" : product.variants?.length ? "Chọn cỡ bó" : "Thêm vào giỏ"} <Icon name="plus" />
                     </button>
                   </div>
                   <div className="product-copy">
@@ -487,7 +486,7 @@ export default function App() {
                     <div className="product-details">
                       <span>{product.stems}</span>
                       <div className="product-price">
-                        <span>Tiêu chuẩn</span>
+                        <span>{product.reference_only ? "Giá dự kiến" : "Tiêu chuẩn"}</span>
                         <strong>{money(product.price)}</strong>
                       </div>
                     </div>
@@ -578,7 +577,7 @@ export default function App() {
                 <br />
                 <em>Và mỗi người nhận, là một câu chuyện riêng.</em>
               </p>
-              <a className="text-link" href="#collection">
+              <a className="text-link" href={isProductPage ? '/#collection' : '#collection'}>
                 Tìm lời nhắn của bạn <Icon name="arrow" />
               </a>
             </Reveal>
@@ -632,7 +631,7 @@ export default function App() {
               <br />
               <em>để hoa nói giúp.</em>
             </h2>
-            <a href="#collection" className="button primary">
+            <a href={isProductPage ? '/#collection' : '#collection'} className="button primary">
               Gửi một chút thương <Icon name="arrow" />
             </a>
           </Reveal>
@@ -646,13 +645,13 @@ export default function App() {
       <footer className="shop-footer">
         <div className="footer-top">
           <div className="footer-story">
-            <a className="brand" href="#home"><Icon name="flower" /><span>{shop.name}</span></a>
+            <a className="brand" href={isProductPage ? '/#home' : '#home'}><Icon name="flower" /><span>{shop.name}</span></a>
             <p>{shop.about}</p>
             <address>{shop.address || shopAddress}</address>
           </div>
           <nav className="footer-navigation" aria-label="Khám phá cửa hàng">
             <h3>Cửa hàng</h3>
-            <a href="#collection">Chọn hoa</a>
+            <a href={isProductPage ? '/#collection' : '#collection'}>Chọn hoa</a>
             <a href="#account">Đơn hoa của tôi</a>
             <a href="#garden">Vườn kỉ niệm</a>
             {isAdmin && <a href="#admin">Quản trị</a>}
@@ -682,7 +681,7 @@ export default function App() {
               Đặt hoa & giao nhận
             </button>
           </div>
-          <a href="#home" className="footer-back">Về đầu trang ↑</a>
+          <a href={isProductPage ? '/#home' : '#home'} className="footer-back">Về đầu trang ↑</a>
         </div>
       </footer>
       <div

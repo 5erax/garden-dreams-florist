@@ -60,7 +60,7 @@ export function StoreProvider({ children }) {
         runtime.features?.variantOrders ? result(backend.from("gd_product_variants").select("*").eq("active", true).order("id")) : [],
       ]);
       setShop(cfg);
-      setProducts(catalog.filter((p) => p.active).map(p => ({ ...p, variants: variants.filter(v => v.product_id === p.id) })));
+      setProducts(catalog.filter((p) => p.active || p.reference_only).map(p => ({ ...p, variants: variants.filter(v => v.product_id === p.id) })));
       setShipping(services.filter((s) => s.active));
     } catch (e) {
       setEnvironmentVerified(false);
