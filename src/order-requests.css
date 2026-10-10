@@ -9,7 +9,7 @@
 .order-requests fieldset:disabled { opacity: .7; }
 .order-requests legend { font-weight: 600; margin-bottom: 20px; }
 .order-requests form label { display: block; margin: 16px 0; }
-.order-requests form input:not([type="radio"]), .order-requests textarea { width: 100%; font-size: 16px; }
+.order-requests form input:not([type="radio"]):not([type="checkbox"]), .order-requests textarea { width: 100%; font-size: 16px; }
 .order-request-types { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
 .order-request-types label { margin: 0 !important; display: flex !important; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 4px; padding: 12px 16px; min-height: 48px; cursor: pointer; }
 .order-request-types input { accent-color: var(--rose); width: 18px; height: 18px; flex-shrink: 0; }
@@ -17,7 +17,7 @@
 .order-request-types label:focus-within { outline: 2px solid var(--rose); outline-offset: 3px; }
 .order-request-notice, .order-request-recovery { background: #eee8df; border-left: 2px solid var(--rose); padding: 18px 20px; margin: 20px 0; }
 .order-request-recovery > p { margin: 12px 0; }
-.order-request-checkbox { display: flex; gap: 12px; align-items: start; margin: 18px 0; line-height: 1.7; }
+.order-requests .order-request-checkbox { display: flex; gap: 12px; align-items: start; margin: 18px 0; line-height: 1.7; }
 .order-request-checkbox input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--rose); flex-shrink: 0; }
 .order-request-history { list-style: none; padding: 0; display: grid; gap: 16px; margin: 24px 0; }
 .order-request-card { border: 1px solid var(--line); background: var(--paper); padding: 24px; }

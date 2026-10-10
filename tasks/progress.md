@@ -171,3 +171,11 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 Owner explicitly authorized direct production release without human review. Account forms now keep the selected action fixed while an Auth request is pending, clear stale messages on mode switches and label password recovery clearly. Password updates use the existing safe error mapper for network, password policy, same-password and expired-session errors; fields lock while saving. No database, SMTP, session persistence, payment or accepting-orders change. 75 production tests/build and 141 staging tests/build pass. Staging source commit 423345e.
 
 Owner received staging recovery mail, establishing reported email delivery, but the body still used the signup template and landed in Spam. The local recovery template is correct. Saved browser permission still rejected the signed-in dashboard after linking the account; no bypass was used. Hosted template, callback/password update, production SMTP and real order acceptance remain unverified. Production remains closed for online orders.
+
+## 2026-10-10 — Checkbox layout and storefront usability
+- Owner reports Anonymous Sign-Ins enabled on production; not independently verified by this release. No Auth settings changed by the agent.
+- Fixed the shared portal input selector: checkbox/radio controls no longer inherit full width, padding or text-field height. Applied the same exclusion to order-request forms and preserved required payment evidence/confirmation.
+- Increased admin label/input readability, 44px confirmation label targets and visible keyboard focus. Payment summaries wrap at narrow widths.
+- Compact hero, readable local-service information, consistent mobile service strip and gentle hover states respecting reduced motion. Reveal content stays visible before intersection instead of leaving a blank collection.
+- Validation: production build passed; 26 focused payment/request/guest/product tests passed. Local browser fixture verified controls 20x20px, 390px layout without horizontal overflow, and successful checkbox interaction. Fixture removed before commit.
+- No production order or payment mutation. Hosted guest checkout, SMTP recovery, real stock and concurrent-order acceptance remain unverified.

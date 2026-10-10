@@ -163,7 +163,7 @@
   margin-bottom: 20px;
   line-height: 1.6;
 }
-.portal input,
+.portal input:not([type="checkbox"]):not([type="radio"]),
 .portal textarea,
 .portal select {
   display: block;
@@ -205,6 +205,15 @@
   min-height: 18px;
   margin: 2px 0;
   flex: none;
+  accent-color: var(--rose);
+}
+.portal input:is([type="checkbox"], [type="radio"]) {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0;
+  margin: 3px 0 0;
+  flex: 0 0 20px;
   accent-color: var(--rose);
 }
 .portal .button {
