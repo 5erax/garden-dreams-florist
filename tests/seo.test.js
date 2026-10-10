@@ -40,7 +40,7 @@ test('SEO fetch only sends public key, only selects public fields, and fails clo
   assert.ok(requests.every(({url})=>!url.includes('/gd_orders?')&&!url.includes('owner_id')));
   assert.ok(requests.find(({url})=>url.includes('gd_products?')).url.includes('occasion'));
   assert.equal(result.products[0].occasion,'Tình yêu');
-  await assert.rejects(publicCatalog(env,async()=>({ok:false})),/CATALOG_UNAVAILABLE/);
+  await assert.rejects(publicCatalog(env,async()=>({ok:false,status:503,json:async()=>({})})),/CATALOG_UNAVAILABLE/);
 });
 
 test('reference pages disclose their state without advertising a purchasable Offer',()=>{
@@ -53,3 +53,4 @@ test('reference pages disclose their state without advertising a purchasable Off
   assert.match(html,/Suyash Dwivedi/);
   assert.doesNotMatch(html,/Chọn cỡ và đặt hoa/);
 });
+

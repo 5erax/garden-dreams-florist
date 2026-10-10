@@ -8,10 +8,17 @@ export async function publicCatalog(env, fetcher = fetch) {
   if (!config.projectRef) throw new Error('REMOTE_BACKEND_REQUIRED');
   const read = async path => {
     const response = await fetcher(`${config.url}/rest/v1/${path}`, { headers: { apikey: config.key }, signal: AbortSignal.timeout(2500) });
-    if (!response.ok) throw new Error('CATALOG_UNAVAILABLE');
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
+      throw new Error('CATALOG_UNAVAILABLE', { cause: { status: response.status, code: detail.code } });
+    }
     return response.json();
   };
-  const [shops, products] = await Promise.all([read('gd_shop?select=name,phone,address,accepting_orders&id=eq.1'), read('gd_products?select=id,slug,name,occasion,stems,description,image,price,active,reference_only&or=(active.eq.true,reference_only.eq.true)&order=id.asc')]);
+  const shopsRead = read('gd_shop?select=name,phone,address,accepting_orders&id=eq.1').catch(error => {
+    if (error.cause?.code !== '42703') throw error;
+    return read('gd_shop?select=name,phone,accepting_orders&id=eq.1');
+  });
+  const [shops, products] = await Promise.all([shopsRead, read('gd_products?select=id,slug,name,occasion,stems,description,image,price,active,reference_only&or=(active.eq.true,reference_only.eq.true)&order=id.asc')]);
   if (shops.length !== 1 || !Array.isArray(products) || products.some(item => !Number.isSafeInteger(item.price) || item.price < 0 || !/^bo-hoa-\d+$/.test(item.slug))) throw new Error('CATALOG_INVALID');
   return { shop: shops[0], products };
 }

@@ -50,3 +50,16 @@ test('fallback remains readable without an Offer or purchase CTA; unknown produc
   const missing=response();await handler({method:'GET',query:{path:'/hoa/bo-hoa-999'}},missing);assert.equal(missing.code,404);
   const post=response();await handler({method:'POST',query:{}},post);assert.equal(post.code,405);
 });
+
+test('legacy shop schema omits optional address instead of failing the entire catalog',async()=>{
+  const {publicCatalog}=await import('../api/storefront.js');
+  const env={VITE_APP_ENV:'staging',VITE_SUPABASE_URL:'https://tgvozhrkolcpszyyrgth.supabase.co',VITE_SUPABASE_PUBLISHABLE_KEY:'sb_publishable_fixture'};
+  const requests=[];
+  const result=await publicCatalog(env,async url=>{
+    requests.push(url);
+    if(url.includes('gd_shop?')&&url.includes('address'))return {ok:false,status:400,json:async()=>({code:'42703'})};
+    return {ok:true,json:async()=>url.includes('gd_shop?')?[{name:shop.name,phone:shop.phone,accepting_orders:false}]:[flower]};
+  });
+  assert.equal(requests.length,3);assert.equal(result.shop.address,undefined);assert.equal(result.products.length,1);
+  await assert.rejects(publicCatalog(env,async()=>({ok:false,status:403,json:async()=>({code:'42501'})})),/CATALOG_UNAVAILABLE/);
+});
