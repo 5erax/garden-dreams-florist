@@ -250,3 +250,6 @@ Production code 28157991aceb6af916f93d1ff6c0daf4aebc6d09 / dpl_Cfzt1i8jGacpPhBMD
 ## Business dashboard / bouquet comparison — 10/10/2026
 Synced schema015, admin aggregate reports and CSV, budget filters, three-bouquet comparison. Production tests 161/161; local mobile filter/comparison/choice tested. See docs/product/BUSINESS-DASHBOARD.md. Both hosted schemas applied; no user data changed. Stage keeps separate environment. READY evidence pending push.
 
+
+Verified rollout: production 72c47343a08455a379240c35cbb8446bd9d6f7a0 / dpl_3kwpwSVTLGqXSev877jH9RSThXn5 READY with garden-dreams-florist.vercel.app; staging 69f16056940955adbb78bec3e74162e9be335c23 / dpl_FfNYSZimuEJFJ2tQTMP7UhAfVUMM READY with fixed feature preview alias. Exact SHA/alias checked through Vercel metadata. Compiled local public handler passed home/product/sitemap/404/HEAD/405; production dependency audit 0 vulnerabilities. No hosted browser checkout or money action performed. This subsequent documentation-only commit records the verified feature release.
+
