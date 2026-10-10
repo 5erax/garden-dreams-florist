@@ -1,3 +1,5 @@
+import BloomDate from "./BloomDate.jsx";
+import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
 import { backend, call, result } from "./backend.js";
 import { vietnamDate } from "./order.js";
@@ -101,12 +103,12 @@ export default function AdminDelivery() {
       <h3>{edit.id ? "Chỉnh ca giao" : "Tạo ca giao"}</h3>
       <fieldset disabled={busy}>
         <div className="form-grid">
-          <label>Khu vực<select name="shippingId" defaultValue={edit.shipping_id} disabled={Boolean(edit.id)} required>
+          <label>Khu vực<BloomSelect name="shippingId" defaultValue={edit.shipping_id} disabled={Boolean(edit.id)} required>
             {services.map(service => <option key={service.id} value={service.id}>{service.name}{!service.active && " (đang tắt)"}</option>)}
-          </select></label>
-          <label>Ca giao<select name="deliveryTime" defaultValue={edit.delivery_time} disabled={Boolean(edit.id)} required>
+          </BloomSelect></label>
+          <label>Ca giao<BloomSelect name="deliveryTime" defaultValue={edit.delivery_time} disabled={Boolean(edit.id)} required>
             {deliveryTimes.map(time => <option key={time}>{time}</option>)}
-          </select></label>
+          </BloomSelect></label>
           <label>Sức chứa mỗi ngày<input type="number" name="capacity" min={0} max={500} step={1} defaultValue={edit.capacity} required /></label>
           <label>Thời gian cần đặt trước (phút)<input type="number" name="leadMinutes" min={0} max={43200} step={1} defaultValue={edit.lead_minutes} required /></label>
         </div>
@@ -132,10 +134,10 @@ export default function AdminDelivery() {
       <h3>{holiday.id ? "Chỉnh ngày nghỉ" : "Thêm ngày nghỉ"}</h3>
       <fieldset disabled={busy}>
         <div className="form-grid">
-          <label>Khu vực<select name="shippingId" defaultValue={holiday.shipping_id} disabled={Boolean(holiday.id)} required>
+          <label>Khu vực<BloomSelect name="shippingId" defaultValue={holiday.shipping_id} disabled={Boolean(holiday.id)} required>
             {services.map(service => <option key={service.id} value={service.id}>{service.name}</option>)}
-          </select></label>
-          <label>Ngày nghỉ<input type="date" name="date" min={vietnamDate()} max={vietnamDate(new Date(Date.now()+365*86400000))} defaultValue={holiday.delivery_date} disabled={Boolean(holiday.id)} required /></label>
+          </BloomSelect></label>
+          <label>Ngày nghỉ<BloomDate  name="date" min={vietnamDate()} max={vietnamDate(new Date(Date.now()+365*86400000))} defaultValue={holiday.delivery_date} disabled={Boolean(holiday.id)} required /></label>
         </div>
         <label>Lý do nội bộ<input name="reason" maxLength={200} defaultValue={holiday.reason} /></label>
         <label className="check-label"><input type="checkbox" name="active" defaultChecked={holiday.active} />Đóng lịch ngày này</label>

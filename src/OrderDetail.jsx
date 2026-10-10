@@ -1,3 +1,4 @@
+import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 import {
@@ -145,11 +146,11 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
           </p>
           <label>
             Chia sẻ thế nào
-            <select value={mode} onChange={(e) => setMode(e.target.value)}>
+            <BloomSelect value={mode} onChange={(e) => setMode(e.target.value)}>
               <option value="PRIVATE">Giữ riêng / rút chia sẻ</option>
               <option value="LINK">Chia sẻ bằng đường dẫn</option>
               <option value="GARDEN">Đường dẫn + đưa vào Vườn kỉ niệm</option>
-            </select>
+            </BloomSelect>
           </label>
           {mode !== "PRIVATE" && (
             <label>
@@ -370,7 +371,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           <div className="form-grid">
             <label>
               Trạng thái đơn
-              <select
+              <BloomSelect
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -379,11 +380,11 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
                     {name}
                   </option>
                 ))}
-              </select>
+              </BloomSelect>
             </label>
             <label>
               Trạng thái tiền
-              <select
+              <BloomSelect
                 value={payment}
                 disabled={features.reconciliationLedger}
                 onChange={(e) => setPayment(e.target.value)}
@@ -393,7 +394,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
                     {name}
                   </option>
                 ))}
-              </select>
+              </BloomSelect>
             </label>
           </div>
           <label>

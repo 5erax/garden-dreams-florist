@@ -1,3 +1,4 @@
+import BloomDate from "./BloomDate.jsx";
 import { useEffect, useState } from 'react';
 import { call } from './backend.js';
 import { money } from './catalog.js';
@@ -32,8 +33,8 @@ export default function BusinessDashboard() {
       e.preventDefault(); const data = new FormData(e.currentTarget);
       setPeriod({ from: data.get('from'), to: data.get('to') }); setRevision(n => n + 1);
     }}>
-      <label>Từ ngày<input type="date" name="from" required defaultValue={period.from} /></label>
-      <label>Đến ngày<input type="date" name="to" required defaultValue={period.to} /></label>
+      <label>Từ ngày<BloomDate  name="from" required defaultValue={period.from} /></label>
+      <label>Đến ngày<BloomDate  name="to" required defaultValue={period.to} /></label>
       <button className="button primary">Xem báo cáo</button>
       {report && <button type="button" className="button outline" onClick={exportDaily}>Xuất CSV theo ngày</button>}
     </form>

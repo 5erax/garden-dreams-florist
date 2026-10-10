@@ -99,7 +99,8 @@ test("calendar checkout waits for a server choice; old backends retain their exi
   const legacy=renderToStaticMarkup(createElement(DeliveryPicker,{shippingId:"fixture",onReady(){}}));
   assert.match(legacy,/name="deliveryTime"/);
   assert.match(legacy,/Chiều · 13–17h/);
-  assert.doesNotMatch(legacy,/<select[^>]*disabled/);
+  assert.match(legacy,/role="combobox"/);
+  assert.doesNotMatch(legacy,/<button[^>]*disabled[^>]*role="combobox"|<button[^>]*role="combobox"[^>]*disabled/);
   assert.equal(selectedDelivery([{time:"morning",available:false},{time:"afternoon",available:true}],"morning"), "");
   assert.equal(selectedDelivery([{time:"afternoon",available:true}],"afternoon"), "afternoon");
 });

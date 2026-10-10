@@ -1,3 +1,5 @@
+import BloomDate from "./BloomDate.jsx";
+import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { call } from "./backend.js";
@@ -45,13 +47,13 @@ export default function DeliveryPicker({ shippingId, calendar = false, initialDa
   return <section className="delivery-picker" aria-label="Chọn ngày và ca giao">
     <div className="form-grid">
       <label>Ngày mong muốn
-        <input name="deliveryDate" type="date" min={vietnamDate()} max={vietnamDate(new Date(Date.now()+90*86400000))}
+        <BloomDate name="deliveryDate"  min={vietnamDate()} max={vietnamDate(new Date(Date.now()+90*86400000))}
           value={day} onChange={event => {setDay(event.target.value);setSchedule(null);if(calendar)onReady(false);}} required />
       </label>
       {!automatic && <label>Khung giờ
-        <select name="deliveryTime" value={time || initialTime} disabled={calendar && (!current || busy)} onChange={event => setTime(event.target.value)} required>
+        <BloomSelect name="deliveryTime" value={time || initialTime} disabled={calendar && (!current || busy)} onChange={event => setTime(event.target.value)} required>
           {deliveryTimes.map(label => <option key={label}>{label}</option>)}
-        </select>
+        </BloomSelect>
       </label>}
     </div>
     {busy && <BloomLoader compact label="Lịch giao hoa" />}

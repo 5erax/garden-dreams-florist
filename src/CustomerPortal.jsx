@@ -1,3 +1,4 @@
+import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
@@ -248,10 +249,10 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
               </fieldset>
               <div className="customer-history-search-row">
                 <label className="customer-history-search">Tìm trong đơn đã tải<input type="search" value={search} maxLength={100} onChange={event => { closeDetail(); setSearch(event.target.value); }} placeholder="Mã đơn, tên hoa hoặc người nhận" aria-describedby="history-scope" /></label>
-                <label>Thanh toán<select value={payment} onChange={event => { closeDetail(); setPayment(event.target.value); }}>
+                <label>Thanh toán<BloomSelect value={payment} onChange={event => { closeDetail(); setPayment(event.target.value); }}>
                   <option value="ALL">Mọi trạng thái tiền</option>
                   {Object.entries(paymentStatuses).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                </select></label>
+                </BloomSelect></label>
                 {hasFilters && <button type="button" className="text-button" onClick={resetFilters}>Xóa bộ lọc</button>}
               </div>
             </div>

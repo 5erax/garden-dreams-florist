@@ -1,3 +1,4 @@
+import BloomDate from "./BloomDate.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
 import { backend, call, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
@@ -43,7 +44,7 @@ export default function OperationsDesk() {
       <button className="button outline" disabled={busy} onClick={()=>setRevision(value=>value+1)}>Cập nhật bàn làm việc</button>
     </div>
     <div className="operations-filter">
-      <label>Ngày giao<input type="date" value={day} onChange={event=>setDay(event.target.value)}/></label>
+      <label>Ngày giao<BloomDate  value={day} onChange={event=>setDay(event.target.value)}/></label>
       <button className="text-button" onClick={()=>setDay(vietnamDate())}>Hôm nay</button>
       <button className="text-button" onClick={()=>setDay('')}>Mọi ngày</button>
       <form onSubmit={event=>{event.preventDefault();setQuery(search.trim().toUpperCase());}}>

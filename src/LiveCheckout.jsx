@@ -1,3 +1,4 @@
+import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { useStore } from "./Store.jsx";
@@ -170,9 +171,9 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               <div className="checkout-fields">
               <h3>Giao hoa khi nào?</h3>
               <label>Khu vực giao hoa
-                <select value={shippingId} onChange={event => setShippingId(event.target.value)} required>
+                <BloomSelect value={shippingId} onChange={event => setShippingId(event.target.value)} required>
                   {shipping.map(s => <option key={s.id} value={s.id}>{s.name} · {money(s.fee)}</option>)}
-                </select>
+                </BloomSelect>
               </label>
               {service && <p className="fineprint">{service.area}. Shop xác nhận địa chỉ và lịch giao trước khi nhận đơn.</p>}
               <DeliveryPicker shippingId={shippingId} calendar={features.deliveryCalendar} initialDate={draft?.deliveryDate} initialTime={draft?.deliveryTime}
@@ -233,7 +234,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               <h3>Bó hoa của bạn</h3>
               <label>
                 Phương thức thanh toán
-                <select
+                <BloomSelect
                   value={payment}
                   onChange={(e) => setPayment(e.target.value)}
                 >
@@ -243,7 +244,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                   {shop.transfer_enabled && (
                     <option value="VIETQR">Chuyển khoản VietQR</option>
                   )}
-                </select>
+                </BloomSelect>
               </label>
               <div className="checkout-summary">
                 {cart.map((line) => (
