@@ -1,5 +1,7 @@
 # Commerce & SEO — 10/10/2026
 
+Release evidence: main b3469ff, dpl_GDVp9TquQEFKJXZPdq7XFzwkwZ6C READY, verified production target and garden-dreams-florist.vercel.app alias. Stage 04a94ca/dpl_4uPTP9C3V1w3oEPUWQEct6rTMXUG READY. Guarded cover cleanup applied after assets deployed on both environments. Production still has one existing order and zero payment receipts. Local handler with the compiled template passed home/product/sitemap/404/HEAD/405 on synthetic public catalog; this does not prove hosted HTTP/browser behavior.
+
 ## Đã nối vào ứng dụng
 
 - Tìm hoa không phân biệt dấu, dùng chung chuẩn hóa với lịch sử khách.

@@ -4,7 +4,7 @@ Ngày 09/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
-- **Commerce/SEO ngày 10/10/2026:** thêm HTML catalog từ máy chủ, URL/slug riêng, sitemap/robots/canonical/Florist/Product, tìm không dấu, WOFF2 và cache; bỏ endpoint đặt demo 503. Kho/BOM/FEFO/hold/release/consume/waste nối admin/OMS; schema 013 đã cài staging và production. 149 tests/build qua; hosted stock rehearsal rollback qua, RLS đủ, không tồn/recipe giả. Còn deploy/alias verification được ghi tại release notes khi READY.
+- **Commerce/SEO ngày 10/10/2026:** thêm HTML catalog từ máy chủ, URL/slug riêng, sitemap/robots/canonical/Florist/Product, tìm không dấu, WOFF2 và cache; bỏ endpoint đặt demo 503. Kho/BOM/FEFO/hold/release/consume/waste nối admin/OMS; schema 013 đã cài staging và production. 149 tests/build qua; hosted stock rehearsal rollback qua, RLS đủ, không tồn/recipe giả. Main b3469ff / dpl_GDVp9TquQEFKJXZPdq7XFzwkwZ6C READY, exact SHA/alias đã kiểm; cover cleanup đã áp dụng sau deploy.
 - **Không nâng trạng thái bằng tên feature:** inventory production vẫn tắt vì chưa được cấp tồn/công thức thật; guest cần bật Anonymous Auth qua dashboard. 40 chức năng một phần, 55 chưa triển khai sau đối chiếu mới; AT-02 chưa hoàn tất race/end-to-end. Chưa có browser/CWV/SEO crawler acceptance hoặc thông báo/coupon/QC enterprise.
 
 - **Cập nhật mới nhất 10/10/2026:** bản commerce main 4d55f05 đã deploy production READY tại dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ; xác minh exact SHA/alias. Backend production đã nâng cấp atomic 004→012 qua Supabase MCP được chủ shop cấp quyền. Một đơn cũ, 20 sản phẩm, ba dịch vụ giao active và trạng thái nhận đơn true có sẵn được giữ; không ghi nhận khoản thu, mọi bảng Garden Dreams có RLS.
