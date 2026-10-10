@@ -1,4 +1,6 @@
-scripts/
+scripts/*
+!scripts/prepare-storefront.mjs
+!scripts/check-storefront-build.mjs
 tests/
 supabase/
 tasks/
