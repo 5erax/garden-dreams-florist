@@ -1,5 +1,7 @@
 # Garden Dreams — first sales release
 
+Latest commerce/SEO release: main b3469ffb2e801fbe772f9814343ca78f963c5c68, production dpl_GDVp9TquQEFKJXZPdq7XFzwkwZ6C READY with exact main alias/SHA verified. Schema 013 and five guarded cover replacements applied; old order retained, inventory remains off without real quantities/recipes. 149 tests, production/staging builds and local compiled-template handler checks pass; hosted stock acceptance rolled back cleanly. Stage 04a94ca / dpl_4uPTP9C3V1w3oEPUWQEct6rTMXUG also READY. See RELEASE-COMMERCE-SEO.md. Guest Auth provider, browser/Auth/QR/CWV, true concurrent-order rehearsal and commercial hosting remain gates; no claim of 95 completed features.
+
 ## Current release — 10/10/2026 (supersedes historical closed/schema notes below)
 
 Commerce source is released directly on main: a212b37, followed by template-directory correction 4d55f0596a54a7b149c4a8fe3a27aa0e9ad9ed30. Vercel dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ is READY, target production, with the exact SHA and garden-dreams-florist.vercel.app alias verified through deployment metadata. Admin albums/variants, delivery calendar, operations, customer requests and manual reconciliation now use the corresponding hosted schema.
