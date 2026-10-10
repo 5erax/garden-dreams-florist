@@ -36,7 +36,7 @@ function Reveal({ children, className = "" }) {
   return (
     <motion.div
       className={className}
-      initial={reduced ? false : { opacity: 0, y: 28 }}
+      initial={reduced ? false : { y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.12 }}
       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
@@ -108,6 +108,7 @@ function Hero() {
         <a className="button hero-cta" href="#collection">
           Chọn một bó hoa <Icon name="arrow" />
         </a>
+        <p className="hero-local">Hoa tươi tại Long Thành, Đồng Nai</p>
       </motion.div>
     </section>
   );
@@ -341,7 +342,7 @@ export default function App() {
         )}
         <div className="service-strip">
           <span>
-            <Icon name="flower" /> Hoa, trong sắc màu tự nhiên
+            <Icon name="flower" /> Miễn phí giao trong Long Thành
           </span>
           <i>✳</i>
           <span>
@@ -349,13 +350,13 @@ export default function App() {
           </span>
           <i>✳</i>
           <span>
-            <Icon name="leaf" /> Chăm chút đến cánh hoa cuối
+            <Icon name="leaf" /> COD hoặc chuyển khoản VietQR
           </span>
         </div>
         <section className="collection section-shell" id="collection">
           <Reveal className="section-heading">
             <div>
-              <span className="eyebrow">The floral collection / 01</span>
+              <span className="eyebrow">Bộ sưu tập hoa tươi / 01</span>
               <h2>
                 Một bó hoa.
                 <br />

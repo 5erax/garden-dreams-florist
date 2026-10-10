@@ -227,3 +227,8 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 - Sửa luồng tài khoản: khóa nút chuyển chế độ khi request đang chạy, guard gửi lại, xóa notice/error khi chuyển chế độ; màn quên mật khẩu nêu rõ thao tác và Spam. Dùng authErrorMessage chung cho updateUser; chỉ trả hướng dẫn tĩnh khi password trùng hoặc session/link hết hạn. Fieldset đổi mật khẩu khóa lúc lưu; không lưu mật khẩu/token hay thay đổi session policy.
 - 141 staging tests / 75 production tests và hai build qua. LOC canonical 14.637 (+3.850 từ baseline 10.787), còn 11.150 tới mục tiêu thêm 15.000. Không coi các unit tests hoặc READY là browser/auth/order acceptance. Production giữ schema legacy và shop đóng.
 - Phát hành trực tiếp main commit 30f0dd3c93242289ba4338d26e2f1fc5b89da74b theo ủy quyền chủ shop, không tạo PR mới. Vercel dpl_9CENWMoBXu3LAGdcknHRYCnH8skt READY, target production, SHA và alias garden-dreams-florist.vercel.app khớp. Staging 423345e cũng READY tại dpl_AeGVSP4MakkDuW6Gxc9SPfiqangt. Đây là bằng chứng deploy metadata; chưa kiểm browser, SMTP production hoặc mở nhận đơn.
+
+## 2026-10-10 — UI layout correction synced from production 386b0f1
+- Shared checkbox/radio sizing, order request confirmation layout, readable admin controls, compact florist hero and visible collection reveal synchronized.
+- Production validation: build and 26 focused tests passed; local browser fixture controls 20x20px, no horizontal overflow at 390px and successful checkbox interaction.
+- Anonymous Sign-Ins production activation reported by owner, not independently verified. Stock still requires actual quantities and recipes.
