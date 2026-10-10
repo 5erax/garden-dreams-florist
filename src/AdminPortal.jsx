@@ -10,6 +10,7 @@ import AdminVariants from "./AdminVariants.jsx";
 import AdminDelivery from "./AdminDelivery.jsx";
 import OperationsDesk from "./OperationsDesk.jsx";
 import ReconciliationDesk from "./ReconciliationDesk.jsx";
+import AdminInventory from './AdminInventory.jsx';
 
 const newProduct = {
   name: "",
@@ -39,7 +40,7 @@ function AdminWorkspace({ store }) {
     [filter, setFilter] = useState("");
   async function load(append = false) {
     if (!store.isAdmin) return;
-    if (["calendar", "desk", "reconciliation"].includes(tab)) return;
+    if (["calendar", "desk", "reconciliation", "inventory"].includes(tab)) return;
     setBusy(true);
     setError("");
     try {
@@ -195,6 +196,7 @@ function AdminWorkspace({ store }) {
           ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
           ...(store.features.operationsDesk ? [["desk", "Bàn xử lý đơn"]] : []),
           ...(store.features.reconciliationLedger ? [["reconciliation", "Đối soát tiền"]] : []),
+          ...(store.features.inventory ? [["inventory", "Kho & công thức"]] : []),
         ].map(([key, name]) => (
           <button
             key={key}
@@ -206,7 +208,7 @@ function AdminWorkspace({ store }) {
           </button>
         ))}
       </nav>
-      {tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
+      {tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
       <div className="portal-section-heading">
         <h2>
           {tab === "orders"

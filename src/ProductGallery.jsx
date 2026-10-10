@@ -14,6 +14,7 @@ export default function ProductGallery({ product }) {
         <img src={src} alt={`Bó hoa ${product.name}, ảnh ${selected + 1}`} decoding="async" onError={() => markFailed(src)} /> :
         <div className="product-photo-placeholder"><Icon name="flower" /><span>Ảnh đang cập nhật</span></div>}
     </div>
+    {src?.endsWith('-pending.svg') && <p className="photo-pending">Ảnh thực tế của mẫu này đang cập nhật. Hình đang hiển thị là nhãn giữ chỗ, không phải ảnh bó hoa.</p>}
     {photos.length > 1 && <>
       <div className="product-gallery-thumbnails" aria-label="Chọn ảnh bó hoa">
         {photos.map((photo, index) => <button key={photo} type="button" aria-label={`Xem ảnh ${index + 1} của ${product.name}`}

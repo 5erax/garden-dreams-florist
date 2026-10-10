@@ -60,6 +60,13 @@ export async function guestCheckoutEnabled() {
 }
 
 const messages = {
+  STOCK_SHORTAGE: 'Nguyên liệu cho bó hoa hoặc ngày giao vừa hết. Chọn mẫu/ngày khác; đơn chưa được lưu và thông tin đang nhập được giữ.',
+  RECIPE_REQUIRED: 'Mẫu/cỡ này chưa có công thức đủ để nhận đặt. Chọn mẫu khác hoặc chờ shop cập nhật.',
+  RECIPES_REQUIRED: 'Cần công thức cho mọi mẫu và cỡ đang bán trước khi bật kiểm soát tồn.',
+  INVALID_RECIPE: 'Kiểm tra mẫu, cỡ và nguyên liệu/số lượng trong công thức.',
+  INVALID_INVENTORY: 'Kiểm tra nguyên liệu, đơn vị, số lượng, giá vốn và hạn sử dụng của lô.',
+  STOCK_RESERVED_OR_INSUFFICIENT: 'Số lượng vượt phần chưa giữ của lô. Xử lý các đơn bị ảnh hưởng trước khi ghi hao hụt.',
+  STOCK_EXPIRED: 'Lô đang giữ đã hết hạn. Không thể bắt đầu bó bằng nguyên liệu này; xử lý đơn và nhập lô mới.',
   AUTH_REQUIRED: "Vui lòng đăng nhập trước.",
   ADMIN_REQUIRED: "Chức năng này dành cho admin.",
   SHOP_CLOSED: "Cửa hàng chưa mở nhận đơn.",

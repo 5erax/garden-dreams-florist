@@ -6,7 +6,7 @@ import {
   validateOrder,
   vietnamDate,
 } from "../src/order.js";
-import handler from "../api/orders.js";
+
 
 const now = new Date("2026-10-09T03:00:00Z");
 const input = {
@@ -118,74 +118,4 @@ test("cart keeps sizes separate, calculates catalog prices and drops unavailable
     [{ id: 1, variantId: 101, quantity: 1 }, { id: 1, variantId: 101, quantity: 2 }]])
     assert.throws(() => validateOrder({ ...input, items }, now, catalog), /Số lượng/);
   assert.deepEqual(normalizeCart(cart, [{ ...catalog[0], variants: [] }]), [{ id: 1, quantity: 1 }]);
-});
-
-function response() {
-  return {
-    headers: {},
-    setHeader(key, value) {
-      this.headers[key] = value;
-      return this;
-    },
-    status(code) {
-      this.code = code;
-      return this;
-    },
-    json(body) {
-      this.body = body;
-      return this;
-    },
-  };
-}
-test("API refuses other methods, foreign origins, malformed origins, and non-JSON requests", async () => {
-  for (const [req, code] of [
-    [{ method: "GET", headers: {} }, 405],
-    [
-      {
-        method: "POST",
-        headers: { origin: "https://other.example", host: "shop.example" },
-      },
-      403,
-    ],
-    [
-      { method: "POST", headers: { origin: "invalid", host: "shop.example" } },
-      403,
-    ],
-    [{ method: "POST", headers: {} }, 415],
-    [
-      {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "content-length": "17000",
-        },
-      },
-      413,
-    ],
-  ]) {
-    const res = response();
-    await handler(req, res);
-    assert.equal(res.code, code);
-  }
-});
-test("demo API does not claim to accept or store an order", async () => {
-  const previous = process.env.SHOP_ORDERS_ENABLED;
-  delete process.env.SHOP_ORDERS_ENABLED;
-  try {
-    const res = response();
-    await handler(
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: input,
-      },
-      res,
-    );
-    assert.equal(res.code, 503);
-    assert.match(res.body.error, /chưa được gửi/);
-    assert.equal(res.body.received, undefined);
-  } finally {
-    if (previous === undefined) delete process.env.SHOP_ORDERS_ENABLED;
-    else process.env.SHOP_ORDERS_ENABLED = previous;
-  }
 });

@@ -1,20 +1,20 @@
 @font-face {
   font-family: Garden Serif;
-  src: url("/media/font-17.ttf") format("truetype");
+  src: url("/media/font-17.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: Garden Serif;
-  src: url("/media/font-15.ttf") format("truetype");
+  src: url("/media/font-15.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: Garden Sans;
-  src: url("/media/font-37.ttf") format("truetype");
+  src: url("/media/font-37.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;

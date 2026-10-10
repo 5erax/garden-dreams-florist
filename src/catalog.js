@@ -157,7 +157,7 @@ export const products = flowers.map(
     price,
     stems,
     description,
-    image: `/flowers/bouquet_${i + 1}.webp`,
+    image: i >= 15 ? `/flowers/bouquet_${i + 1}-pending.svg` : `/flowers/bouquet_${i + 1}.webp`,
     featured: [1, 2, 6, 8].includes(i + 1),
   }),
 );

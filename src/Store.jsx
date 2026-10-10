@@ -18,6 +18,8 @@ import { authCallbackRoute } from "./auth-callback.js";
 import { products as demoProducts } from "./catalog.js";
 
 const Store = createContext(null);
+let initialCatalog;
+try { initialCatalog = JSON.parse(globalThis.document?.getElementById('gd-public-catalog')?.textContent || 'null'); } catch { /* Live refresh recovers an absent snapshot. */ }
 export function sessionIsAdmin(session, adminUserId) {
   return Boolean(session?.user?.id && session.user.id === adminUserId);
 }
@@ -30,8 +32,8 @@ const demoShop = {
   transfer_enabled: false,
 };
 export function StoreProvider({ children }) {
-  const [shop, setShop] = useState(demoShop),
-    [products, setProducts] = useState(demoProducts),
+  const [shop, setShop] = useState(initialCatalog?.shop || demoShop),
+    [products, setProducts] = useState(initialCatalog?.products || demoProducts),
     [shipping, setShipping] = useState([]);
   const [session, setSession] = useState(null),
     [adminUserId, setAdminUserId] = useState(null),

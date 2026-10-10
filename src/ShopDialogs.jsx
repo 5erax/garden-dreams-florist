@@ -4,6 +4,7 @@ import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./ord
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import ProductGallery from "./ProductGallery.jsx";
+import { productUrl } from './product-url.js';
 
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
@@ -51,18 +52,21 @@ export function ProductDialog({
   onBuy,
   favorite,
   onFavorite,
+  inline = false,
 }) {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState(null);
   const choice = cartChoice({ id: product.id, variantId }, [product]);
+  const Wrapper = inline ? 'section' : Modal;
   return (
-    <Modal title={product.name} onClose={onClose} className="product-dialog">
+    <Wrapper {...(inline ? { className: 'product-page' } : { title: product.name, onClose, className: 'product-dialog' })}>
       <ProductGallery key={product.id} product={product} />
       <div className="product-detail-copy">
         <span className="eyebrow">
           Một món quà cho {product.occasion.toLocaleLowerCase("vi")}
         </span>
         <h2>{product.name}</h2>
+        {!inline && <a className="text-link" href={productUrl(product)}>Mở trang riêng của bó hoa ↗</a>}
         {choice && <p className="detail-price">{money(choice.price)} <span>/ bó</span></p>}
         {(product.variants?.length > 0 || variantId !== null) && <label className="variant-choice">
           Cỡ bó hoa
@@ -118,7 +122,7 @@ export function ProductDialog({
           {favorite ? "Đã lưu vào yêu thích" : "Lưu bó hoa này"}
         </button>
       </div>
-    </Modal>
+    </Wrapper>
   );
 }
 
