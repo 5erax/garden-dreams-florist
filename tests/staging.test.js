@@ -105,11 +105,11 @@ async function finish(db, order) {
 test("runtime is public metadata, owner-only configuration, and staging init refuses an existing production account", async () => {
   assert.deepEqual(
     await as(production, null, () => rpc(production, "gd_environment")),
-    { environment: "production", projectRef: "ztzpipgptticvliotbsc", features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true, reconciliationLedger: true } },
+    { environment: "production", projectRef: "ztzpipgptticvliotbsc", features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true, reconciliationLedger: true, inventory: true, productPages: true } },
   );
   assert.deepEqual(
     await as(staging, null, () => rpc(staging, "gd_environment")),
-    { environment: "staging", projectRef: "tgvozhrkolcpszyyrgth", features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true, reconciliationLedger: true } },
+    { environment: "staging", projectRef: "tgvozhrkolcpszyyrgth", features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true, deliveryCalendar: true, operationsDesk: true, orderRequests: true, reconciliationLedger: true, inventory: true, productPages: true } },
   );
   await assert.rejects(
     production.exec(stagingInit),

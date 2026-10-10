@@ -15,7 +15,9 @@ import RouteBoundary from "./RouteBoundary.jsx";
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
+import { normalizeSearch, productUrl, productFromPath } from "./product-url.js";
 import "./portal.css";
+import './commerce-upgrade.css';
 
 const loadCustomer = () => import("./CustomerPortal.jsx");
 const loadAdmin = () => import("./AdminPortal.jsx");
@@ -124,11 +126,21 @@ export default function App() {
   const [storedCart, setCart] = useState(() => readStored("gd-cart", []));
   const cart = normalizeCart(storedCart, products);
   const [route, setRoute] = useState(location.hash);
+  const pageProduct = productFromPath(location.pathname, products);
   useEffect(() => {
     const changed = () => setRoute(location.hash);
     window.addEventListener("hashchange", changed);
     return () => window.removeEventListener("hashchange", changed);
   }, []);
+  useEffect(() => {
+    const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỉ niệm', '#collection': 'Bộ sưu tập hoa tươi' }[route];
+    document.title = `${section || pageProduct?.name || 'Hoa tươi, giao hoa Long Thành, Đồng Nai'} | Garden Dreams`;
+    let robots = document.querySelector('meta[name="robots"]');
+    if (['#account', '#admin'].includes(route)) {
+      if (!robots) { robots = document.createElement('meta'); robots.name = 'robots'; document.head.append(robots); }
+      robots.content = 'noindex,nofollow';
+    } else if (import.meta.env.VITE_APP_ENV === 'production') robots?.remove();
+  }, [route, pageProduct?.name]);
   const [favorites, setFavorites] = useState(() => {
     const ids = readStored("gd-favorites", []);
     return Array.isArray(ids) ? ids.filter((id) => Number.isInteger(id)) : [];
@@ -231,9 +243,7 @@ export default function App() {
     (p) =>
       (occasion === "Tất cả" || p.occasion === occasion) &&
       (!onlyFavorites || favorites.includes(p.id)) &&
-      `${p.name} ${p.stems}`
-        .toLocaleLowerCase("vi")
-        .includes(query.trim().toLocaleLowerCase("vi")),
+      normalizeSearch(`${p.name} ${p.stems}`).includes(normalizeSearch(query)),
   );
   if (sort === "low")
     filtered = [...filtered].sort((a, b) => a.price - b.price);
@@ -319,7 +329,10 @@ export default function App() {
         </div>
       </header>
       <main>
-        <Hero />
+        {location.pathname.startsWith('/hoa/') ? <section className="product-route section-shell">
+          <a className="text-link" href="/#collection">← Bộ sưu tập hoa</a>
+          {pageProduct ? <><h1>{pageProduct.name}</h1><ProductDialog key={pageProduct.id} inline product={pageProduct} onAdd={add} onBuy={buy} favorite={favorites.includes(pageProduct.id)} onFavorite={() => favorite(pageProduct.id)} /></> : <p role="status">{loading ? 'Đang tải bó hoa…' : 'Bó hoa này hiện không được bán.'}</p>}
+        </section> : <Hero />}
         {panel !== "checkout" && pendingNotice}
         {(loading || storeError) && (
           <p className="store-status" role={storeError ? "alert" : "status"}>

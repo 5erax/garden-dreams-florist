@@ -1,0 +1,28 @@
+.product-route { padding-top: 130px; }
+.product-route > h1 { font-family: Garden Serif, serif; font-weight: 400; font-size: clamp(2.5rem, 5vw, 5rem); margin: 28px 0; }
+.product-page, .seo-product { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: clamp(24px,5vw,80px); }
+.product-page .product-gallery { min-width: 0; }
+.product-page .product-detail-copy { padding: 0; }
+.seo-initial { padding: 48px max(20px,6vw); }
+.seo-initial h1 { font-family: Garden Serif, serif; font-weight: 400; }
+.seo-initial img { width: 100%; height: auto; object-fit: cover; }
+.seo-catalog { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 24px; }
+.seo-catalog article { min-width: 0; }
+.seo-initial footer { margin-top: 48px; }
+.inventory-forms { border: 0; padding: 0; margin-top: 24px; }
+.inventory-forms details { border-block-end: 1px solid var(--line, #d9d0c6); padding-block: 20px; }
+.inventory-forms summary { cursor: pointer; font-size: 18px; }
+.inventory-forms .portal-form { margin-top: 20px; }
+.inventory-recipe-line { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; }
+.inventory-recipe-line > label { flex: 1; min-width: 140px; }
+.inventory-table { overflow-x: auto; margin-block: 20px 32px; }
+.inventory-table table { border-collapse: collapse; width: 100%; text-align: left; }
+.inventory-table th, .inventory-table td { padding: 14px; border-bottom: 1px solid var(--line, #d9d0c6); }
+.inventory-table small { display: block; font-weight: 400; }
+.inventory-panel { overflow-wrap: anywhere; }
+.photo-pending { font-size: 13px; line-height: 1.6; color: #6b645e; }
+@media(max-width:700px) {
+  .product-page, .seo-product { grid-template-columns: 1fr; }
+  .seo-catalog { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+  .inventory-forms input, .inventory-forms select, .inventory-forms textarea { font-size:16px; }
+}

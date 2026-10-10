@@ -4,6 +4,9 @@ Ngày 10/10/2026, giờ Việt Nam. Chủ shop đã yêu cầu triển khai lầ
 
 ## Hiện tại
 
+- **Commerce/SEO 10/10/2026:** main b3469ff, production dpl_GDVp9TquQEFKJXZPdq7XFzwkwZ6C READY, exact SHA/alias đã kiểm. Cài schema 013 staging/production; HTML catalog máy chủ, URL/slug, sitemap/robots/canonical/JSON-LD, tìm không dấu, WOFF2 (giảm 255.124 byte), bỏ video/API demo. Admin có kho/BOM phiên bản, FEFO giữ/nhả/trừ/hao hụt; 149 local tests/build qua, hosted stock rehearsal rollback sạch, mọi bảng có RLS. Năm ảnh trùng production đã đổi sang nhãn giữ chỗ sau deploy, giữ ảnh snapshot đơn cũ và album owner.
+- **Gate còn mở:** cần tồn/công thức thật trước bật inventory (hiện false), Anonymous Sign-Ins để khách không cần email, browser/SMTP recovery/CWV/QR/race hai đơn hosted và hosting thương mại. TRACEABILITY hiện 40 phần/55 chưa làm; không tick 95 chức năng hoặc AT-02 đầy đủ. LOC canonical 15.169 (+4.382), còn 10.618 tới yêu cầu thêm 15.000.
+
 - **Cập nhật mới nhất 10/10/2026:** bản commerce main 4d55f05 đã deploy production READY tại dpl_stKh6VYQsNj2BdLTSMtEZbYRGLxJ; xác minh exact SHA/alias. Backend production đã nâng cấp atomic 004→012 qua Supabase MCP được chủ shop cấp quyền. Một đơn cũ, 20 sản phẩm, ba dịch vụ giao active và trạng thái nhận đơn true có sẵn được giữ; không ghi nhận khoản thu, mọi bảng Garden Dreams có RLS.
 - **Kiểm chứng:** 143 tests/build production qua; SQL acceptance hosted staging qua COD 0/30k/50k, VietQR UNPAID, idempotency, quyền khách/admin, fulfillment, kỉ niệm opt-in/revoke; toàn bộ dữ liệu thử rollback. Có regression migration thất bại rollback, giữ snapshot đơn/shop/catalog và không chạy lại nhầm.
 - **Retention:** phát hiện production thiếu pg_cron/job; đã cài retention.sql hiện có. Job active=true, 03:00 Việt Nam, không có liên hệ quá hạn. Chưa có scheduled-run history và backup/restore hosted.
