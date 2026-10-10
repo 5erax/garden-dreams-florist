@@ -199,3 +199,7 @@ Owner received staging recovery mail, establishing reported email delivery, but 
 - Wrote LAUNCH-AUDIT-2026-10-10.md: 95 Word requirements remain 40 partial/55 unimplemented. Vercel API verified Hobby plan; no commercial plan purchase, SMTP change, hosted browser access workaround or real purchase performed.
 
 - Final validation: full suite 158/158, production/staging builds, 0 production dependency audit vulnerabilities, whitespace diff check pass. Reference photos inspected visually; runtime read before seed found two existing production orders, unchanged by DDL.
+
+## Verified rollout — 10/10/2026
+
+Production code 28157991aceb6af916f93d1ff6c0daf4aebc6d09 / dpl_Cfzt1i8jGacpPhBMDTVKdGGYyLYn READY, exact garden-dreams-florist.vercel.app alias and SHA verified via Vercel metadata. Staging c3af8015dca773a077687e5ddf30ff4b334e5a48 / dpl_9RRyZAYiBuxZgz3SMYW5AGTostHi READY, fixed preview alias verified. Both catalogs seeded only after corresponding assets were READY. Post-seed DB reads: 40 catalog models = 20 active sale + 20 inactive public references, 20 distinct reference image paths; production retains 2 existing orders and accepting_orders=true; staging has 0 orders and accepting_orders=false; inventory=false in both. Local compiled-template handler passed root/product/sitemap/404/HEAD/405. Hosted browsing/checkout/Google indexing were not tested. This evidence describes the code release; a subsequent documentation-only commit records it.

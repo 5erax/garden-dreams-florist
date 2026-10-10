@@ -53,3 +53,7 @@ Coupon, loyalty, xưởng/QC và đa chi nhánh là scope mở rộng còn thi�
 ## Phát hành và rollback
 
 Triển khai mã/ảnh trước, xác nhận Vercel READY đúng SHA, rồi seed 20 mẫu inactive/reference_only vào từng project qua official MCP. Thêm schema không phá bản cũ; rollback mã không drop schema hay dữ liệu đơn. Có thể ẩn các reference bằng admin/SQL, giữ đơn và catalog bán hiện có. Không rollback sang bản có lỗi cold product route mà không cân nhắc lỗi đã biết.
+
+## Verified rollout — 10/10/2026
+
+Production code 28157991aceb6af916f93d1ff6c0daf4aebc6d09 / dpl_Cfzt1i8jGacpPhBMDTVKdGGYyLYn READY, exact garden-dreams-florist.vercel.app alias and SHA verified via Vercel metadata. Staging c3af8015dca773a077687e5ddf30ff4b334e5a48 / dpl_9RRyZAYiBuxZgz3SMYW5AGTostHi READY, fixed preview alias verified. Both catalogs seeded only after corresponding assets were READY. Post-seed DB reads: 40 catalog models = 20 active sale + 20 inactive public references, 20 distinct reference image paths; production retains 2 existing orders and accepting_orders=true; staging has 0 orders and accepting_orders=false; inventory=false in both. Local compiled-template handler passed root/product/sitemap/404/HEAD/405. Hosted browsing/checkout/Google indexing were not tested. This evidence describes the code release; a subsequent documentation-only commit records it.
