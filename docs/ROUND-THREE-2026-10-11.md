@@ -11,3 +11,5 @@ Lịch khởi đầu hằng ngày: mỗi buổi sáng 9–12 và chiều 13–17
 Còn cần dữ liệu shop: tồn thật, công thức từng mẫu/cỡ, ảnh thật của năm mẫu đang thiếu, phạm vi xã/phường cho ba mức phí, tên pháp lý và đăng ký khi có. Không tự tạo tồn hoặc công thức giả. Chưa có kết nối Search Console và chưa xác nhận hiệu quả SEO.
 
 Chưa hoàn tất các đề xuất mở rộng: địa chỉ có cấu trúc, nhãn tên từng nhân viên và rút ngắn mã đơn cũ. Mã mới đã ngắn; mã cũ giữ để khách tra cứu. Chưa đo Core Web Vitals hoặc kiểm tra giao diện bằng trình duyệt trong đợt này do quyền truy cập bị chặn.
+
+Kết quả triển khai: 198/198 kiểm tra qua; build production và staging qua, 40 trang sản phẩm/16 URL sitemap. Production đã READY. Kiểm tra SMTP thực tế trả EAUTH: Gmail không chấp nhận mật khẩu ứng dụng đã lưu. Chưa bật Cron hoặc gửi email thử; hàng đợi giữ đơn mới trong lúc chờ thông tin xác thực hợp lệ.
