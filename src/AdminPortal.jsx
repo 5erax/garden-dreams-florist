@@ -57,6 +57,13 @@ function AdminWorkspace({ store }) {
   const [deskQueue,setDeskQueue]=useState('ALL');
   const requestedEdit=useRef(null), requestSequence=useRef(0);
   const [search,setSearch]=useState('');
+  function changeTab(next) {
+    if (next === tab) return;
+    // Clear the old section before rendering the next table or form.
+    requestSequence.current++;
+    setRows([]); setEdit(null); setSelected(null); setMore(false);
+    setError(''); setNotice(''); setTab(next);
+  }
   useEffect(() => {
     if (store.isAdmin && store.connected) {
       try { sessionStorage.setItem(`gd-admin-tab:${store.session.user.id}`, tab); } catch {}
@@ -222,9 +229,9 @@ function AdminWorkspace({ store }) {
           Theo dõi đơn, hoa, lịch giao và tiền thu.
         </p>
       </div>
-      <AdminNavigation tab={tab} features={store.features} busy={busy} onChange={setTab} />
+      <AdminNavigation tab={tab} features={store.features} busy={busy} onChange={changeTab} />
       <div className="admin-content">
-      {tab === "memories" ? <AdminMemories /> : tab === "dashboard" ? <BusinessDashboard onNavigate={(next,id)=>{requestedEdit.current=typeof id==='number'?id:null;if(next==='desk')setDeskQueue(id==='OVERDUE'?'OVERDUE':'ALL');setTab(next);}} /> : tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk initialQueue={deskQueue} /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
+      {tab === "memories" ? <AdminMemories /> : tab === "dashboard" ? <BusinessDashboard onNavigate={(next,id)=>{requestedEdit.current=typeof id==='number'?id:null;if(next==='desk')setDeskQueue(id==='OVERDUE'?'OVERDUE':'ALL');changeTab(next);}} /> : tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk initialQueue={deskQueue} /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
       {!selected && <div className="portal-section-heading">
         <h2>
           {tab === "orders"
