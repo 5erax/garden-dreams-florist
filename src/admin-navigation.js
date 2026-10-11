@@ -1,5 +1,5 @@
 export function readAdminTab(userId, features, storage) {
-  const tabs = ['orders', 'products', 'shipping', 'shop', 'dashboard'];
+  const tabs = ['orders', 'products', 'shipping', 'shop', 'dashboard','memories'];
   for (const [feature, tab] of [['deliveryCalendar','calendar'],['operationsDesk','desk'],['reconciliationLedger','reconciliation'],['inventory','inventory']])
     if (features[feature]) tabs.push(tab);
   try {

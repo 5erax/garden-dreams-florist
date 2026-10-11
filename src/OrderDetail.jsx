@@ -1,3 +1,4 @@
+import { nextOrderStatus, OrderProgress, OrderTools } from "./OrderTools.jsx";
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
@@ -132,6 +133,7 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
       <blockquote>
         {cardMessage || "Đơn hoa này chưa có lời nhắn trên thiệp."}
       </blockquote>
+      {memory.moderation_removed && <p role="status">Shop đã gỡ lời nhắn khỏi khu vườn. Lịch sử đơn và lời nhắn riêng của bạn vẫn được giữ.</p>}
       {memory.revoked ? (
         <p>
           Kỷ niệm được giữ trong lịch sử riêng; đơn đã hoàn tiền nên không còn
@@ -223,7 +225,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
       result(
         backend
           .from("gd_order_events")
-          .select("id,event,note,created_at")
+          .select(admin ? "id,event,note,created_at,actor_id" : "id,event,note,created_at")
           .eq("order_id", order.id)
           .order("id"),
       ),
@@ -273,15 +275,13 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
   return (
     <div className="order-detail">
       <header>
-        <span className="eyebrow">{order.reference}</span>
-        <h2>
-          Một bó hoa, <em>một câu chuyện.</em>
-        </h2>
+        <span className="eyebrow">CHI TIẾT ĐƠN HOA</span>
+        <h2>{order.reference}</h2>
         <p>
-          {orderStatuses[order.status]} ·{" "}
-          {paymentStatuses[order.payment_status]}
+          <span className="status-badge">{orderStatuses[order.status]}</span> <span className="status-badge">{paymentStatuses[order.payment_status]}</span>
         </p>
       </header>
+      <OrderProgress order={order} /><OrderTools order={order} admin={admin} />
       <div className="order-detail-grid">
         <section>
           <h3>Những đóa hoa đã chọn</h3>
@@ -320,20 +320,13 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
             )}{" "}
             · {order.delivery_time}
           </p>
-          <p>
-            {order.recipient_name}
-            <br />
-            {order.recipient_phone}
-            <br />
-            {order.address ||
-              "Thông tin giao hàng đã được xóa theo thời hạn lưu giữ."}
-          </p>
+          <dl className="order-contact"><div><dt>Người nhận</dt><dd>{order.recipient_name || "Thông tin đã hết hạn lưu"}</dd></div><div><dt>Điện thoại</dt><dd>{order.recipient_phone || "—"}</dd></div><div><dt>Địa chỉ giao</dt><dd>{order.address || "Thông tin giao hàng đã được xóa theo thời hạn lưu giữ."}</dd></div><div><dt>Người đặt</dt><dd>{order.buyer_name || (admin?"Đơn cũ chưa lưu thông tin người đặt riêng":"Tài khoản đang xem đơn này")}</dd></div>{order.buyer_phone && <div><dt>Điện thoại người đặt</dt><dd>{order.buyer_phone}</dd></div>}</dl>
           <p>{order.shipping.area}</p>
           <h3>Lời nhắn riêng trên thiệp</h3>
           <blockquote>{order.card_message || "(Không có lời nhắn)"}</blockquote>
         </section>
       </div>
-      <BankPayment order={order} />
+      {!admin && <BankPayment order={order} />}
       {features.reconciliationLedger && <Reconciliation key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
       {features.orderRequests && <OrderRequests key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
       <section className="order-timeline">
@@ -352,7 +345,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
                 {event.event.includes(" · ") &&
                   " · " + paymentStatuses[event.event.split(" · ")[1]]}
               </strong>
-              {event.note && <p>{event.note}</p>}
+              {admin && event.actor_id && <small>Người thao tác: …{event.actor_id.slice(-6)}</small>}{event.note && <p>{event.note}</p>}
             </li>
           ))}
         </ol>
@@ -368,6 +361,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
       {admin && (
         <form className="admin-order-form" onSubmit={update}>
           <h3>{features.reconciliationLedger ? "Cập nhật tiến trình" : "Cập nhật đơn & đối soát"}</h3>
+          {nextOrderStatus(order.status) && <button type="button" className="button primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{onUpdated(await call('gd_update_order',{p_id:order.id,p_version:order.version,p_status:nextOrderStatus(order.status),p_payment:order.payment_status,p_note:''}));}catch(e){setError(e.message);}finally{setBusy(false);}}}>Chuyển sang: {orderStatuses[nextOrderStatus(order.status)]}</button>}
           <div className="form-grid">
             <label>
               Trạng thái đơn

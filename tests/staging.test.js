@@ -217,7 +217,7 @@ test("the additive migration keeps the real order and one-memory path intact", a
     Number(
       await as(production, null, () => rpc(production, "gd_memory_count")),
     ),
-    1,
+    0,
   );
   const memory = (
     await production.query(

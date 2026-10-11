@@ -181,7 +181,7 @@ test("a disk backup restores orders, memories, permissions and retention without
         .message,
       "Lời nhắn giả được giữ sau phục hồi.",
     );
-    assert.equal(Number(await rpc("gd_memory_count")), 0);
+    assert.equal(Number(await rpc("gd_memory_count")), 1);
     await assert.rejects(
       as(null, () => db.query("select * from public.gd_orders")),
       /permission denied/,

@@ -6,7 +6,7 @@ import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./ord
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import ProductGallery from "./ProductGallery.jsx";
-import { productUrl } from './product-url.js';
+import { productUrl, productTitle } from './product-url.js';
 import { deliveryCopy } from './delivery-copy.js';
 
 export function Modal({ title, children, onClose, className = "" }) {
@@ -72,7 +72,7 @@ export function ProductDialog({
         <span className="eyebrow">
           Một món quà cho {(product.occasion || "người bạn thương").toLocaleLowerCase("vi")}
         </span>
-        <Heading>{product.name}</Heading>
+        <Heading>{productTitle(product)}</Heading>
         {choice && <p className="detail-price">{money(choice.price)} <span>/ bó</span></p>}
         {(product.variants?.length > 0 || variantId !== null) && <label className="variant-choice">
           Cỡ bó hoa

@@ -24,7 +24,7 @@ import { withinBudget, toggleComparison, matchesFlowerDescription } from './flow
 import LiveCheckout from "./LiveCheckout.jsx";
 import { shopAddress, displayPhone } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
-import { normalizeSearch, productUrl, productFromPath } from "./product-url.js";
+import { normalizeSearch, productUrl, productFromPath, productTitle } from "./product-url.js";
 import "./styles.css";
 import "./portal.css";
 import './commerce-upgrade.css';
@@ -151,7 +151,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỷ niệm', '#collection': 'Bộ sưu tập hoa tươi' }[route];
-    document.title = `${section || pageProduct?.name || 'Hoa tươi, giao hoa Long Thành, Đồng Nai'} | Garden Dreams`;
+    document.title = `${section || (pageProduct && productTitle(pageProduct)) || 'Hoa tươi, giao hoa Long Thành, Đồng Nai'} | Garden Dreams`;
     let robots = document.querySelector('meta[name="robots"]');
     if (['#account', '#admin'].includes(route)) {
       if (!robots) { robots = document.createElement('meta'); robots.name = 'robots'; document.head.append(robots); }
@@ -278,7 +278,7 @@ export default function App() {
   }
   let filtered = products.filter(
     (p) =>
-      (occasion === "Tất cả" || p.occasion === occasion) &&
+      (occasion === "Tất cả" || p.occasion === occasion || p.occasions?.includes(occasion)) &&
       (!onlyFavorites || favorites.includes(p.id)) &&
       withinBudget(p, budget, saleOnly) &&
       matchesFlowerDescription(p, flowerColor, flowerType) &&
@@ -583,9 +583,9 @@ export default function App() {
                 <figcaption>01 — Từ thiên nhiên</figcaption>
               </figure>
               <div className="story-handwriting">
-                with love,
+                bằng tất cả
                 <br />
-                always.
+                lời thương.
               </div>
               <figure className="story-photo second">
                 <img
@@ -658,7 +658,7 @@ export default function App() {
               <em>để hoa nói giúp.</em>
             </h2>
             <a href={isProductPage ? '/#collection' : '#collection'} className="button primary">
-              Gửi một chút thương <Icon name="arrow" />
+              Chọn một bó hoa <Icon name="arrow" />
             </a>
           </Reveal>
           <img
@@ -673,7 +673,7 @@ export default function App() {
           <div className="footer-story">
             <a className="brand" href={isProductPage ? '/#home' : '#home'}><Icon name="flower" /><span>{shop.name}</span></a>
             <p>{shop.about}</p>
-            <address>{shop.address || shopAddress}</address>
+            <address>{shop.address || shopAddress}</address><p className="shop-hours">Giờ mở cửa: {(shop.opens_at||'08:00').slice(0,5)}–{(shop.closes_at||'17:00').slice(0,5)}</p>{shop.legal_name && <p>{shop.legal_name}{shop.registration_number && ` · Mã đăng ký: ${shop.registration_number}`}</p>}
           </div>
           <nav className="footer-navigation" aria-label="Khám phá cửa hàng">
             <h3>Cửa hàng</h3>
@@ -791,6 +791,7 @@ export default function App() {
                 kiểm tra tiền nhận rồi mới ghi nhận đã trả. Không thu thông tin
                 thẻ.
               </p>
+              <p>{shop.returns_policy || "Hoa theo mùa có thể khác ảnh. Shop trao đổi trước mọi thay đổi. Khi giao sai hoặc hoa hỏng, liên hệ shop qua điện thoại/Zalo kèm mã đơn và ảnh để kiểm tra, thống nhất đổi bó hoặc hoàn tiền. Mọi khoản hoàn do shop xử lý và đối soát."}</p>
               <p>
                 Hoa theo mùa có thể khác ảnh. Mọi thay đổi và yêu cầu hủy cần
                 được cửa hàng xác nhận trước khi bó hoa được chuẩn bị.

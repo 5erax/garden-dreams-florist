@@ -1,4 +1,4 @@
-export function guestStorage(key, storage) {
+export function guestStorage(key, storage, tabStorage) {
   const memory = new Map();
   const preference = `${key}-remember`;
   const read = name => { try { return storage?.getItem(name); } catch { return null; } };
@@ -8,6 +8,8 @@ export function guestStorage(key, storage) {
   return {
     getItem(name) {
       if (memory.has(name)) return memory.get(name);
+      let tabValue;try{tabValue=tabStorage?.getItem(name);}catch{}
+      if(tabValue){try{if(JSON.parse(tabValue)?.user?.id){memory.set(name,tabValue);return tabValue;}}catch{}}
       const value = name === key && remember ? read(key) : null;
       if (!anonymous(value)) return null;
       memory.set(name, value);
@@ -15,9 +17,10 @@ export function guestStorage(key, storage) {
     },
     setItem(name, value) {
       memory.set(name, value);
+      try{tabStorage?.setItem(name,value);}catch{}
       if (name === key) write(key, remember && anonymous(value) ? value : null);
     },
-    removeItem(name) { memory.delete(name); write(name, null); },
+    removeItem(name) { memory.delete(name); write(name, null);try{tabStorage?.removeItem(name);}catch{} },
     get remember() { return remember; },
     setRemember(value) {
       remember = value;
