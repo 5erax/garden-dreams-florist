@@ -20,6 +20,6 @@ export function notificationHandler({secret,verify,send,claim,finish}) {
     await finish(row,'SENT','');sent++;
    }
    return Response.json({sent,failed});
-  }catch{return Response.json({error:'NOTIFICATION_FAILED'},{status:502});}
+  }catch(error){return Response.json({error:'NOTIFICATION_FAILED',code:['EAUTH','ETIMEDOUT','ESOCKET','ECONNECTION','EREJECTED'].includes(error.code)?error.code:'WORKER_FAILED'},{status:502});}
  };
 }
