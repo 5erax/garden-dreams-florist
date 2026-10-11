@@ -36,3 +36,12 @@ test('catalog table exposes non-hover edit, formatted price and explicit availab
  const html=renderToStaticMarkup(createElement(Catalog,{rows:[{id:1,slug:'hong-phan',name:'Hồng phấn',stems:'Hồng',price:550000,image:'/flowers/bouquet_1.webp',active:false,version:1}],busy:false}));
  assert.match(html,/role="switch" aria-checked="false"/);assert.match(html,/Chỉnh sửa/);assert.match(html,/Lưu giá/);assert.match(html,/\/hoa\/hong-phan/);
 });
+
+test('catalog explains boundaries and keeps separate named reorder actions',()=>{
+ const rows=[{id:1,name:'Cúc trắng',slug:'cuc-trang',price:100000,version:1},{id:2,name:'Cúc vàng',slug:'cuc-vang',price:120000,version:1}];
+ const html=renderToStaticMarkup(createElement(Catalog,{rows,busy:false}));
+ assert.match(html,/Vị trí 1\/2 · Đầu danh mục/);
+ assert.match(html,/Vị trí 2\/2 · Cuối danh mục/);
+ assert.match(html,/aria-label="Đưa Cúc trắng lên một vị trí" title="Mẫu đang ở đầu danh mục" disabled/);
+ assert.match(html,/catalog-order-actions/);
+});

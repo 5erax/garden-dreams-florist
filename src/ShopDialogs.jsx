@@ -58,6 +58,7 @@ export function ProductDialog({
   onFavorite,
   inline = false,
   shipping = [],
+  readOnly = false,
 }) {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState(null);
@@ -95,14 +96,14 @@ export function ProductDialog({
           Hoa được chọn theo mùa. Nếu cần thay hoa hoặc màu sắc, shop sẽ trao đổi trước khi thực hiện.
         </p>
         <p className="product-delivery">{deliveryCopy(shipping)}. Chọn địa chỉ và ca giao ở bước đặt hoa để kiểm tra phí và lịch còn nhận.</p>
-        <button
+        {!readOnly && <button
           className="text-button favorite-detail"
           onClick={onFavorite}
           aria-pressed={favorite}
         >
           <Icon name="heart" />
           {favorite ? "Đã lưu vào yêu thích" : "Lưu bó hoa này"}
-        </button>
+        </button>}
         <div className="product-share">
           <button className="text-button" onClick={async () => {
             try { await navigator.clipboard.writeText(new URL(productUrl(product), location.origin).href); setShareNotice('Đã sao chép liên kết bó hoa.'); }
@@ -112,7 +113,7 @@ export function ProductDialog({
         </div>
         <p className="product-care">Giữ hoa nơi mát, tránh nắng trực tiếp; thay nước và cắt gốc thường xuyên nếu cắm bình.</p>
       </div>
-      <div className="product-purchase-footer">
+      {!readOnly && <div className="product-purchase-footer">
         {choice && <div className="detail-summary" aria-live="polite" aria-atomic="true">
           <span>Tạm tính</span>
           <strong>{money(subtotal([{ id: product.id, quantity, variantId }], [product]))}</strong>
@@ -139,7 +140,7 @@ export function ProductDialog({
             Đặt ngay <Icon name="arrow" />
           </button>
         </div>
-      </div>
+      </div>}
     </Wrapper>
   );
 }

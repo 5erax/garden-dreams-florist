@@ -240,6 +240,7 @@ export default function App() {
     );
   }
   function add(id, quantity = 1, variantId) {
+    if (isAdmin) return;
     setCart((current) =>
       normalizeCart(
         [...normalizeCart(current, products), { id, quantity, variantId }],
@@ -256,13 +257,14 @@ export default function App() {
     );
   }
   function buy(id, quantity, variantId) {
+    if (isAdmin) return;
     add(id, quantity, variantId);
     if (selected) closeProduct();
     setPanel("checkout");
     setNotice("");
   }
   function reorder(items) {
-    if (!connected || loading || storeError) return;
+    if (isAdmin || !connected || loading || storeError) return;
     const plan = prepareReorder(items, cart, products);
     if (!plan.addedQuantity) return;
     setCart(current => prepareReorder(items, current, products).cart);
@@ -295,7 +297,7 @@ export default function App() {
       Bạn có một yêu cầu đặt hoa cần kiểm tra. <button className="text-button" onClick={() => { location.hash = "#collection"; setPanel("checkout"); }}>Tiếp tục kiểm tra đơn</button>
     </p>
   );
-  const shoppingDialogs = <>
+  const shoppingDialogs = !isAdmin && <>
       {panel === "cart" && (
         <CartDialog
           cart={cart}
@@ -322,6 +324,10 @@ export default function App() {
           />
         ))}
   </>;
+  if (isAdmin) return <PortalShell>
+    {isProductPage && pageProduct ? <ProductDialog key={pageProduct.id} inline readOnly shipping={shipping} product={pageProduct} /> :
+    <RouteBoundary key={session.user.id} load={loadAdmin} title="Quản trị cửa hàng" />}
+  </PortalShell>;
   if (
     route === "#account" ||
     route === "#admin" ||

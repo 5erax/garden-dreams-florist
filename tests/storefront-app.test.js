@@ -45,3 +45,18 @@ test('cold product route has readable navigation and tolerates legacy snapshot d
   assert.equal((html.match(/<h1[ >]/g)||[]).length,1);
   assert.doesNotMatch(html,/id="home"/);
 });
+
+test('admin account uses the workspace on the homepage and product previews have no purchasing controls',()=>{
+ const previous=globalThis.storefrontFixture;
+ globalThis.storefrontFixture={...previous,isAdmin:true,session:{user:{id:'admin'}},features:{}};
+ try{
+ globalThis.location={pathname:'/',hash:'#home'};
+ const home=renderToStaticMarkup(createElement(App));
+ assert.doesNotMatch(home,/id="home"|id="collection"|Mở giỏ hoa|hero-cta/);
+ assert.match(home,/Quản trị cửa hàng/);
+ globalThis.location={pathname:'/hoa/bo-hoa-1',hash:''};
+ const detail=renderToStaticMarkup(createElement(App));
+ assert.match(detail,/product-page/);
+ assert.doesNotMatch(detail,/product-purchase-footer|Đặt ngay|Thêm vào giỏ hoa|Lưu bó hoa này/);
+ }finally{globalThis.storefrontFixture=previous;}
+});

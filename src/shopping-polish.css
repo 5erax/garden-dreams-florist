@@ -69,3 +69,26 @@
 }
 @media(max-width:420px){.card-add{white-space:normal;text-align:left;line-height:1.4;font-size:13px;padding:12px}.card-add svg{display:none}}
 @media(prefers-reduced-motion:reduce){.product-open img,.favorite-button svg{transition:none}}
+/* Keep the image's measured box separate from its caption, even in a short dialog. */
+.product-gallery-main{flex:none;min-height:0;overflow:hidden}
+.product-gallery-main>img{display:block;min-height:0;min-width:0;width:100%;height:100%;object-fit:contain}
+.product-gallery>.photo-disclosure,.product-gallery>.photo-credit,.product-gallery>.photo-pending{flex:none;align-self:stretch;margin:0;padding:12px 0 0;border-top:1px solid var(--line);font-size:14px;line-height:1.65}
+.product-dialog .product-gallery{justify-content:flex-start}
+.product-dialog .product-gallery-main{flex:none;height:auto;aspect-ratio:1;max-height:none;display:block}
+.product-dialog .product-gallery-main img{height:100%;max-height:none}
+.portal-header nav a,.portal-header nav a:hover{border-bottom:0;text-decoration:none}
+.portal-header nav a:hover,.portal-header nav [aria-current=page]{text-decoration:underline;text-underline-offset:6px}
+.header nav [aria-current=page]{text-decoration:none}
+.header nav [aria-current=page]:after{transform:scaleX(1)}
+.flower-comparison h2{font-size:clamp(30px,4vw,48px);line-height:1.15;max-width:850px;padding-right:32px}
+.flower-comparison .comparison-grid{grid-template-columns:repeat(var(--comparison-columns,3),minmax(0,1fr));align-items:stretch}
+.flower-comparison .comparison-grid article{padding:18px;border:1px solid var(--line);background:var(--paper);gap:14px}
+.flower-comparison .comparison-grid .product-gallery-main{height:auto;aspect-ratio:1;display:block}
+.flower-comparison .comparison-grid .product-gallery-main img{object-fit:contain}
+.flower-comparison .comparison-grid h3{font-size:28px;line-height:1.2}
+.flower-comparison .comparison-grid .button{width:100%}
+.catalog-order-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.catalog-order-actions .catalog-position{flex-basis:100%;font-size:13px;color:var(--muted);white-space:normal}
+.catalog-order-actions .button{min-height:44px;padding:8px 14px;font-size:14px}
+.catalog-order-actions .button:disabled{opacity:1;color:var(--muted);background:#eee8e2;border-color:var(--line);cursor:not-allowed}
+@media(max-width:700px){.flower-comparison .comparison-grid{grid-template-columns:1fr}.product-dialog .product-gallery-main{height:22dvh;aspect-ratio:auto}.product-dialog .product-gallery-main img{max-height:none}}
