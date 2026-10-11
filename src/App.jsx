@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useInView } from "motion/react";
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartKey, removeOrderedItems } from "./order.js";
+import { useCustomerCart } from './customer-cart.js';
+import { appEnvironment } from './backend.js';
 import {
   CartDialog,
   CheckoutDialog,
@@ -128,11 +130,12 @@ export default function App() {
     shop,
     connected,
     session,
+    authReady,
     isAdmin,
     loading,
     error: storeError,
   } = useStore();
-  const [storedCart, setCart] = useState(() => readStored("gd-cart", []));
+  const [storedCart, setCart] = useCustomerCart({ session, authReady, environment: appEnvironment, products, loading, error: storeError });
   const cart = normalizeCart(storedCart, products);
   const [route, setRoute] = useState(location.hash);
   const isProductPage = location.pathname.startsWith('/hoa/');
@@ -169,20 +172,18 @@ export default function App() {
   const selectedProduct = products.find(p => p.id === selected?.id);
   const [panel, setPanel] = useState(null);
   const pendingCheckout = useRef(null);
+  const previousCustomer = useRef(null);
   useEffect(() => {
     if (pendingCheckout.current?.ownerId !== session?.user.id)
       pendingCheckout.current = null;
+    if (previousCustomer.current && previousCustomer.current !== session?.user.id) {
+      setPanel(null);
+      setNotice("");
+    }
+    previousCustomer.current = session?.user.id || null;
   }, [session?.user.id]);
   const [notice, setNotice] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    try {
-      if (!loading && !storeError)
-        localStorage.setItem("gd-cart", JSON.stringify(cart));
-    } catch {
-      /* Shopping still works when browser storage is unavailable. */
-    }
-  }, [storedCart, products, loading, storeError]);
   useEffect(() => {
     try {
       localStorage.setItem("gd-favorites", JSON.stringify(favorites));
