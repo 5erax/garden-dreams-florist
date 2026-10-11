@@ -1,4 +1,4 @@
-export const reconciliationActions = { RECEIPT: "Ghi nhận đã thu đủ", REFUND: "Ghi nhận đã hoàn đủ" };
+export const reconciliationActions = { RECEIPT: "Ghi nhận tiền thu", REFUND: "Ghi nhận tiền hoàn" };
 
 export function validateReconciliationReport(value, period) {
   const unsigned = ["received", "refunded", "eventCount", "legacyReceiptBalance", "legacyRefundBalance"];
@@ -13,17 +13,17 @@ export function validatePaymentBalance(value, orderId) {
   const amounts = ["total", "received", "refunded", "heldCash", "receivable", "refundable"];
   if (!value || value.orderId !== orderId || typeof value.legacyBalance !== "boolean" || typeof value.fullOnly !== "boolean" ||
       amounts.some(key => !Number.isSafeInteger(value[key]) || value[key] < 0) ||
-      value.refunded > value.received || value.heldCash !== value.received - value.refunded ||
+      value.received > value.total || value.refunded > value.received || value.heldCash !== value.received - value.refunded ||
       value.refundable > value.heldCash || value.receivable > value.total)
     throw new Error("Số dư trả về chưa hợp lệ. Tải lại sổ đối soát trước khi thao tác.");
   return value;
 }
 
 export function allowedReconciliationActions(order, balance) {
-  if (!balance || !balance.fullOnly || balance.orderId !== order.id || balance.total !== Number(order.total) || balance.total <= 0) return [];
-  if (order.payment_status === "UNPAID" && ["PENDING", "CONFIRMED", "PREPARING", "SHIPPING", "DELIVERED"].includes(order.status) &&
-      balance.received === 0 && balance.refunded === 0 && balance.receivable === balance.total) return ["RECEIPT"];
-  if (order.payment_status === "PAID" && balance.received === balance.total && balance.refunded === 0 && balance.refundable === balance.total) return ["REFUND"];
+  if (!balance || balance.orderId !== order.id || balance.total !== Number(order.total) || balance.total <= 0) return [];
+  if (["UNPAID","PARTIAL"].includes(order.payment_status) && ["CONFIRMED", "PREPARING", "SHIPPING", "DELIVERED"].includes(order.status) &&
+      balance.refunded === 0 && balance.receivable > 0) return balance.refundable>0?["RECEIPT","REFUND"]:["RECEIPT"];
+  if (balance.refundable > 0) return ["REFUND"];
   return [];
 }
 
@@ -40,5 +40,9 @@ export function prepareReconciliation(order, balance, fields, id) {
     throw new Error("Nội dung đối soát cần từ 5 đến 500 ký tự, không chứa ký tự điều khiển.");
   if (reference.length > 120 || !/^[A-Za-z0-9 /._-]*$/.test(reference))
     throw new Error("Tham chiếu tối đa 120 ký tự; dùng chữ không dấu, số, khoảng trắng hoặc / . _ -.");
-  return { p_id: id, p_order: order.id, p_version: order.version, p_action: fields.action, p_evidence: evidence, p_reference: reference };
+  if(order.payment_method==='VIETQR'&&!reference)throw Error('Nhập mã giao dịch ngân hàng cho VietQR.');
+  const limit=fields.action==='RECEIPT'?balance.receivable:balance.refundable;
+  const amount=fields.amount==null?limit:Number(fields.amount);
+  if(!Number.isSafeInteger(amount)||amount<1||amount>limit)throw Error('Số tiền phải nằm trong số dư còn được thu/hoàn.');
+  return { ...(fields.amount==null?{}:{p_amount:amount}),p_id: id, p_order: order.id, p_version: order.version, p_action: fields.action, p_evidence: evidence, p_reference: reference };
 }

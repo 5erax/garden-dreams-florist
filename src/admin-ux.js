@@ -41,4 +41,10 @@ export function recipeCsv(text,ingredients) {
  seen.add(item.id);return {ingredientId:item.id,quantity:Number(quantity)};});
 }
 
-export function deliveryRemaining(order,now=Date.now()){const hour=Number(order.delivery_time?.match(/[–-](\d+)h/)?.[1]);if(!Number.isFinite(hour))return '';const end=Date.parse(order.delivery_date+'T'+String(hour).padStart(2,'0')+':00:00+07:00');const minutes=Math.ceil((end-now)/60000);return minutes>=0?'Còn '+Math.floor(minutes/60)+'h '+minutes%60+' phút đến hết ca giao':'Đã qua khung giờ giao '+Math.floor(-minutes/60)+'h '+(-minutes)%60+' phút';}
+export function deliveryRemaining(order,now=Date.now()){const end=deliveryDeadline(order);if(!Number.isFinite(end))return '';const minutes=Math.ceil((end-now)/60000);return minutes>=0?'Còn '+Math.floor(minutes/60)+'h '+minutes%60+' phút đến hết ca giao':'Đã qua khung giờ giao '+Math.floor(-minutes/60)+'h '+(-minutes)%60+' phút';}
+
+export function deliveryDeadline(order){const hour=Number(order.delivery_time?.match(/[–-](\d+)h/)?.[1]);return Number.isFinite(hour)?Date.parse(order.delivery_date+'T'+String(hour).padStart(2,'0')+':00:00+07:00'):NaN;}
+export const isOverdue=(order,now=Date.now())=>!['DELIVERED','CANCELLED'].includes(order.status)&&deliveryDeadline(order)<now;
+export const formatDate=value=>new Intl.DateTimeFormat('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(value.length===10?value+'T12:00:00+07:00':value));
+export const formatDateTime=value=>new Intl.DateTimeFormat('vi-VN',{timeZone:'Asia/Ho_Chi_Minh',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(value));
+export function inventoryChecklist(data,products,today){return data.readiness||{ingredients:data.ingredients.length>0,recipes:products.length>0&&products.every(product=>[null,...(product.variants||[]).filter(v=>v.active).map(v=>v.id)].every(variant=>data.recipes.some(recipe=>recipe.product_id===product.id&&(recipe.variant_id??null)===variant))),stock:data.batches.some(batch=>batch.expires_on>=today&&batch.on_hand>batch.reserved)};}

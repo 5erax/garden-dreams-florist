@@ -1,3 +1,6 @@
+import BloomLoader from './BloomLoader.jsx';
+import RescheduleOrder from './RescheduleOrder.jsx';
+import {formatDateTime,isOverdue} from "./admin-ux.js";
 import { nextOrderStatus, OrderProgress, OrderTools } from "./OrderTools.jsx";
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
@@ -18,22 +21,20 @@ import Reconciliation from "./Reconciliation.jsx";
 export function BankPayment({ order }) {
   const [qr, setQr] = useState(""),
     [error, setError] = useState("");
+  const [amount,setAmount]=useState(null);
   const [copyNotice, setCopyNotice] = useState("");
   useEffect(() => {
     let active = true;
     setQr("");
-    setError("");
+    setAmount(null);setError("");
     if (
       order.payment_method !== "VIETQR" ||
-      order.payment_status !== "UNPAID" ||
+      !["UNPAID","PARTIAL"].includes(order.payment_status) ||
       order.status === "CANCELLED"
     )
       return;
     try {
-      QRCode.toDataURL(
-        vietqrPayload(order.bank, Number(order.total), order.reference),
-        { width: 240, margin: 2, errorCorrectionLevel: "M" },
-      )
+      Promise.resolve(order.payment_status==='PARTIAL'?call('gd_payment_balance',{p_order:order.id}):{receivable:Number(order.total)}).then(balance=>{if(!active)return null;if(!Number.isSafeInteger(balance.receivable)||balance.receivable<1)throw Error('Invalid balance');setAmount(balance.receivable);return QRCode.toDataURL(vietqrPayload(order.bank,balance.receivable,order.reference),{width:240,margin:2,errorCorrectionLevel:'M'});})
         .then((src) => {
           if (active) setQr(src);
         })
@@ -69,7 +70,7 @@ export function BankPayment({ order }) {
       </div>
       <div>
         <span className="eyebrow">CHUYỂN KHOẢN VIETQR</span>
-        <h3>{money(order.total)}</h3>
+        <h3>{amount===null?<BloomLoader compact label="Thông tin chuyển khoản"/>:money(amount)}</h3>
         <p>
           {order.bank.bankName}
           <br />
@@ -313,7 +314,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           </dl>
         </section>
         <section>
-          <h3>Ngày lời thương đến</h3>
+          <h3>Giao hoa & người nhận</h3>
           <p>
             {new Intl.DateTimeFormat("vi-VN").format(
               new Date(order.delivery_date + "T12:00:00+07:00"),
@@ -322,7 +323,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           </p>
           <dl className="order-contact"><div><dt>Người nhận</dt><dd>{order.recipient_name || "Thông tin đã hết hạn lưu"}</dd></div><div><dt>Điện thoại</dt><dd>{order.recipient_phone || "—"}</dd></div><div><dt>Địa chỉ giao</dt><dd>{order.address || "Thông tin giao hàng đã được xóa theo thời hạn lưu giữ."}</dd></div><div><dt>Người đặt</dt><dd>{order.buyer_name || (admin?"Đơn cũ chưa lưu thông tin người đặt riêng":"Tài khoản đang xem đơn này")}</dd></div>{order.buyer_phone && <div><dt>Điện thoại người đặt</dt><dd>{order.buyer_phone}</dd></div>}</dl>
           <p>{order.shipping.area}</p>
-          <h3>Lời nhắn riêng trên thiệp</h3>
+          <h3>Lời nhắn trên thiệp</h3>
           <blockquote>{order.card_message || "(Không có lời nhắn)"}</blockquote>
         </section>
       </div>
@@ -335,17 +336,14 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           {events.map((event) => (
             <li key={event.id}>
               <span>
-                {new Intl.DateTimeFormat("vi-VN", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                }).format(new Date(event.created_at))}
+                {formatDateTime(event.created_at)}
               </span>
               <strong>
                 {orderStatuses[event.event.split(" · ")[0]] || event.event}
                 {event.event.includes(" · ") &&
                   " · " + paymentStatuses[event.event.split(" · ")[1]]}
               </strong>
-              {admin && event.actor_id && <small>Người thao tác: …{event.actor_id.slice(-6)}</small>}{event.note && <p>{event.note}</p>}
+              {admin && <small>Người thao tác: {event.actor_id ? event.actor_id===order.owner_id?'Khách đặt hoa':'Nhân viên cửa hàng':'Hệ thống'}</small>}{event.note && <p>{event.note}</p>}
             </li>
           ))}
         </ol>
@@ -358,11 +356,13 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           onChange={setMemory}
         />
       )}
+      {admin && <RescheduleOrder order={order} onUpdated={onUpdated}/>}
       {admin && (
         <form className="admin-order-form" onSubmit={update}>
           <h3>{features.reconciliationLedger ? "Cập nhật tiến trình" : "Cập nhật đơn & đối soát"}</h3>
-          {nextOrderStatus(order.status) && <button type="button" className="button primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{onUpdated(await call('gd_update_order',{p_id:order.id,p_version:order.version,p_status:nextOrderStatus(order.status),p_payment:order.payment_status,p_note:''}));}catch(e){setError(e.message);}finally{setBusy(false);}}}>Chuyển sang: {orderStatuses[nextOrderStatus(order.status)]}</button>}
-          <div className="form-grid">
+          {nextOrderStatus(order.status) && !(order.status==='PENDING'&&isOverdue(order)) && <button type="button" className="button primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{onUpdated(await call('gd_update_order',{p_id:order.id,p_version:order.version,p_status:nextOrderStatus(order.status),p_payment:order.payment_status,p_note:''}));}catch(e){setError(e.message);}finally{setBusy(false);}}}>Chuyển sang: {orderStatuses[nextOrderStatus(order.status)]}</button>}
+          {isOverdue(order) && <p className="form-error">Đơn đã quá khung giờ giao. Liên hệ khách để thống nhất lịch khác hoặc hủy; không xác nhận giờ giao cũ.</p>}
+          <details className="advanced-order"><summary>Nâng cao: thay đổi trạng thái / hủy đơn</summary><div className="form-grid">
             <label>
               Trạng thái đơn
               <BloomSelect
@@ -395,6 +395,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
             {features.reconciliationLedger ? "Ghi chú tiến trình (khách đọc được)" : "Ghi chú / mã đối soát"}
             <input
               name="note"
+              required minLength={5}
               maxLength={500}
               placeholder={features.reconciliationLedger ? "Ví dụ: hoa đã sẵn sàng để giao" : "Chỉ xác nhận sau khi kiểm tra ngân hàng hoặc tiền COD"}
             />
@@ -404,7 +405,7 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
           </p>
           <button className="button primary" disabled={busy}>
             {busy ? "Đang lưu…" : "Lưu cập nhật"}
-          </button>
+          </button></details>
         </form>
       )}
       {error && (

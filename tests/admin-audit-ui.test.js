@@ -4,10 +4,18 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createServer} from 'vite';
 import react from '@vitejs/plugin-react';
-let server,money,tools,Catalog;
+let server,money,tools,Catalog,Time,Reschedule;
 before(async()=>{
  server=await createServer({configFile:false,envDir:false,plugins:[react()],define:{'import.meta.env.VITE_APP_ENV':'"demo"','import.meta.env.VITE_SUPABASE_URL':'""','import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY':'""'},server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
  money=await server.ssrLoadModule('/src/BloomMoney.jsx');tools=await server.ssrLoadModule('/src/OrderTools.jsx');Catalog=(await server.ssrLoadModule('/src/AdminCatalogTable.jsx')).default;
+ Time=(await server.ssrLoadModule('/src/BloomTime.jsx')).default;Reschedule=(await server.ssrLoadModule('/src/RescheduleOrder.jsx')).default;
+});
+test('shop time stays in 24-hour form values and reschedule requires customer agreement',()=>{
+ const html=renderToStaticMarkup(createElement(Time,{name:'closes_at',defaultValue:'17:30'}));
+ assert.match(html,/name="closes_at" value="17:30"/);assert.match(html,/aria-label="Giờ"/);assert.doesNotMatch(html,/type="time"|PM|AM/);
+ const order={id:'fixture',version:2,status:'PENDING',delivery_date:'2030-01-01',delivery_time:'Chiều · 13–17h'};
+ const form=renderToStaticMarkup(createElement(Reschedule,{order}));assert.match(form,/Đã liên hệ và được khách đồng ý/);assert.match(form,/type="checkbox" required=""/);assert.match(form,/minLength="10"/);
+ assert.equal(renderToStaticMarkup(createElement(Reschedule,{order:{...order,status:'SHIPPING'}})),'');
 });
 after(async()=>{await server?.close();});
 test('money inputs reject negatives, fractional, unsafe and missing amounts; preserve canonical form value',()=>{

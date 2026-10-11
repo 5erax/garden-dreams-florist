@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { checkEnvironment } from '../src/environment.js';
 import { productFromPath, productUrl } from '../src/product-url.js';
-import { renderStorefront, renderSitemap } from '../src/storefront-html.js';
+import { renderStorefront, renderSitemap, isSaleProduct } from '../src/storefront-html.js';
 
 export async function publicCatalog(env, fetcher = fetch) {
   const config = checkEnvironment(env);
@@ -61,7 +61,7 @@ export function storefrontHandler({ catalog = readCatalog, template = () => read
       const product = path === '/' ? undefined : productFromPath(path, data.products);
       if (path !== '/' && !product) return res.status(404).setHeader('Cache-Control', 'no-store').send('Bó hoa này hiện không được bán.');
       if(product && path.replace(/\/$/,'')!==productUrl(product))return res.status(301).setHeader('Location',productUrl(product)).end();
-      if (product?.reference_only && !noindex) res.setHeader('X-Robots-Tag', 'noindex, follow');
+      if (product && !isSaleProduct(product) && !noindex) res.setHeader('X-Robots-Tag', 'noindex, follow');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.send(req.method === 'HEAD' ? '' : renderStorefront({ template: await template(), ...data, product, preview: noindex }));
     } catch {

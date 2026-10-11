@@ -71,8 +71,8 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
         </div>
         <label className="check-label"><input type="checkbox" name="active" defaultChecked={edit.active} />Cho phép đặt cỡ này</label>
         <div className="form-actions">
-          <button className="button primary">Lưu cỡ bó</button>
-          <button type="button" className="text-button" onClick={() => setEdit(null)}>Hủy sửa cỡ</button>
+          <button className="button primary">Lưu cỡ</button>
+          <button type="button" className="button outline" onClick={() => setEdit(null)}>Hủy sửa cỡ</button>
         </div>
       </fieldset>
     </form>}

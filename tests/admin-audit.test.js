@@ -43,8 +43,9 @@ test('admin audit migration preserves privacy, buyer retention, composition and 
   await assert.rejects(f.order(actors.bob,{buyerPhone:'bad'}),/check constraint/);
   await db.query('update gd_orders set contacts_erased_at=now() where id=$1',[order.id]);
   assert.equal((await db.query('select buyer_phone from gd_orders where id=$1',[order.id])).rows[0].buyer_phone,null);
-  let delivered=(await as(actors.admin,()=>rpc('gd_reconcile_payment',[randomUUID(),order.id,order.version,'RECEIPT','Fixture verified payment','']))).order;
-  for(const status of ['CONFIRMED','PREPARING','SHIPPING','DELIVERED'])delivered=await as(actors.admin,()=>rpc('gd_update_order',[delivered.id,delivered.version,status,'PAID','']));
+  const confirmed=await as(actors.admin,()=>rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));
+  let delivered=(await as(actors.admin,()=>rpc('gd_reconcile_payment',[randomUUID(),order.id,confirmed.version,'RECEIPT','Fixture verified payment','']))).order;
+  for(const status of ['PREPARING','SHIPPING','DELIVERED'])delivered=await as(actors.admin,()=>rpc('gd_update_order',[delivered.id,delivered.version,status,'PAID','']));
   const memory=(await db.query('select id from gd_memories where order_id=$1',[order.id])).rows[0];
   assert.equal(Number(await rpc('gd_memory_count')),0);
   const shared=await as(actors.alice,()=>rpc('gd_share_memory',[memory.id,'GARDEN','Người thử']));

@@ -65,11 +65,12 @@ declare saved jsonb; state text; target_order uuid:=current_setting('gd.acceptan
   request_id uuid:=gen_random_uuid(); replay jsonb; memory_id uuid;
 begin
   select to_jsonb(o) into saved from public.gd_orders o where id=target_order;
+  saved := public.gd_update_order(target_order,(saved->>'version')::integer,'CONFIRMED','UNPAID','');
   saved := public.gd_reconcile_payment(request_id,target_order,(saved->>'version')::integer,'RECEIPT','QA-REFERENCE','Synthetic rehearsal only')->'order';
   replay := public.gd_reconcile_payment(request_id,target_order,(saved->>'version')::integer-1,'RECEIPT','QA-REFERENCE','Synthetic rehearsal only')->'order';
   if saved->>'version' <> replay->>'version' or saved->>'payment_status' <> 'PAID' then
     raise exception 'PAYMENT_RETRY_ACCEPTANCE_FAILED'; end if;
-  foreach state in array array['CONFIRMED','PREPARING','SHIPPING','DELIVERED'] loop
+  foreach state in array array['PREPARING','SHIPPING','DELIVERED'] loop
     saved := public.gd_update_order(target_order,(saved->>'version')::integer,state,'PAID','Synthetic fulfillment rehearsal');
   end loop;
   select id into memory_id from public.gd_memories where order_id=target_order and owner_id=auth.uid();

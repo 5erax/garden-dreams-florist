@@ -61,6 +61,11 @@ export async function guestCheckoutEnabled() {
 }
 
 const messages = {
+  ORDER_OVERDUE:"Đơn đã quá khung giao. Liên hệ khách và đổi lịch hoặc hủy trước khi xác nhận.",
+  PRODUCT_PHOTO_REQUIRED:"Mẫu chưa có ảnh thực tế, shop chưa nhận đặt mẫu này.",
+  STOCK_REQUIRED:"Nhập tồn thật còn dùng được trước khi bật kiểm soát kho.",
+  PAYMENT_REFERENCE_REQUIRED:"Nhập mã giao dịch VietQR đã kiểm tra.",
+  PAYMENT_USE_LEDGER_REQUIRED:"Xác nhận đơn rồi ghi thu/hoàn trong sổ đối soát.",
   STOCK_SHORTAGE: 'Nguyên liệu cho bó hoa hoặc ngày giao vừa hết. Chọn mẫu/ngày khác; đơn chưa được lưu và thông tin đang nhập được giữ.',
   RECIPE_REQUIRED: 'Mẫu/cỡ này chưa có công thức đủ để nhận đặt. Chọn mẫu khác hoặc chờ shop cập nhật.',
   RECIPES_REQUIRED: 'Cần công thức cho mọi mẫu và cỡ đang bán trước khi bật kiểm soát tồn.',
@@ -148,9 +153,10 @@ export const orderStatuses = {
   CANCELLED: "Đã hủy",
 };
 export const paymentStatuses = {
+  PARTIAL:"Đã thu một phần",REFUND_PARTIAL:"Đã hoàn một phần",
   UNPAID: "Chưa thanh toán",
   PAID: "Đã nhận tiền",
   REFUNDED: "Đã ghi nhận hoàn tiền",
 };
 export const orderColumns =
-  "id,reference,buyer_name,buyer_phone,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";
+  "id,owner_id,reference,buyer_name,buyer_phone,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";

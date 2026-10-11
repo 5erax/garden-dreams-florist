@@ -11,7 +11,8 @@ test('dashboard gates admin and dates, separates booking from money, omits priva
     await assert.rejects(f.as(actors.alice, () => f.rpc('gd_business_dashboard', ['2030-01-10','2030-01-10'])), /ADMIN_REQUIRED/);
     await assert.rejects(f.as(null, () => f.rpc('gd_business_dashboard', ['2030-01-10','2030-01-10'])), /permission denied/);
     await assert.rejects(f.as(actors.admin, () => f.rpc('gd_business_dashboard', ['2030-01-10','2030-12-10'])), /INVALID_REPORT_PERIOD/);
-    const first = await f.order();
+    let first = await f.order();
+    first=await f.as(actors.admin,()=>f.rpc('gd_update_order',[first.id,first.version,'CONFIRMED','UNPAID','']));
     const second = await f.order(actors.alice, { paymentMethod: 'VIETQR' });
     const cancelled = await f.order(actors.bob);
     await f.as(actors.admin, () => f.rpc('gd_update_order', [cancelled.id, cancelled.version, 'CANCELLED', 'UNPAID', 'fixture cancellation']));

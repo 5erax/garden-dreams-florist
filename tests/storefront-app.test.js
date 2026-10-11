@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
+import {cartChoice} from '../src/order.js';
 import { products } from '../src/catalog.js';
 
 let server, App;
@@ -28,7 +29,7 @@ test('homepage renders its hero and collection from the public snapshot',()=>{
   globalThis.location={pathname:'/',hash:'#home'};
   const html=renderToStaticMarkup(createElement(App));
   assert.match(html,/id="home"/);assert.match(html,/id="collection"/);
-  assert.match(html,/20\/40 bó hoa phù hợp/);
+  assert.ok(html.includes(`${products.filter(p=>cartChoice({id:p.id},[p])).length} bó hoa phù hợp`));
   assert.match(html,/<details class="flower-finder" open=""/);
   assert.doesNotMatch(html,/class="quick-add"/);
   assert.match(html,/class="button hero-cta" href="#collection"/);

@@ -27,7 +27,7 @@ test('PAY-BR01/SEC-BR01: customers cannot settle, read evidence or invoke the pr
   assert.equal((await balance(order)).receivable,390000);
 });
 test('PAY-BR02: lost acknowledgement retries one receipt and changed evidence/reference conflicts',async()=>{
-  const order=await fixture.order(),id=randomUUID();
+  let order=await fixture.order();order=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));const id=randomUUID();
   const saved=await reconcile(order,'RECEIPT',id,'INTERNAL BANK PROOF','bank-20261010-01');
   assert.equal(saved.order.payment_status,'PAID');
   assert.equal(saved.event.reference,'BANK-20261010-01');
@@ -69,16 +69,16 @@ test('PAY-BR04/05: delivered COD stays uncollected until verified; refund is ful
   assert.equal(revoked.revoked,true);assert.equal(revoked.share_token,null);
 });
 test('references cannot settle a second order and failed duplicate transactions roll back payment and audit',async()=>{
-  const one=await fixture.order(),two=await fixture.order();
+  let one=await fixture.order(),two=await fixture.order();for(const [key,order]of[['one',one],['two',two]]){const confirmed=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));if(key==='one')one=confirmed;else two=confirmed;}
   await reconcile(one,'RECEIPT',randomUUID(),'Phiếu thu được kiểm tra','RECEIPT-UNIQUE');
   await assert.rejects(reconcile(two,'RECEIPT',randomUUID(),'Phiếu thu bị dùng lại','receipt-unique'),/PAYMENT_REFERENCE_USED/);
   const current=(await fixture.db.query('select payment_status,version from gd_orders where id=$1',[two.id])).rows[0];
-  assert.equal(current.payment_status,'UNPAID');assert.equal(current.version,1);
+  assert.equal(current.payment_status,'UNPAID');assert.equal(current.version,2);
   assert.equal((await fixture.db.query('select count(*)::int count from gd_payment_ledger where order_id=$1',[two.id])).rows[0].count,0);
   assert.equal((await fixture.db.query("select count(*)::int count from gd_admin_audit where entity='gd_payment_ledger' and after_data->>'orderId'=$1",[two.id])).rows[0].count,0);
 });
 test('legacy update callers still create immutable full-payment ledger entries with private evidence',async()=>{
-  const order=await fixture.order();
+  let order=await fixture.order();order=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));
   const paid=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','PAID','PRIVATE FINANCE EVIDENCE']));
   const same=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[paid.id,paid.version,'PREPARING','PAID','Đang chuẩn bị hoa']));
   assert.equal((await fixture.db.query('select count(*)::int count from gd_payment_ledger where order_id=$1',[order.id])).rows[0].count,1);
@@ -118,7 +118,7 @@ test('FIN-BR01/03: reports use Vietnam settlement days, queues are paged and pay
     await assert.rejects(fixture.as(actors.admin,()=>fixture.rpc('gd_reconciliation_queue',args)),/INVALID_QUEUE_FILTER/);
 });
 test('SEC/FIN: production aggregates exclude test orders even if money events exist',async()=>{
-  const order=await fixture.order(),receipt=await reconcile(order);
+  let order=await fixture.order();order=await fixture.as(actors.admin,()=>fixture.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));const receipt=await reconcile(order);
   const before=await fixture.as(actors.admin,()=>fixture.rpc('gd_reconciliation_totals',[today,today]));
   await fixture.db.exec('alter table gd_orders disable trigger classify_order');
   try{await fixture.db.query('update gd_orders set is_test=true where id=$1',[order.id]);}
@@ -133,7 +133,8 @@ test('FIN-BR03: Vietnam midnight includes the start and excludes the following d
   try{
     const times=['2030-01-09T16:59:59Z','2030-01-09T17:00:00Z','2030-01-10T16:59:59Z','2030-01-10T17:00:00Z'];
     for(let index=0;index<times.length;index++){
-      const order=await isolated.order(actors.alice,{items:[{id:1,quantity:index+1}],expectedTotal:390000*(index+1)});
+      let order=await isolated.order(actors.alice,{items:[{id:1,quantity:index+1}],expectedTotal:390000*(index+1)});
+      order=await isolated.as(actors.admin,()=>isolated.rpc('gd_update_order',[order.id,order.version,'CONFIRMED','UNPAID','']));
       const receipt=await isolated.as(actors.admin,()=>isolated.rpc('gd_reconcile_payment',[randomUUID(),order.id,order.version,'RECEIPT','Fixture receipt confirmed','']));
       await isolated.db.query('update gd_payment_ledger set effective_at=$1 where id=$2',[times[index],receipt.event.id]);
       if(index===2){

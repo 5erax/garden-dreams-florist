@@ -41,6 +41,7 @@ test('CRT-BR03: retry keeps one request and one event, changed intent conflicts 
 });
 test('OMS-BR03/PAY-BR05: request does not cancel; acceptance cancels without claiming refund', async () => {
   let order = await fixture.order();
+  order = await fixture.as(actors.admin, () => fixture.rpc('gd_update_order', [order.id, order.version, 'CONFIRMED', 'UNPAID', '']));
   order = await fixture.as(actors.admin, () => fixture.rpc('gd_update_order', [order.id, order.version, 'CONFIRMED', 'PAID', 'Đã kiểm tra khoản thu trong fixture']));
   const entry = await request(order);
   assert.equal((await fixture.db.query('select status from gd_orders where id=$1', [order.id])).rows[0].status, 'CONFIRMED');

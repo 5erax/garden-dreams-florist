@@ -2,7 +2,7 @@ import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useInView } from "motion/react";
 import { occasions, money } from "./catalog.js";
-import { normalizeCart, cartKey, removeOrderedItems } from "./order.js";
+import { normalizeCart, cartChoice, cartKey, removeOrderedItems,vietnamDate } from "./order.js";
 import { useCustomerCart } from './customer-cart.js';
 import { appEnvironment } from './backend.js';
 import {
@@ -280,7 +280,7 @@ export default function App() {
     (p) =>
       (occasion === "Tất cả" || p.occasion === occasion || p.occasions?.includes(occasion)) &&
       (!onlyFavorites || favorites.includes(p.id)) &&
-      withinBudget(p, budget, saleOnly) &&
+      withinBudget(p, budget, saleOnly) && (!saleOnly || Boolean(cartChoice({id:p.id},[p]))) &&
       matchesFlowerDescription(p, flowerColor, flowerType) &&
       normalizeSearch(`${p.name} ${p.stems}`).includes(normalizeSearch(query)),
   );
@@ -405,7 +405,7 @@ export default function App() {
         {storeError ? <p className="store-status" role="alert">{storeError}</p> : loading && !products.length && <BloomLoader />}
         <div className="service-strip">
           <span>
-            <Icon name="flower" /> {deliveryCopy(shipping)}
+            <Icon name="flower" /><span>{deliveryCopy(shipping)} <a href="#delivery-zones" onClick={event=>{event.preventDefault();setPanel('delivery-zones');}}>Xem khu vực & phí giao</a></span>
           </span>
           <i>✳</i>
           <span>
@@ -416,7 +416,7 @@ export default function App() {
             <Icon name="leaf" /> COD hoặc chuyển khoản VietQR
           </span>
         </div>
-        <section className="collection section-shell" id="collection">
+        <section className="collection section-shell" id="collection">{products.some(p=>p.active&&p.occasions?.includes('20/10'))&&vietnamDate().slice(5)<='10-20'&&vietnamDate().slice(5)>='10-01'&&<div className="holiday-banner"><p><strong>20/10 · Một bó hoa cho người bạn thương</strong><br/>Còn {Math.ceil((Date.parse(vietnamDate().slice(0,4)+'-10-20T00:00:00+07:00')-Date.parse(vietnamDate()+'T00:00:00+07:00'))/86400000)} ngày. Ngày giao và giờ chốt được kiểm tra khi đặt.</p><button className="button outline" onClick={()=>selectOccasion('20/10')}>Chọn hoa 20/10</button></div>}
           <Reveal className="section-heading">
             <div>
               <span className="eyebrow">Bộ sưu tập hoa tươi / 01</span>
@@ -442,7 +442,7 @@ export default function App() {
               role="group"
               aria-label="Chọn dịp tặng hoa"
             >
-              {occasions.map((value) => (
+              {[...new Set([...occasions,...products.flatMap(product=>product.occasions||[])])].map((value) => (
                 <button
                   key={value}
                   className={
@@ -474,7 +474,7 @@ export default function App() {
             <span>
               {onlyFavorites
                 ? "Những bó hoa bạn đã yêu thích"
-                : `${filtered.length}/${products.length} bó hoa phù hợp`}
+                : `${filtered.length} bó hoa phù hợp${saleOnly?' đang nhận đặt':' (gồm mẫu tham khảo)'}`}
               {onlyFavorites && (
                 <button
                   className="text-button"
@@ -497,17 +497,16 @@ export default function App() {
               </BloomSelect>
             </label>
           </div>
-          <details className="flower-finder" open>
-            <summary>Tìm hoa vừa ý — chọn theo ngân sách</summary>
+          <details className="flower-finder" open={typeof window==='undefined'||window.innerWidth>650}>
+            <summary><span className="flower-finder-desktop-label">Tìm hoa vừa ý — sắc hoa, loại hoa & ngân sách</span><span className="flower-finder-mobile-label">Bộ lọc ({[occasion!=='Tất cả',budget>0,Boolean(flowerColor),Boolean(flowerType),!saleOnly].filter(Boolean).length})</span></summary>
             <div className="flower-finder-fields">
-              <label>Dịp tặng<BloomSelect aria-label="Dịp tặng" value={occasion} onChange={e => selectOccasion(e.target.value)}>{occasions.map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
               <label>Sắc hoa<BloomSelect aria-label="Sắc hoa" value={flowerColor} onChange={e => { setFlowerColor(e.target.value); setShowAll(true); }}><option value="">Mọi sắc hoa</option>{['hồng','đỏ','trắng','vàng','tím','xanh'].map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
               <label>Loại hoa<BloomSelect aria-label="Loại hoa" value={flowerType} onChange={e => { setFlowerType(e.target.value); setShowAll(true); }}><option value="">Mọi loại hoa</option>{['hồng','mẫu đơn','ly','cẩm tú cầu','cẩm chướng','hướng dương','tulip'].map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
               <label>Ngân sách bó hoa<BloomSelect aria-label="Ngân sách bó hoa" value={budget} onChange={e => { setBudget(Number(e.target.value)); setShowAll(true); }}>
                 <option value="0">Mọi mức giá</option>{[300000,500000,800000,1500000].map(value => <option key={value} value={value}>Tối đa {money(value)}</option>)}
               </BloomSelect></label>
               <label><input type="checkbox" checked={saleOnly} onChange={e => { setSaleOnly(e.target.checked); setShowAll(true); }} />Chỉ mẫu đang nhận đặt</label>
-              <button className="button outline finder-reset" onClick={() => { setBudget(0); setFlowerColor(''); setFlowerType(''); setSaleOnly(true); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>
+              {(occasion!=='Tất cả'||budget||flowerColor||flowerType||!saleOnly||query)&&<button className="button outline finder-reset" onClick={() => { setBudget(0); setFlowerColor(''); setFlowerType(''); setSaleOnly(true); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>}
             </div>
             <p>Tìm theo dịp tặng, tên hoa hoặc ngân sách. Bỏ chọn trạng thái nhận đặt để xem thêm mẫu tham khảo. Ngân sách chưa gồm phí giao; mẫu tham khảo dùng giá dự kiến và chưa nhận đặt.</p>
           </details>
@@ -576,7 +575,7 @@ export default function App() {
               />
               <figure className="story-photo first">
                 <img
-                  src="/media/story-4.jpg"
+                  width="720" height="900" src="/media/story-4.jpg"
                   alt="Một khu vườn xanh, nơi những mầm hoa bắt đầu"
                   loading="lazy"
                 />
@@ -589,7 +588,7 @@ export default function App() {
               </div>
               <figure className="story-photo second">
                 <img
-                  src="/media/story-3.jpg"
+                  width="720" height="900" src="/media/story-3.jpg"
                   alt="Hoa được chọn để tạo nên một bó hoa riêng"
                   loading="lazy"
                 />
@@ -668,7 +667,7 @@ export default function App() {
           />
         </section>
       </main>
-      <footer className="shop-footer">
+      {panel==='delivery-zones'&&<Modal title="Khu vực & phí giao" className="info-dialog" onClose={()=>setPanel(null)}><h2>Khu vực giao hoa</h2>{shipping.map(zone=><p key={zone.id}><strong>{zone.name} · {money(zone.fee)}</strong><br/>{zone.area||'Liên hệ shop để xác nhận địa chỉ thuộc khu vực này trước khi đặt.'}</p>)}</Modal>}<footer className="shop-footer">
         <div className="footer-top">
           <div className="footer-story">
             <a className="brand" href={isProductPage ? '/#home' : '#home'}><Icon name="flower" /><span>{shop.name}</span></a>
@@ -678,7 +677,7 @@ export default function App() {
           <nav className="footer-navigation" aria-label="Khám phá cửa hàng">
             <h3>Cửa hàng</h3>
             <a href={isProductPage ? '/#collection' : '#collection'}>Chọn hoa</a>
-            <a href="#account">Đơn hoa của tôi</a>
+            <a href="#account">Góc của tôi</a>
             <a href="#garden">Vườn kỷ niệm</a>
             {isAdmin && <a href="#admin">Quản trị</a>}
           </nav>

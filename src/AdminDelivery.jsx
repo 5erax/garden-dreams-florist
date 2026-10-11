@@ -1,3 +1,4 @@
+import BloomLoader from "./BloomLoader.jsx";
 import { cutoffLabel } from "./admin-ux.js";
 import BloomDate from "./BloomDate.jsx";
 import BloomSelect from "./BloomSelect.jsx";
@@ -10,7 +11,7 @@ const weekdays = ["Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sá
 
 export default function AdminDelivery() {
   const [settings, setSettings] = useState(null);
-  const [rules, setRules] = useState([]), [closures, setClosures] = useState([]), [services, setServices] = useState([]);
+  const [rules, setRules] = useState([]), [closures, setClosures] = useState([]), [services, setServices] = useState([]),[shop,setShop]=useState(null);
   const [edit, setEdit] = useState(null), [holiday, setHoliday] = useState(null);
   const [leadHours,setLeadHours]=useState(2), [ruleTime,setRuleTime]=useState(deliveryTimes[0]);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
@@ -18,13 +19,14 @@ export default function AdminDelivery() {
   async function load() {
     setBusy(true); setError("");
     try {
-      const [config, schedule, holidays, shipping] = await Promise.all([
+      const [config, schedule, holidays, shipping,store] = await Promise.all([
         result(backend.from("gd_delivery_settings").select("*").eq("id", 1).single()),
         result(backend.from("gd_delivery_rules").select("*").order("shipping_id").order("delivery_time")),
         result(backend.from("gd_delivery_closures").select("*").gte("delivery_date", vietnamDate()).order("delivery_date").limit(100)),
         result(backend.from("gd_shipping").select("*").order("name")),
+        result(backend.from("gd_shop").select("opens_at,closes_at").eq("id",1).single()),
       ]);
-      setSettings(config); setRules(schedule); setClosures(holidays); setServices(shipping);
+      setShop(store);setSettings(config); setRules(schedule); setClosures(holidays); setServices(shipping);
     } catch (e) { setError(e.message); }
     finally { setBusy(false); }
   }
@@ -51,7 +53,7 @@ export default function AdminDelivery() {
         weekdays: data.getAll("weekday").map(Number), capacity: Number(data.get("capacity")),
         leadMinutes: Math.round(Number(data.get("leadHours"))*60), active: data.get("active") === "on",
       },
-    }, "Đã lưu ca giao. Lịch và điều kiện trên đơn cũ được giữ lại.");
+    }, "Đã lưu khung giờ giao. Lịch và điều kiện trên đơn cũ được giữ lại.");
   }
   async function saveHoliday(event) {
     event.preventDefault();
@@ -69,12 +71,12 @@ export default function AdminDelivery() {
   const serviceName = id => services.find(service => service.id === id)?.name || "Dịch vụ giao hoa";
   return <section className="delivery-admin" aria-label="Quản lý lịch giao hoa">
     <div className="portal-section-heading">
-      <div><h2>Khung giờ & sức chứa</h2><p>Ca giao, sức chứa và ngày nghỉ theo từng khu vực.</p></div>
-      <button className="button outline" disabled={busy} onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại lịch</button>
+      <div><h2>Khung giờ & sức chứa</h2><p>Khung giờ giao, sức chứa và ngày nghỉ theo từng khu vực.</p></div>
+      <button className="button outline" disabled={busy} onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
     {notice && <p className="portal-notice" role="status">{notice}</p>}
-    {busy && <p role="status">Đang cập nhật lịch giao…</p>}
+    {busy && <BloomLoader compact label="Lịch giao"/>}
     {settings && <div className="delivery-mode">
       <div><h3>Lịch giao tự động: {settings.enabled ? "Bật" : "Tắt"}</h3>
         <p>{settings.enabled ? "Khách chỉ chọn được ca còn chỗ và chưa qua giờ chốt. Xác nhận đơn giữ chỗ; hủy đơn nhả chỗ." : "Shop đang xác nhận lịch thủ công. Tạo ít nhất một ca đang hoạt động, còn sức chứa trước khi bật tự động."}</p></div>
@@ -85,42 +87,42 @@ export default function AdminDelivery() {
       </button>
     </div>}
     <div className="portal-section-heading">
-      <h3>Các ca giao</h3>
-      <button className="button outline" disabled={busy || !services.length} onClick={() => {
-        if(edit){setEdit(null);return;} setLeadHours(2);setRuleTime(deliveryTimes[0]);setHoliday(null); setNotice(""); setEdit({shipping_id: services[0]?.id, delivery_time: deliveryTimes[0], weekdays:[1,2,3,4,5,6,7],capacity:10,lead_minutes:120,active:false});
-      }}>{edit?"Đóng biểu mẫu":"Thêm ca giao"}</button>
+      <h3>Các khung giờ giao</h3>
+      <button className="button outline" disabled={busy || !services.some(service=>service.active)} onClick={() => {
+        if(edit){setEdit(null);return;} setLeadHours(2);setRuleTime(deliveryTimes[0]);setHoliday(null); setNotice(""); setEdit({shipping_id: services.find(service=>service.active)?.id, delivery_time: deliveryTimes[0], weekdays:[1,2,3,4,5,6,7],capacity:10,lead_minutes:120,active:true});
+      }}>{edit?"Đóng biểu mẫu":"Thêm khung giờ"}</button>
     </div>
     {edit && <form className="admin-edit-form" key={`${edit.id || "new"}-${edit.version || 0}`} onSubmit={saveRule}>
-      <h3>{edit.id ? "Chỉnh ca giao" : "Tạo khung giờ giao"}</h3>
+      <h3>{edit.id ? "Chỉnh khung giờ" : "Tạo khung giờ giao"}</h3>
       <fieldset disabled={busy}>
         <div className="form-grid">
           <label>Khu vực<BloomSelect name="shippingId" defaultValue={edit.shipping_id} disabled={Boolean(edit.id)} required>
-            {services.map(service => <option key={service.id} value={service.id}>{service.name}{!service.active && " (đang tắt)"}</option>)}
+            {services.map(service => <option key={service.id} value={service.id} disabled={!service.active}>{service.name}{!service.active && " (đang tắt)"}</option>)}
           </BloomSelect></label>
-          <label>Ca giao<BloomSelect name="deliveryTime" value={ruleTime} onChange={event=>setRuleTime(event.target.value)} disabled={Boolean(edit.id)} required>
+          <label>Khung giờ<BloomSelect name="deliveryTime" value={ruleTime} onChange={event=>setRuleTime(event.target.value)} disabled={Boolean(edit.id)} required>
             {deliveryTimes.map(time => <option key={time}>{time}</option>)}
           </BloomSelect></label>
           <label>Sức chứa mỗi ngày<input type="number" name="capacity" min={0} max={500} step={1} defaultValue={edit.capacity} required /></label>
           <label>Thời gian cần đặt trước (giờ)<input type="number" name="leadHours" min={0} max={720} step={1/60} value={leadHours} onChange={event=>setLeadHours(event.target.value)} required /></label>
         </div>
-        <p className="cutoff-preview">Ngừng nhận lúc {cutoffLabel(ruleTime,Math.round(Number(leadHours)*60))} (giờ Việt Nam).</p><p className="fineprint">Ví dụ ca 13h và đặt trước 120 phút sẽ ngừng nhận vào 11h. Số 0 ở sức chứa nghĩa là không còn nhận trong ca; không thể giảm thấp hơn số đơn đã giữ chỗ.</p>
+        <p className="cutoff-preview">{/^\d{2}:/.test(cutoffLabel(ruleTime,Math.round(Number(leadHours)*60))) && (cutoffLabel(ruleTime,Math.round(Number(leadHours)*60)) < (shop?.opens_at||'08:00').slice(0,5) || cutoffLabel(ruleTime,Math.round(Number(leadHours)*60)) > (shop?.closes_at||'17:00').slice(0,5)) ? 'Chốt trước 20:00 ngày hôm trước vì thời gian chuẩn bị nằm trước giờ mở cửa.' : 'Ngừng nhận lúc '+cutoffLabel(ruleTime,Math.round(Number(leadHours)*60))+' (giờ Việt Nam).'}</p><p className="fineprint">Ví dụ khung giờ 13h và đặt trước 2 giờ sẽ ngừng nhận vào 11h. Số 0 ở sức chứa nghĩa là không còn nhận trong khung giờ; không thể giảm thấp hơn số đơn đã giữ chỗ.</p>
         <fieldset className="weekday-options"><legend>Ngày hoạt động trong tuần</legend>
           {weekdays.map((name, index) => <label className="check-label" title={name} key={name}><input type="checkbox" name="weekday" value={index + 1} defaultChecked={edit.weekdays.includes(index + 1)} />{index===6?"CN":`T${index+2}`}</label>)}
         </fieldset>
-        <label className="check-label"><input type="checkbox" name="active" defaultChecked={edit.active} />Cho phép nhận yêu cầu trong ca này</label>
-        <div className="form-actions"><button className="button primary">Lưu ca giao</button><button type="button" className="button outline" onClick={() => setEdit(null)}>Hủy sửa</button></div>
+        <label className="check-label"><input type="checkbox" name="active" defaultChecked={edit.active} />Đang hoạt động — nhận yêu cầu trong khung giờ này</label>
+        <div className="form-actions"><button className="button primary">Lưu khung giờ</button><button type="button" className="button outline" onClick={() => setEdit(null)}>Hủy sửa</button></div>
       </fieldset>
     </form>}
-    {!busy && !rules.length && <p className="portal-empty">Chưa có ca giao. Tạo ca theo năng lực thực tế của shop, rồi bật lịch khi đã kiểm tra.</p>}
+    {!busy && !rules.length && !edit && <p className="portal-empty">Chưa có ca giao. Tạo ca theo năng lực thực tế của shop, rồi bật lịch khi đã kiểm tra.</p>}
     <div className="delivery-rule-grid">
       {rules.map(rule => <article className="delivery-rule-card" key={rule.id}>
         <span className="eyebrow">{serviceName(rule.shipping_id)}</span>
         <h3>{rule.delivery_time}</h3>
         <p>{rule.weekdays.map(day => weekdays[day - 1]).join(" · ")}</p>
         <dl><div><dt>Sức chứa</dt><dd>{rule.capacity} đơn / ngày</dd></div>
-          <div><dt>Đặt trước giờ bắt đầu</dt><dd>{rule.lead_minutes} phút</dd></div></dl>
+          <div><dt>Đặt trước giờ bắt đầu</dt><dd>{rule.lead_minutes/60} giờ</dd></div></dl>
         <span className="status-badge">{rule.active ? "Đang áp dụng" : "Đã tắt"}</span>
-        <button className="text-button" disabled={busy} onClick={() => { setHoliday(null); setEdit(rule);setLeadHours(rule.lead_minutes/60);setRuleTime(rule.delivery_time); setNotice(""); }}>Chỉnh ca giao</button>
+        <button className="text-button" disabled={busy} onClick={() => { setHoliday(null); setEdit(rule);setLeadHours(rule.lead_minutes/60);setRuleTime(rule.delivery_time); setNotice(""); }}>Chỉnh khung giờ</button>
       </article>)}
     </div>
     <div className="portal-section-heading"><h3>Ngày nghỉ theo khu vực</h3>

@@ -99,7 +99,7 @@ test("accepts the Vietnam +84 format and trims submitted text", () => {
 });
 
 test("cart keeps sizes separate, calculates catalog prices and drops unavailable sizes without substituting", () => {
-  const catalog = [{ id: 1, name: "Hoa thử", price: 390000, variants: [
+  const catalog = [{ id: 1, image: "/flowers/test.webp", name: "Hoa thử", price: 390000, variants: [
     { id: 101, size_name: "Bó lớn", sku: "TEST-L", price: 700000, active: true },
     { id: 102, size_name: "Bó vừa", sku: "TEST-M", price: 500000, active: true },
     { id: 103, size_name: "Cỡ tắt", price: 1000000, active: false },

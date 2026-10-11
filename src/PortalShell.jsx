@@ -21,20 +21,20 @@ export function PortalShell({ children, cartCount = 0, onCart }) {
     finally { setBusy(false); }
   }
   return (
-    <div className="portal">
+    <div className={'portal'+(location.hash==='#admin'?' admin-shell':'')}>
       <header className="portal-header">
         <a className="brand" href="/">
           <Icon name="flower" />
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng cửa hàng">
-          <a href="/#collection">Bộ sưu tập</a>
-          <a href="/#story">Câu chuyện</a>
-          <a href="#garden" aria-current={location.hash === '#garden' ? 'page' : undefined}>Vườn kỷ niệm</a>
-          <a href="#account" aria-current={location.hash === '#account' ? 'page' : undefined}>Góc của tôi</a>
-          {isAdmin && <a href="#admin">Quản trị</a>}
+          {location.hash!=='#admin'&&<a href="/#collection">Bộ sưu tập</a>}
+          {location.hash!=='#admin'&&<a href="/#story">Câu chuyện</a>}
+          <a hidden={location.hash==='#admin'} href="#garden" aria-current={location.hash === '#garden' ? 'page' : undefined}>Vườn kỷ niệm</a>
+          <a hidden={location.hash==='#admin'} href="#account" aria-current={location.hash === '#account' ? 'page' : undefined}>Góc của tôi</a>
+          {isAdmin && <a href="#admin" aria-current={location.hash==='#admin'?'page':undefined}>Quản trị cửa hàng</a>}
         </nav>
-        <button className="cart-trigger portal-cart" onClick={onCart} aria-label={`Mở giỏ hoa, ${cartCount} bó`}><Icon name="bag" /><span>Giỏ hoa</span><span className="cart-count">{cartCount}</span></button>
+        <button hidden={location.hash==='#admin'} className="cart-trigger portal-cart" onClick={onCart} aria-label={`Mở giỏ hoa, ${cartCount} bó`}><Icon name="bag" /><span>Giỏ hoa</span><span className="cart-count">{cartCount}</span></button>
         {session && (
           <button
             className="portal-signout"

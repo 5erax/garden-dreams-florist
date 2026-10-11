@@ -1,5 +1,5 @@
 import { useStore } from "./Store.jsx";
-import { datePresets } from "./admin-ux.js";
+import { formatDate, formatDateTime, datePresets } from "./admin-ux.js";
 import BloomDate from "./BloomDate.jsx";
 import { useEffect, useState } from 'react';
 import { call } from './backend.js';
@@ -15,6 +15,8 @@ export default function BusinessDashboard({onNavigate}) {
   const [revision, setRevision] = useState(0);
   const [report, setReport] = useState(null);
   const [error, setError] = useState('');
+  const [mail,setMail]=useState(null);
+  useEffect(()=>{let current=true;call('gd_order_notification_status').then(data=>{if(current)setMail(data);}).catch(()=>{if(current)setMail({unavailable:true});});return()=>{current=false;};},[revision]);
   useEffect(() => {
     let current = true;
     setReport(null); setError('');
@@ -45,17 +47,17 @@ export default function BusinessDashboard({onNavigate}) {
     <p className="dashboard-note">Tối đa 92 ngày, theo giờ Việt Nam. Đơn theo ngày tạo; tiền theo ngày ghi nhận thu/hoàn. Báo cáo không chứa thông tin giao hàng.</p>
     {error ? <p role="alert" className="form-error">{error} <button className="text-button" onClick={() => setRevision(n => n + 1)}>Thử lại</button></p> : !report ? <BloomLoader label="Báo cáo cửa hàng" /> : <>
       {report.staging && <p className="portal-notice">Môi trường thử nghiệm — bao gồm đơn thử, không dùng làm báo cáo kinh doanh thật.</p>}
-      <p className="dashboard-note">Kỳ {report.from} → {report.to} · Cập nhật {new Date(report.generatedAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}</p>
+      <p className="dashboard-note">Kỳ {formatDate(report.from)} → {formatDate(report.to)} · Cập nhật {formatDateTime(report.generatedAt)}</p>
       <div className="dashboard-metrics">
         {[
           ['Giá trị đơn chưa hủy', money(report.orders.bookedValue), `${report.orders.count} đơn tạo, ${report.orders.cancelled} đơn hủy`],
           ['Tiền đã thu trong kỳ', money(report.cash.received), 'Khoản thu đã được admin đối soát'],
           ['Tiền đã hoàn trong kỳ', money(report.cash.refunded), 'Khoản hoàn thực tế đã ghi nhận'],
           ['Thu trừ hoàn trong kỳ', money(report.cash.netCollected), 'Dòng tiền, chưa phải lợi nhuận'],
-          ['Còn phải thu hiện tại', money(report.receivableNow), 'Mọi đơn chưa hủy, chưa nhận tiền; không giới hạn kỳ'],
+          ['Còn phải thu hiện tại', money(report.receivableNow), 'Số tiền còn phải thu của mọi đơn chưa hủy; không giới hạn kỳ'],
           ['Phiên/tài khoản đặt đơn', report.orders.buyers, 'Có đơn chưa hủy trong kỳ; không phải số người duy nhất'],
           ['Giá trị đơn trung bình', money(report.orders.count>report.orders.cancelled?Math.round(report.orders.bookedValue/(report.orders.count-report.orders.cancelled)):0), 'Các đơn chưa hủy theo ngày tạo'],
-          ['Tỷ lệ hủy', report.orders.count? (report.orders.cancelled/report.orders.count*100).toFixed(1)+'%':'—', 'Trên các đơn tạo trong kỳ'],
+          ['Tỷ lệ hủy', report.orders.count? (report.orders.cancelled/report.orders.count*100).toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—', 'Trên các đơn tạo trong kỳ'],
           ['Giá trị đơn kỳ trước', money(report.previous?.bookedValue||0), `${report.previous?.orders||0} đơn tạo trong khoảng liền trước có cùng số ngày`],
         ].map(([label, value, note]) => <article className="dashboard-metric" key={label}><h3>{label}</h3><strong>{value}</strong><p>{note}</p></article>)}
       </div>
@@ -68,7 +70,7 @@ export default function BusinessDashboard({onNavigate}) {
         <article className="dashboard-card"><h3>Phương thức thanh toán đã chọn</h3>{report.methods.length ? report.methods.map(m => <p key={m.method}><strong>{m.method === 'COD' ? 'COD' : 'Chuyển khoản'}</strong> · {m.orders} đơn · {money(m.value)}</p>) : <p>Chưa có đơn chưa hủy trong kỳ.</p>}<p className="dashboard-note">Lựa chọn khi đặt đơn chưa chứng minh đã nhận tiền. Đối soát tại mục Đối soát tiền.</p></article>
         <article className="dashboard-card"><h3>Hoa được đặt nhiều</h3>{report.flowers.length ? <ol>{report.flowers.map((f, i) => <li key={i}>{f.name} · {f.quantity} bó · {money(f.value)}</li>)}</ol> : <p>Chưa có dữ liệu đặt hoa trong kỳ.</p>}<p className="dashboard-note">Đơn chưa hủy theo ngày tạo. Giá trị hoa chưa gồm phí giao, chưa phải doanh thu đã thu.</p></article>
         <article className="dashboard-card"><h3>Chất lượng danh mục</h3><p>{report.catalog.sale} mẫu bán · {report.catalog.reference} mẫu tham khảo.</p><ul><li>{report.catalog.missingSlug} mẫu thiếu đường dẫn riêng; {report.catalog.genericSlug||0} mẫu dùng slug mã số.</li><li>{report.catalog.shortDescription} mẫu có mô tả dưới 120 ký tự.</li><li>{report.catalog.pendingImages} mẫu bán còn ảnh SVG/thiếu ảnh.</li></ul><details><summary>Mẫu cần sửa dữ liệu</summary>{products.filter(product=>/^bo-hoa-\d+$/.test(product.slug||'')||product.description?.length<120||product.image?.endsWith('.svg')).map(product=><button className="text-button dashboard-warning-link" key={product.id} onClick={()=>onNavigate?.('products',product.id)}>Chỉnh {product.name}</button>)}</details><a href="https://search.google.com/search-console" target="_blank" rel="noreferrer">Mở Google Search Console ↗</a><p className="dashboard-note">Chưa kết nối Search Console: chưa có lượt hiển thị, nhấp hoặc thứ hạng Google. Các số ở đây đo chất lượng dữ liệu, không chứng nhận hiệu quả SEO.</p></article>
-        <article className="dashboard-card"><h3>Cần chú ý khi vận hành</h3><button className="text-button dashboard-warning-link" onClick={()=>onNavigate?.('desk','OVERDUE')}>Mở bàn xử lý đơn · {report.overdueNow||0} đơn qua ngày giao chưa hoàn tất</button><button className="text-button dashboard-warning-link" onClick={()=>onNavigate?.('inventory')}>Mở kho & công thức</button><p>Kiểm soát tồn: <strong>{report.inventoryEnabled ? 'Đã bật' : 'Chưa bật'}</strong>.</p><p>Giá trị đơn đã giao và hiện đã thu: {money(report.orders.deliveredPaidValue)} (theo ngày tạo đơn).</p><p>Số dư thu cũ: {money(report.cash.legacyReceiptBalance)} · Hoàn cũ: {money(report.cash.legacyRefundBalance)}. Tách khỏi dòng tiền trong kỳ.</p><p className="dashboard-note">Chưa tính lợi nhuận: cần giá vốn và chi phí vận hành đầy đủ. Mở báo cáo lại sau khi xử lý đơn để nhận số liệu mới.</p></article>
+        <article className="dashboard-card"><h3>Cần chú ý khi vận hành</h3>{mail && <p role={mail.attention?"alert":undefined}>Thông báo email: {mail.unavailable?"chưa đọc được trạng thái":`${mail.pending} đang chờ gửi · ${mail.attention} cần kiểm tra`}{mail.lastSentAt?` · Gửi gần nhất ${formatDateTime(mail.lastSentAt)}`:""}.</p>}<button className="text-button dashboard-warning-link" onClick={()=>onNavigate?.('desk','OVERDUE')}>Mở bàn xử lý đơn · {report.overdueNow||0} đơn quá khung giờ giao chưa hoàn tất</button><button className="text-button dashboard-warning-link" onClick={()=>onNavigate?.('inventory')}>Mở kho & công thức</button><p>Kiểm soát tồn: <strong>{report.inventoryEnabled ? 'Đã bật' : 'Chưa bật'}</strong>.</p><p>Giá trị đơn đã giao và hiện đã thu: {money(report.orders.deliveredPaidValue)} (theo ngày tạo đơn).</p><p hidden={!report.cash.legacyReceiptBalance&&!report.cash.legacyRefundBalance}>Số dư thu cũ: {money(report.cash.legacyReceiptBalance)} · Hoàn cũ: {money(report.cash.legacyRefundBalance)}. Tách khỏi dòng tiền trong kỳ.</p><p className="dashboard-note">Chưa tính lợi nhuận: cần giá vốn và chi phí vận hành đầy đủ. Mở báo cáo lại sau khi xử lý đơn để nhận số liệu mới.</p></article>
       </div>
     </>}
   </section>;

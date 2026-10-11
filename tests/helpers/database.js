@@ -10,7 +10,7 @@ export const actors = {
 };
 export async function database({ through } = {}) {
   const db = new PGlite();
-  await db.exec(`create role anon; create role authenticated; create schema auth;
+  await db.exec(`create role anon; create role authenticated; create role service_role; create schema auth;
     create table auth.users(id uuid primary key);
     grant usage on schema auth to anon,authenticated;
     create function auth.uid() returns uuid language sql stable as $$

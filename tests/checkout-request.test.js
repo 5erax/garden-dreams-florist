@@ -51,6 +51,6 @@ test("recovering an earlier order preserves flowers subsequently added to the ca
     { id: 1, quantity: 2 }, { id: 2, quantity: 1 },
   ]);
   assert.deepEqual(removeOrderedItems([{ id: 1, quantity: 1 }], [{ id: 1, quantity: 2 }]), []);
-  const catalog = [{ id: 1, price: 390000, variants: [{ id: 101, price: 700000, active: true }] }];
+  const catalog = [{ id: 1, image: "/flowers/test.webp", price: 390000, variants: [{ id: 101, price: 700000, active: true }] }];
   assert.deepEqual(removeOrderedItems([{ id: 1, quantity: 1 }, { id: 1, variantId: 101, quantity: 1 }], request.items, catalog), [{ id: 1, variantId: 101, quantity: 1 }]);
 });

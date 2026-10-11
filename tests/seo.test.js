@@ -7,6 +7,13 @@ import { publicCatalog } from '../api/storefront.js';
 const shop={name:'Garden Dreams',phone:'0832345780',address:'665L, Long Phước, Long Thành, Đồng Nai'};
 const product={id:6,slug:'bo-hoa-6',name:'Giấc mơ mẫu đơn',occasion:'Tình yêu',active:true,reference_only:false,stems:'Mẫu đơn hồng',price:890000,image:'/flowers/bouquet_6.webp',description:'Lời thương </script><script>alert(1)</script>'};
 const template=await readFile(new URL('../index.html',import.meta.url),'utf8');
+test('active placeholder cannot advertise an Offer or enter sitemap',()=>{
+  const pending={...product,image:'/flowers/bouquet-pending.svg'};
+  const html=renderStorefront({template,shop,products:[pending],product:pending});
+  assert.doesNotMatch(html,/"@type":"Offer"|href="#buy"/);
+  assert.match(html,/noindex,follow/);
+  assert.doesNotMatch(renderSitemap([pending]),/\/hoa\//);
+});
 test('Vietnamese search folds diacritics, đ, combining marks and case',()=>{
   assert.ok(normalizeSearch(product.name).includes(normalizeSearch(' MAU DON ')));
   assert.equal(normalizeSearch('Đồng Nai'), 'dong nai');
