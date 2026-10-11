@@ -29,7 +29,7 @@ test("delivered COD remains receivable until a checked receipt is recorded", () 
   assert.deepEqual(allowedReconciliationActions(order, unpaid), ["RECEIPT"]);
   assert.equal(unpaid.received, 0);
   assert.equal(unpaid.heldCash, 0);
-  for (const status of ["PENDING", "CONFIRMED", "PREPARING", "SHIPPING", "DELIVERED"])
+  for (const status of ["CONFIRMED", "PREPARING", "SHIPPING", "DELIVERED"])
     assert.deepEqual(allowedReconciliationActions({ ...order, status }, unpaid), ["RECEIPT"]);
   assert.deepEqual(allowedReconciliationActions({ ...order, status: "CANCELLED" }, { ...unpaid, receivable: 0 }), []);
   assert.deepEqual(allowedReconciliationActions({ ...order, status: "UNKNOWN" }, unpaid), []);
@@ -38,15 +38,15 @@ test("delivered COD remains receivable until a checked receipt is recorded", () 
 test("paid cancellation can record one full refund, while refunded and partially accounted balances stay blocked", () => {
   assert.deepEqual(allowedReconciliationActions({ ...order, status: "CANCELLED", payment_status: "PAID" }, paid), ["REFUND"]);
   assert.deepEqual(allowedReconciliationActions({ ...order, payment_status: "REFUNDED" }, refunded), []);
-  assert.deepEqual(allowedReconciliationActions({ ...order, payment_status: "PAID" }, { ...paid, refunded: 10000, heldCash: 380000, refundable: 380000 }), []);
+  assert.deepEqual(allowedReconciliationActions({ ...order, payment_status: "PAID" }, { ...paid, refunded: 10000, heldCash: 380000, refundable: 380000 }), ["REFUND"]);
   assert.deepEqual(allowedReconciliationActions({ ...order, payment_status: "PAID" }, { ...paid, legacyBalance: true }), ["REFUND"]);
-  assert.deepEqual(allowedReconciliationActions(order, { ...unpaid, fullOnly: false }), []);
+  assert.deepEqual(allowedReconciliationActions(order, { ...unpaid, fullOnly: false }), ["RECEIPT"]);
   assert.deepEqual(allowedReconciliationActions({ ...order, total: 0 }, { ...unpaid, total: 0, receivable: 0 }), []);
 });
 
-test("full receipt sends operation identity, snapshot version and evidence, never a client amount", () => {
+test("full receipt sends operation identity, snapshot version and evidence, validated partial amount", () => {
   const args = prepareReconciliation(order, unpaid, { ...fields, amount: 1, total: 1, payment_status: "PAID", actor_id: "fake" }, id);
-  assert.deepEqual(args, { p_id: id, p_order: order.id, p_version: 4, p_action: "RECEIPT", p_evidence: "Đã kiểm tra tiền COD nhận đủ", p_reference: "COD/CA_1-02.03" });
+  assert.deepEqual(args, { p_amount: 1, p_id: id, p_order: order.id, p_version: 4, p_action: "RECEIPT", p_evidence: "Đã kiểm tra tiền COD nhận đủ", p_reference: "COD/CA_1-02.03" });
   assert.equal(order.payment_status, "UNPAID");
   assert.equal(unpaid.received, 0);
 });

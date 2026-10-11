@@ -9,7 +9,7 @@ const products = [
       { id: 11, product_id: 1, price: 650000, size_name: "Lớn", sku: "ROSE-L", active: true },
       { id: 12, product_id: 1, price: 390000, size_name: "Nhỏ", sku: "ROSE-S", active: false },
     ] },
-  { id: 2, name: "Nắng dịu", price: 390000, active: true, variants: [
+  { id: 2, name: "Nắng dịu", image: "/flowers/daisy.webp", price: 390000, active: true, variants: [
     { id: 21, product_id: 2, price: 590000, size_name: "Lớn", sku: "DAISY-L", active: true },
   ] },
   { id: 3, name: "Hoa đã ngừng bán", price: 100000, active: false },
@@ -92,7 +92,7 @@ test("base and variant are distinct house cart keys while duplicate requests mer
 });
 
 test("20 unique cart lines block only new choices; existing choices can still gain quantity", () => {
-  const catalog = Array.from({ length: 22 }, (_, index) => ({ id: index + 1, name: `Mẫu ${index + 1}`, price: 100000, active: true }));
+  const catalog = Array.from({ length: 22 }, (_, index) => ({ id: index + 1, name: `Mẫu ${index + 1}`, image: "/flowers/test.webp", price: 100000, active: true }));
   const cart = catalog.slice(0, 20).map(product => ({ id: product.id, quantity: 1 }));
   const result = prepareReorder([item(21), item(1), item(22)], cart, catalog);
   assert.equal(result.cart.length, 20);
@@ -103,7 +103,7 @@ test("20 unique cart lines block only new choices; existing choices can still ga
 });
 
 test("an over-limit legacy cart is preserved instead of silently truncating existing selections", () => {
-  const catalog = Array.from({ length: 21 }, (_, index) => ({ id: index + 1, name: `Mẫu ${index + 1}`, price: 100000, active: true }));
+  const catalog = Array.from({ length: 21 }, (_, index) => ({ id: index + 1, name: `Mẫu ${index + 1}`, image: "/flowers/test.webp", price: 100000, active: true }));
   const cart = catalog.map(product => ({ id: product.id, quantity: 1 }));
   const result = prepareReorder([item(1)], cart, catalog);
   assert.deepEqual(result.cart, cart);

@@ -82,7 +82,7 @@ export function ProductDialog({
             {product.variants?.map(v => <option key={v.id} value={v.id}>{v.size_name} · {money(v.price)}</option>)}
           </BloomSelect>
         </label>}
-        {product.reference_only ? <p className="reference-note">Mẫu tham khảo · Giá dự kiến {money(product.price)}. Shop đang xác nhận nguồn hoa, quy cách và giá bán trước khi nhận đặt mẫu này.</p> : !choice && <p className="form-error" role="alert">Cỡ này đã ngừng nhận đặt. Chọn lại cỡ bó.</p>}
+        {product.reference_only ? <p className="reference-note">Mẫu tham khảo · Giá dự kiến {money(product.price)}. Shop đang xác nhận nguồn hoa, quy cách và giá bán trước khi nhận đặt mẫu này.</p> : !choice && <p className="form-error" role="alert">Mẫu hoặc cỡ này chưa đủ điều kiện nhận đặt; shop cần ảnh thực tế trước khi bán.</p>}
         <p>{product.description}</p>
         <dl>
           <dt>Trong bó hoa</dt>

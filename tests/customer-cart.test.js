@@ -51,7 +51,7 @@ test('real cart hook hides old selections before effects, rejects stale updates 
     }], server: { middlewareMode: true, hmr: false, ws: false, watch: null } });
   try {
     const { useCustomerCart } = await server.ssrLoadModule('/src/customer-cart.js');
-    const options = { session: null, authReady: false, environment: 'production', products: [{ id: 1 }, { id: 2 }], loading: false, error: '' };
+    const options = { session: null, authReady: false, environment: 'production', products: [{ id: 1, image: "/flowers/test.webp" }, { id: 2, image: "/flowers/test.webp" }], loading: false, error: '' };
     const render = () => { h.cursor = 0; return useCustomerCart(options); };
     const settle = () => { for (let i = 0; i < 4; i++) { render(); const effects = h.effects.splice(0); effects.forEach(effect => effect()); } return render(); };
     saveCustomerCart(globalThis.sessionStorage, 'production', 'alice', aliceFlowers);

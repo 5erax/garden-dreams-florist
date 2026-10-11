@@ -29,9 +29,9 @@ test('purchase is outside the image with explicit actions; unavailable cards can
   assert.ok(html.indexOf('product-card-actions') > html.indexOf('product-copy'));
   assert.match(html, /Thêm vào giỏ hoa/); assert.doesNotMatch(html, /quick-add/);
   assert.match(html, /type="checkbox"/); assert.match(html, /hoa nhỏ phối cùng/);
-  assert.doesNotMatch(html, /class="button primary card-add" disabled/);
+  assert.doesNotMatch(html, /class="button outline card-add" disabled/);
   const reference = card({ ...flower, active: false, reference_only: true });
-  assert.match(reference, /Chưa nhận đặt/); assert.match(reference, /class="button primary card-add" disabled=""/);
+  assert.match(reference, /Chưa nhận đặt/); assert.match(reference, /class="button outline card-add" disabled=""/);
   assert.match(reference, /Xem mẫu hoa/);
 });
 test('garden with no public messages hides zero counter and has an immediate way to choose flowers', () => {

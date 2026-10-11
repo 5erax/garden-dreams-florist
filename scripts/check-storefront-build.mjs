@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
-import { renderStorefront, renderSitemap } from '../src/storefront-html.js';
+import { renderStorefront, renderSitemap, isSaleProduct } from '../src/storefront-html.js';
 import { catalogReader, storefrontHandler } from '../api/storefront.js';
 const root = new URL('../', import.meta.url);
 await assert.rejects(access(new URL('dist/index.html', root)), { code: 'ENOENT' });
@@ -16,7 +16,7 @@ assert.match(html, /<h1>Hoa tươi Long Thành, Đồng Nai<\/h1>/);
 assert.match(html, /rel="canonical"/);
 const graph = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];
 assert.equal(graph[0]['@type'], 'Florist');
-const sale = snapshot.catalog.products.filter(product => product.active && !product.reference_only);
+const sale = snapshot.catalog.products.filter(product => isSaleProduct(product));
 const sitemap = renderSitemap(snapshot.catalog.products);
 assert.equal((sitemap.match(/<url>/g)||[]).length, sale.length + 1);
 for (const product of snapshot.catalog.products.filter(product=>product.reference_only)) assert.ok(!sitemap.includes('/hoa/' + product.slug + '<'));
@@ -33,7 +33,7 @@ for (const product of snapshot.catalog.products) {
   assert.equal(res.body.match(/name="twitter:image" content="([^"]+)"/)[1], ogImage);
   const productGraph = JSON.parse(res.body.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'][1];
   assert.equal(productGraph['@type'], 'Product');
-  if (product.reference_only) {
+  if (!isSaleProduct(product)) {
     assert.equal(res.headers['X-Robots-Tag'], 'noindex, follow');
     assert.match(res.body, /name="robots" content="noindex,follow"/);
     assert.ok(!productGraph.offers);

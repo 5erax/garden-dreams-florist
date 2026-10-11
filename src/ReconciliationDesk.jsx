@@ -1,4 +1,4 @@
-import { datePresets } from "./admin-ux.js";
+import { formatDate, formatDateTime, datePresets } from "./admin-ux.js";
 import BloomDate from "./BloomDate.jsx";
 import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
@@ -14,11 +14,13 @@ import "./reconciliation-desk.css";
 const paymentFilters = [
   ["ALL", "Mọi trạng thái"],
   ["UNPAID", "Chưa thu đủ"],
-  ["PAID", "Đã nhận tiền"],
+  ["PAID", "Đã thu đủ"],
+  ["PARTIAL","Đã thu một phần"],
+  ["REFUND_PARTIAL","Đã hoàn một phần"],
   ["REFUNDED", "Đã hoàn tiền"],
 ];
-const dateLabel = new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeZone: "Asia/Ho_Chi_Minh" });
-const stampLabel = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" });
+const dateLabel = new Intl.DateTimeFormat("vi-VN", { day:"2-digit",month:"2-digit",year:"numeric", timeZone: "Asia/Ho_Chi_Minh" });
+const stampLabel = new Intl.DateTimeFormat("vi-VN", { day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",hourCycle:"h23", timeZone: "Asia/Ho_Chi_Minh" });
 
 function ReconciliationWorkspace() {
   const today = vietnamDate();
@@ -194,7 +196,7 @@ function ReconciliationWorkspace() {
     <section className="reconciliation-desk" aria-label={`Đối soát đơn ${selected.reference}`}>
       <div className="reconciliation-detail-tools">
         <button ref={detailBack} type="button" className="text-button" onClick={backToQueue}>← Trở về bàn đối soát</button>
-        <button type="button" className="button outline" disabled={detailBusy} onClick={refreshDetail}>{detailBusy ? "Đang cập nhật…" : "Tải lại đơn và số dư"}</button>
+        <button type="button" className="button outline" disabled={detailBusy} onClick={refreshDetail}>{detailBusy ? "Đang cập nhật…" : "Tải lại"}</button>
       </div>
       {detailBusy && <p role="status">Đang lấy thông tin mới nhất…</p>}
       {detailError && <p className="form-error" role="alert">{detailError}</p>}
@@ -214,17 +216,17 @@ function ReconciliationWorkspace() {
     <section className="reconciliation-desk" aria-labelledby="reconciliation-heading">
       <div className="portal-section-heading reconciliation-heading">
         <div><span className="eyebrow">TIỀN THU · TIỀN HOÀN</span><h2 id="reconciliation-heading">Bàn đối soát</h2></div>
-        <button type="button" className="button outline" disabled={queueBusy || reportBusy} onClick={() => { setQueueRevision(value => value + 1); setReportRevision(value => value + 1); }}>Cập nhật toàn bộ</button>
+        <button type="button" className="button outline" disabled={queueBusy || reportBusy} onClick={() => { setQueueRevision(value => value + 1); setReportRevision(value => value + 1); }}>Tải lại</button>
       </div>
       <p className="reconciliation-intro">Kiểm tra tiền COD hoặc tiền về ngân hàng trước khi xác nhận. Ghi nhận trên website lưu sổ đối soát; thao tác hoàn tiền không tự chuyển tiền cho khách.</p>
       <section className="reconciliation-report" aria-labelledby="reconciliation-period-heading" aria-busy={reportBusy}>
-        <div className="reconciliation-report-heading"><div><h3 id="reconciliation-period-heading">Thu và hoàn trong kỳ</h3><p>Theo ngày thực thu / thực hoàn, giờ Việt Nam. Kỳ tối đa 92 ngày.</p></div><div className="reconciliation-quick-period">{datePresets(today).map(([label,from,to])=><button type="button" className="period-preset" key={label} aria-pressed={period.from===from && period.to===to} onClick={()=>applyPeriod(from,to)}>{label}</button>)}<a href="#reconciliation-custom">Tuỳ chọn</a></div></div>
+        <div className="reconciliation-report-heading"><div><h3 id="reconciliation-period-heading">Thu và hoàn trong kỳ</h3><p>Theo ngày thực thu / thực hoàn, giờ Việt Nam. Kỳ tối đa 92 ngày.</p></div><div className="reconciliation-quick-period">{datePresets(today).map(([label,from,to])=><button type="button" className="period-preset" key={label} aria-pressed={period.from===from && period.to===to} onClick={()=>applyPeriod(from,to)}>{label}</button>)}<a className="period-preset" href="#reconciliation-custom">Tuỳ chọn</a></div></div>
         <form id="reconciliation-custom" className="reconciliation-period-form" onSubmit={event => { event.preventDefault(); applyPeriod(draftFrom, draftTo); }}>
           <label>Từ ngày<BloomDate  value={draftFrom} max={draftTo || undefined} required onChange={event => setDraftFrom(event.target.value)} /></label>
           <label>Đến ngày<BloomDate  value={draftTo} min={draftFrom || undefined} required onChange={event => setDraftTo(event.target.value)} /></label>
           <button className="button outline" disabled={reportBusy}>Xem kỳ này</button>
         </form>
-        {reportError && <div className="reconciliation-error" role="alert"><p>{reportError}</p><button type="button" className="text-button" disabled={reportBusy} onClick={() => setReportRevision(value => value + 1)}>Tải lại kỳ đã chọn</button>{report && <p>Số liệu dưới đây là lần tải trước; chưa phải bản cập nhật.</p>}</div>}
+        {reportError && <div className="reconciliation-error" role="alert"><p>{reportError}</p><button type="button" className="text-button" disabled={reportBusy} onClick={() => setReportRevision(value => value + 1)}>Tải lại</button>{report && <p>Số liệu dưới đây là lần tải trước; chưa phải bản cập nhật.</p>}</div>}
         {reportBusy && <BloomLoader compact label="Sổ thu & hoàn tiền" />}
         {report && <>
           <p className="reconciliation-period-caption">Kỳ {dateLabel.format(new Date(period.from + "T12:00:00+07:00"))} — {dateLabel.format(new Date(period.to + "T12:00:00+07:00"))}{reportTime && ` · Tải lúc ${stampLabel.format(reportTime)}`}{reportBusy ? " · Đang cập nhật" : ""}</p>
@@ -234,11 +236,11 @@ function ReconciliationWorkspace() {
             <div><dt>Tiền thu trừ hoàn trong kỳ</dt><dd>{money(report.netCollected)}</dd></div>
           </dl>
           <p className="reconciliation-definition">{report.eventCount} bút toán có ngày trong kỳ. Số âm có thể xuất hiện khi hoàn cho khoản thu của kỳ trước. Đây là dòng tiền đã đối soát; chưa phải doanh thu hoặc lợi nhuận.</p>
-          <div className="reconciliation-legacy"><h4>Số dư chuyển từ dữ liệu cũ</h4><dl><div><dt>Tiền thu cũ chưa xác định ngày</dt><dd>{money(report.legacyReceiptBalance)}</dd></div><div><dt>Tiền hoàn cũ chưa xác định ngày</dt><dd>{money(report.legacyRefundBalance)}</dd></div></dl><p>Các số dư cũ tính toàn bộ lịch sử, không cộng vào kỳ trên vì chưa có ngày thực thu / thực hoàn xác thực.</p></div>
+          <div className="reconciliation-legacy" hidden={!report.legacyReceiptBalance&&!report.legacyRefundBalance}><h4>Số dư chuyển từ dữ liệu cũ</h4><dl><div><dt>Tiền thu cũ chưa xác định ngày</dt><dd>{money(report.legacyReceiptBalance)}</dd></div><div><dt>Tiền hoàn cũ chưa xác định ngày</dt><dd>{money(report.legacyRefundBalance)}</dd></div></dl><p>Các số dư cũ tính toàn bộ lịch sử, không cộng vào kỳ trên vì chưa có ngày thực thu / thực hoàn xác thực.</p></div>
         </>}
       </section>
       <section className="reconciliation-queue" aria-labelledby="reconciliation-queue-heading" aria-busy={queueBusy || !!openingId}>
-        <div className="reconciliation-queue-heading"><h3 ref={queueHeading} tabIndex={-1} id="reconciliation-queue-heading">Đơn cần kiểm tra</h3><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Tải lại danh sách</button></div>
+        <div className="reconciliation-queue-heading"><h3 ref={queueHeading} tabIndex={-1} id="reconciliation-queue-heading">Sổ thanh toán theo đơn</h3><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Tải lại</button></div>
         <p className="reconciliation-definition">Danh sách theo trạng thái tiền và phương thức, độc lập với kỳ báo cáo phía trên. Mở từng đơn để xem chứng cứ và ghi nhận tiền. Ngày sắp xếp là ngày tạo đơn.</p>
         <div className="reconciliation-queue-filters">
           <label>Trạng thái tiền<BloomSelect value={filter} onChange={event => setFilter(event.target.value)}>{paymentFilters.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</BloomSelect></label>
@@ -246,20 +248,20 @@ function ReconciliationWorkspace() {
           <form onSubmit={event => { event.preventDefault(); setQuery(search.trim().toUpperCase()); }}><label>Mã đơn<input value={search} maxLength={40} pattern="GD-[A-Z0-9-]*" onChange={event => setSearch(event.target.value.toUpperCase())} placeholder="GD-…" aria-describedby="reconciliation-search-hint" /></label><button className="button outline">Tìm</button>{query && <button type="button" className="text-button" onClick={() => { setSearch(""); setQuery(""); }}>Xóa mã</button>}</form>
         </div>
         <p id="reconciliation-search-hint" className="reconciliation-definition">Tìm theo mã bắt đầu bằng GD-. Danh sách không hiển thị số điện thoại, địa chỉ, người nhận hoặc lời nhắn.</p>
-        {queueError && <div className="reconciliation-error" role="alert"><p>{queueError}</p><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Thử tải lại danh sách</button>{visibleRows.length > 0 && <p>Các đơn bên dưới là lần tải trước, số dư có thể đã thay đổi.</p>}</div>}
+        {queueError && <div className="reconciliation-error" role="alert"><p>{queueError}</p><button type="button" className="text-button" disabled={queueBusy} onClick={() => setQueueRevision(value => value + 1)}>Tải lại</button>{visibleRows.length > 0 && <p>Các đơn bên dưới là lần tải trước, số dư có thể đã thay đổi.</p>}</div>}
         {detailError && <p className="form-error" role="alert">{detailError}</p>}
         {queueBusy && <BloomLoader compact label="Danh sách đối soát" />}
         {openingId && <BloomLoader compact label="Chi tiết đơn hoa" />}
         {loadedQueue === queueFilter && !queueBusy && !queueError && !visibleRows.length && <div className="portal-empty"><h4>Chưa có đơn phù hợp.</h4><p>Đổi trạng thái tiền, phương thức hoặc mã đơn để kiểm tra.</p></div>}
         {!!visibleRows.length && <>
-          <p className="reconciliation-period-caption">Đã tải {visibleRows.length} đơn{queueTime && ` · ${stampLabel.format(queueTime)}`}{queueBusy ? " · Đang cập nhật" : ""}. Số liệu từng đơn gồm toàn bộ bút toán của đơn đó.</p>
+          <p className="reconciliation-period-caption">Hiển thị {visibleRows.length} đơn{queueTime && ` · ${stampLabel.format(queueTime)}`}{queueBusy ? " · Đang cập nhật" : ""}. Số liệu từng đơn gồm toàn bộ bút toán của đơn đó.</p>
           <ul className="reconciliation-orders">{visibleRows.map(row => <li key={row.id}><button type="button" className="reconciliation-order" disabled={queueBusy || !!openingId} onClick={() => openOrder(row)}>
             <div className="reconciliation-order-main"><strong>{row.reference}</strong><span>{stampLabel.format(new Date(row.created_at))}</span><div><span className="status-badge">{paymentStatuses[row.payment_status]}</span><span className="status-badge">{orderStatuses[row.status]}</span><span>{row.payment_method === "COD" ? "COD" : "VietQR"}</span></div></div>
             <dl className="reconciliation-order-balances"><div><dt>Giá trị đơn</dt><dd>{money(row.total)}</dd></div><div><dt>Đã thu / đã hoàn</dt><dd>{money(row.received)} / {money(row.refunded)}</dd></div><div><dt>Tiền giữ lại</dt><dd>{money(row.heldCash)}</dd></div><div><dt>Còn phải thu</dt><dd>{money(row.receivable)}</dd></div></dl>
             <span className="reconciliation-order-open">Mở & đối soát</span>
           </button></li>)}</ul>
         </>}
-        {more && loadedQueue === queueFilter && <div className="reconciliation-pagination"><button type="button" className="button outline" disabled={queueBusy || !!openingId} onClick={() => loadQueue(true)}>Tải thêm 30 đơn</button><p>Danh sách chưa bao gồm tất cả đơn. Báo cáo trong kỳ phía trên được tính tại server, độc lập số trang đã tải.</p></div>}
+        {more && loadedQueue === queueFilter && <div className="reconciliation-pagination"><button type="button" className="button outline" disabled={queueBusy || !!openingId} onClick={() => loadQueue(true)}>Tải thêm 30 đơn</button><p>Danh sách chưa bao gồm tất cả đơn. Báo cáo trong kỳ phía trên được tính trên toàn bộ đơn, không giới hạn trang danh sách.</p></div>}
       </section>
     </section>
   );

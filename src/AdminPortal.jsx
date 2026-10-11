@@ -1,13 +1,14 @@
+import BloomTime from './BloomTime.jsx';
 import BloomMoney from "./BloomMoney.jsx";
 import BloomDate from "./BloomDate.jsx";
 import AdminCatalogTable from "./AdminCatalogTable.jsx";
 import { call } from "./backend.js";
 import BankSettings from "./BankSettings.jsx";
 import AdminMemories from "./AdminMemories.jsx";
-import { downloadCsv } from "./admin-ux.js";
+import { formatDate, downloadCsv } from "./admin-ux.js";
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState, useRef } from "react";
-import { backend, result, orderColumns, orderStatuses } from "./backend.js";
+import { backend, result, orderColumns, orderStatuses, paymentStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import { AuthPanel } from "./PortalShell.jsx";
 import { beforeCursor } from "./cursor.js";
@@ -118,7 +119,7 @@ function AdminWorkspace({ store }) {
           <em>người chăm hoa.</em>
         </h1>
         <p>
-          Tài khoản này chưa có quyền admin. Quyền được cấp từ database, không
+          Tài khoản này chưa có quyền admin. Quyền do chủ cửa hàng cấp, không
           thể tự bật bằng đăng ký hay trình duyệt.
         </p>
         <a href="#account" className="button outline">
@@ -193,7 +194,7 @@ function AdminWorkspace({ store }) {
       setEdit(null);
       await load();
       await store.refresh();
-      setNotice("Đã lưu cấu hình vào database.");
+      setNotice("Đã lưu cấu hình cửa hàng.");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -213,12 +214,10 @@ function AdminWorkspace({ store }) {
       <div className="portal-title">
         <span className="eyebrow">BÀN CHĂM CỬA HÀNG</span>
         <h1>
-          Một cửa hàng.
-          <br />
-          <em>Cả một khu vườn.</em>
+          Quản lý cửa hàng
         </h1>
         <p>
-          Quản lý hoa, giao nhận, phương thức thanh toán và từng lời thương.
+          Theo dõi đơn, hoa, lịch giao và tiền thu.
         </p>
       </div>
       <nav className="admin-tabs" aria-label="Phần quản trị">
@@ -347,17 +346,13 @@ function AdminWorkspace({ store }) {
                     <tr key={row.id}>
                       <td>{row.reference}</td>
                       <td>{row.recipient_name || "Đã xóa thông tin"}</td>
-                      <td>{row.delivery_date}</td>
+                      <td>{formatDate(row.delivery_date)}</td>
                       <td>{row.shipping?.name}</td><td>{row.payment_method==='COD'?'COD':'VietQR'}</td><td>{money(row.total)}</td>
                       <td>
                         {orderStatuses[row.status]}
                         <br />
                         <small>
-                          {row.payment_status === "PAID"
-                            ? "Đã nhận tiền"
-                            : row.payment_status === "REFUNDED"
-                              ? "Đã hoàn"
-                              : "Chưa nhận tiền"}
+                          {paymentStatuses[row.payment_status]}
                         </small>
                       </td>
                       <td>
@@ -373,8 +368,8 @@ function AdminWorkspace({ store }) {
                 </tbody>
               </table>
             </div>
-            <p className="fineprint">Đã tải {rows.length} đơn; nút xuất chỉ xuất các đơn đang tải trong bộ lọc này.</p>
-            <button className="button outline" disabled={!rows.length || busy} onClick={()=>downloadCsv([['Mã đơn','Ngày giao','Khu vực','Phương thức','Trạng thái','Tổng'],...rows.map(row=>[row.reference,row.delivery_date,row.shipping?.name,row.payment_method,orderStatuses[row.status],row.total])],'garden-dreams-orders.csv')}>Xuất đơn đã tải</button>
+            <p className="fineprint">Hiển thị {rows.length} đơn; xuất CSV chỉ bao gồm trang đơn này.</p>
+            <button className="button outline" disabled={!rows.length || busy} onClick={()=>downloadCsv([['Mã đơn','Ngày giao','Khu vực','Phương thức','Trạng thái','Tổng'],...rows.map(row=>[row.reference,row.delivery_date,row.shipping?.name,row.payment_method,orderStatuses[row.status],row.total])],'garden-dreams-orders.csv')}>Xuất trang đơn này</button>
             {!rows.length && !busy && <p>Chưa có đơn phù hợp.</p>}
             {more && (
               <button
@@ -387,7 +382,7 @@ function AdminWorkspace({ store }) {
             )}
           </>
         ))}
-      {tab==='products' && !edit && <AdminCatalogTable rows={rows} busy={busy} onEdit={row=>setEdit({...row,images:row.images||[]})} onPatch={quickPatch} onBulk={bulk} onReorder={async ids=>{setBusy(true);try{await call('gd_reorder_products',{p_ids:ids});await load();await store.refresh();}catch(e){setError(e.message);}finally{setBusy(false);}}} />}
+      {tab==='products' && !edit && <AdminCatalogTable rows={rows} busy={busy} onEdit={row=>setEdit({...row,images:row.images||[]})} onPatch={quickPatch} onBulk={bulk} onSlugs={async ids=>{if(busy)return;setBusy(true);try{const amount=await call('gd_generate_product_slugs',{p_ids:ids});setNotice('Đã tạo slug cho '+amount+' mẫu; link mã số cũ vẫn chuyển hướng.');await load();await store.refresh();}catch(e){setError(e.message);}finally{setBusy(false);}}} onReorder={async ids=>{setBusy(true);try{await call('gd_reorder_products',{p_ids:ids});await load();await store.refresh();}catch(e){setError(e.message);}finally{setBusy(false);}}} />}
       {tab === "shipping" && !edit && (
         <div className="admin-items">
           {rows.map((row) => (
@@ -399,7 +394,7 @@ function AdminWorkspace({ store }) {
                 <strong>
                   {money(tab === "products" ? row.price : row.fee)}
                 </strong>
-                <button type="button" role="switch" aria-checked={row.active} disabled={busy} className="status-badge" onClick={()=>quickPatch(row,{active:!row.active})}>{row.active ? "Đang hoạt động" : "Đã tắt"}</button>
+                <button type="button" role="switch" aria-checked={row.active} disabled={busy} className="status-badge" onClick={()=>quickPatch(row,{active:!row.active})}>{row.active ? "Đang hoạt động" : "Ngừng nhận đặt"}</button>
               </div>
               <button className="button outline" disabled={busy} onClick={() => setEdit(
                 tab === "products" && store.features.productAlbum ? { ...row, images: row.images || [] } : row,
@@ -589,8 +584,8 @@ function AdminWorkspace({ store }) {
                   />
                   Đang nhận đơn
                 </label>
-                <div className="form-grid"><label>Mở cửa<input type="time" name="opens_at" defaultValue={item.opens_at?.slice(0,5)||'08:00'} required/></label><label>Đóng cửa<input type="time" name="closes_at" defaultValue={item.closes_at?.slice(0,5)||'17:00'} required/></label><label>Ngày dự kiến mở lại<BloomDate name="reopens_on" defaultValue={item.reopens_on||''}/></label><label>Thông báo khi tạm nghỉ<input name="closed_message" defaultValue={item.closed_message||''} maxLength={500}/></label></div>
-                <label>Chính sách đổi trả<textarea name="returns_policy" defaultValue={item.returns_policy||''} maxLength={4000} rows={6}/></label><div className="form-grid"><label>Tên pháp lý (khi đã có)<input name="legal_name" defaultValue={item.legal_name||''} maxLength={200}/></label><label>Mã đăng ký kinh doanh (khi đã có)<input name="registration_number" defaultValue={item.registration_number||''} maxLength={80}/></label></div>
+                <div className="form-grid"><label>Mở cửa<BloomTime name="opens_at" defaultValue={item.opens_at?.slice(0,5)||'08:00'}/></label><label>Đóng cửa<BloomTime name="closes_at" defaultValue={item.closes_at?.slice(0,5)||'17:00'}/></label><label>Ngày dự kiến mở lại<BloomDate name="reopens_on" defaultValue={item.reopens_on||''}/></label><label>Thông báo khi tạm nghỉ<input placeholder="Ví dụ: Shop tạm nghỉ; liên hệ Zalo để được hỗ trợ." name="closed_message" defaultValue={item.closed_message||''} maxLength={500}/></label></div>
+                <label>Chính sách đổi trả<textarea rows={8} onInput={event=>{event.target.style.height='auto';event.target.style.height=event.target.scrollHeight+'px';}} name="returns_policy" defaultValue={item.returns_policy||''} maxLength={4000}/></label><div className="form-grid"><label>Tên pháp lý (khi đã có)<input name="legal_name" defaultValue={item.legal_name||''} maxLength={200}/></label><label>Mã đăng ký kinh doanh (khi đã có)<input name="registration_number" defaultValue={item.registration_number||''} maxLength={80}/></label></div>
                 <h3>Thanh toán</h3>
                 <label className="check-label">
                   <input
@@ -618,15 +613,15 @@ function AdminWorkspace({ store }) {
             )}
             <div className="form-actions">
               <button className="button primary">
-                Lưu {tab === "shop" ? "cửa hàng" : "thay đổi"}
+                {tab === "shop" ? "Lưu cửa hàng" : tab === "products" ? edit?.id ? "Lưu bó hoa" : "Tạo bó hoa" : edit?.id ? "Lưu khu vực giao" : "Tạo khu vực giao"}
               </button>
               {edit && (
                 <button
-                  className="text-button"
+                  className="button outline"
                   type="button"
                   onClick={() => setEdit(null)}
                 >
-                  Hủy chỉnh sửa
+                  Hủy
                 </button>
               )}
             </div>
@@ -637,7 +632,7 @@ function AdminWorkspace({ store }) {
         key={edit.id} productId={edit.id} disabled={busy} onBusyChange={setBusy} onSaved={store.refresh}
       />}
       <p className="fineprint">
-        Quyền được kiểm tra trong database cho mọi thao tác. Giá và phí mới chỉ
+        Chỉ nhân viên được phân quyền mới thay đổi cấu hình. Giá và phí mới chỉ
         áp dụng cho đơn đặt sau khi lưu.
       </p>
       </>}

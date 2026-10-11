@@ -21,7 +21,7 @@ export function hasMemoryEligibility(order) {
 }
 
 export function needsBankPayment(order) {
-  return order.payment_method === "VIETQR" && order.payment_status === "UNPAID" && order.status !== "CANCELLED";
+  return order.payment_method === "VIETQR" && ["UNPAID","PARTIAL"].includes(order.payment_status) && order.status !== "CANCELLED";
 }
 
 export function historySummary(orders) {

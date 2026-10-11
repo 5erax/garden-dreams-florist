@@ -64,6 +64,7 @@ test('internal notes are private, append-only and idempotent without customer ti
 });
 test('collection metrics change only after reconciliation and refund, cancelled unpaid orders are excluded',async()=>{
   let first=orders[0];
+  first=await as(admin,()=>rpc('gd_update_order',[first.id,first.version,'CONFIRMED','UNPAID','']));
   first=await as(admin,()=>rpc('gd_update_order',[first.id,first.version,'CONFIRMED','PAID','Fixture receipt verified']));
   let second=orders[1];second=await as(admin,()=>rpc('gd_update_order',[second.id,second.version,'CANCELLED','UNPAID','']));
   let totals=await as(admin,()=>rpc('gd_operations_summary',[day]));
