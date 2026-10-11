@@ -35,7 +35,8 @@ test('work queues and summaries are admin-only and omit private card/address/ban
   }
   const rows=await as(admin,()=>rpc('gd_operations_queue',['PENDING',day,'',null,null,30]));
   assert.equal(rows.length,3);
-  assert.doesNotMatch(JSON.stringify(rows),/PRIVATE CARD|Địa chỉ giả|recipient_phone|request_body|bank/);
+  assert.equal(rows[0].recipient_phone,"0900000000");
+  assert.doesNotMatch(JSON.stringify(rows),/PRIVATE CARD|Địa chỉ giả|request_body|bank/);
   const totals=await as(admin,()=>rpc('gd_operations_summary',[day]));
   assert.equal(totals.pending,3);assert.equal(totals.outstanding,1170000);assert.equal(totals.heldCash,0);
 });

@@ -62,7 +62,7 @@ export function PortalShell({ children, cartCount = 0, onCart }) {
         {shop.name} · Những lời thương được giữ lại.
         <a href={`tel:${shop.phone}`}>{displayPhone(shop.phone)}</a>
         <a href={`https://zalo.me/${shop.phone.replace(/^\+84/, '0')}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
-        <address>{shop.address || shopAddress}</address>
+        <address>{shop.address || shopAddress}</address><span className="shop-hours">Mở cửa {(shop.opens_at||'08:00').slice(0,5)}–{(shop.closes_at||'17:00').slice(0,5)}</span>
       </footer>
     </div>
   );
@@ -84,6 +84,7 @@ export function BackendNotice() {
 }
 export function AuthPanel() {
   const { connected } = useStore();
+  const [showPassword,setShowPassword]=useState(false);
   const [mode, setMode] = useState("login"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -132,7 +133,7 @@ export function AuthPanel() {
   }
   return (
     <section className="auth-card" aria-busy={busy}>
-      <span className="eyebrow">YOUR LITTLE CORNER</span>
+      <span className="eyebrow">GÓC NHỎ CỦA BẠN</span>
       <h1>
         {mode === "reset" ? "Khôi phục" : mode === "signup" ? "Bắt đầu một" : "Trở về"}
         <br />
@@ -156,7 +157,7 @@ export function AuthPanel() {
               Mật khẩu
               <input
                 name="password"
-                type="password"
+                type={showPassword?"text":"password"}
                 autoComplete={
                   mode === "signup" ? "new-password" : "current-password"
                 }
@@ -166,6 +167,7 @@ export function AuthPanel() {
               />
             </label>
           )}
+          {mode!=="reset" && <button type="button" className="text-button password-toggle" aria-pressed={showPassword} onClick={()=>setShowPassword(value=>!value)}>{showPassword?"Ẩn mật khẩu":"Hiện mật khẩu"}</button>}
           {error && (
             <p className="form-error" role="alert">
               {error}
@@ -191,7 +193,7 @@ export function AuthPanel() {
       <div className="auth-options">
         {mode !== "signup" && (
           <button
-            className="text-button"
+            className="button outline"
             disabled={busy}
             onClick={() => {
               setMode("signup");
@@ -214,8 +216,7 @@ export function AuthPanel() {
         )}
       </div>
       <small>
-        Phiên đăng nhập chỉ được giữ trong bộ nhớ của tab. Cửa hàng không lưu
-        mật khẩu hay token trong localStorage.
+        Phiên đăng nhập được giữ trong tab này để bạn quay lại sau khi mở ứng dụng ngân hàng hoặc tải lại trang. Đóng tab sẽ kết thúc việc lưu phiên trong tab; dùng thiết bị chung hãy đăng xuất khi xong. Mật khẩu không được lưu trên website.
       </small>
     </section>
   );

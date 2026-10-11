@@ -1,5 +1,12 @@
+import BloomMoney from "./BloomMoney.jsx";
+import BloomDate from "./BloomDate.jsx";
+import AdminCatalogTable from "./AdminCatalogTable.jsx";
+import { call } from "./backend.js";
+import BankSettings from "./BankSettings.jsx";
+import AdminMemories from "./AdminMemories.jsx";
+import { downloadCsv } from "./admin-ux.js";
 import BloomSelect from "./BloomSelect.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { backend, result, orderColumns, orderStatuses } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import { AuthPanel } from "./PortalShell.jsx";
@@ -18,15 +25,15 @@ import { readAdminTab } from './admin-navigation.js';
 const newProduct = {
   name: "",
   occasion: "Sinh nhật",
-  price: 390000,
+  price: "",
   stems: "",
   description: "",
-  image: "/flowers/bouquet_1.webp",
+  image: "",
   images: [],
-  active: true,
+  active: false,
   featured: false,
 };
-const newShipping = { name: "", area: "", fee: 0, active: false };
+const newShipping = { name: "", area: "", fee: "", active: false };
 export default function AdminPortal() {
   const store = useStore();
   return <AdminWorkspace key={`${store.session?.user.id || "signed-out"}:${Boolean(store.isAdmin)}:${Boolean(store.connected)}`} store={store} />;
@@ -44,6 +51,9 @@ function AdminWorkspace({ store }) {
     [selected, setSelected] = useState(null),
     [more, setMore] = useState(false),
     [filter, setFilter] = useState("");
+  const [deskQueue,setDeskQueue]=useState('ALL');
+  const requestedEdit=useRef(null), requestSequence=useRef(0);
+  const [search,setSearch]=useState('');
   useEffect(() => {
     if (store.isAdmin && store.connected) {
       try { sessionStorage.setItem(`gd-admin-tab:${store.session.user.id}`, tab); } catch {}
@@ -51,16 +61,14 @@ function AdminWorkspace({ store }) {
   }, [tab, store.isAdmin, store.connected, store.session?.user.id]);
   async function load(append = false) {
     if (!store.isAdmin) return;
-    if (["dashboard", "calendar", "desk", "reconciliation", "inventory"].includes(tab)) return;
+    if (["dashboard", "calendar", "desk", "reconciliation", "inventory", "memories"].includes(tab)) return;
+    const request=++requestSequence.current;
     setBusy(true);
     setError("");
     try {
       if (tab === "shop") {
-        setRows([
-          await result(
-            backend.from("gd_shop").select("*").eq("id", 1).single(),
-          ),
-        ]);
+        const shop=await result(backend.from("gd_shop").select("*").eq("id",1).single());
+        if(request===requestSequence.current)setRows([shop]);
         return;
       }
       let query = backend
@@ -72,9 +80,12 @@ function AdminWorkspace({ store }) {
           .order("id", { ascending: false })
           .limit(31);
         if (filter) query = query.eq("status", filter);
+        if(search)query=query.ilike('reference',search.toUpperCase().replace(/[^A-Z0-9-]/g,'')+'%');
         if (append) query = beforeCursor(query, rows.at(-1));
-      } else query = query.order(tab === "products" ? "id" : "name");
+      } else query = query.order(tab === "products" ? "sort_order" : "fee").order("id");
       const data = await result(query);
+      if(request!==requestSequence.current)return;
+      if(tab==='products' && requestedEdit.current){setEdit(data.find(row=>row.id===requestedEdit.current)||null);requestedEdit.current=null;}
       setMore(tab === "orders" && data.length > 30);
       setRows((old) =>
         append
@@ -84,9 +95,9 @@ function AdminWorkspace({ store }) {
             : data,
       );
     } catch (e) {
-      setError(e.message);
+      if(request===requestSequence.current)setError(e.message);
     } finally {
-      setBusy(false);
+      if(request===requestSequence.current)setBusy(false);
     }
   }
   useEffect(() => {
@@ -95,7 +106,8 @@ function AdminWorkspace({ store }) {
     setSelected(null);
     setNotice("");
     if (store.isAdmin) load();
-  }, [tab, filter, store.isAdmin]);
+    return()=>{requestSequence.current++;};
+  }, [tab, filter, search, store.isAdmin]);
   if (!store.session) return <AuthPanel />;
   if (!store.isAdmin)
     return (
@@ -126,10 +138,13 @@ function AdminWorkspace({ store }) {
         fields = {
           name: f.name.trim(),
           occasion: f.occasion,
+          slug: f.slug.trim(),
+          occasions: new FormData(event.currentTarget).getAll('occasions'),
+          image_alts: edit.image_alts || {},
           price: Number(f.price),
           stems: f.stems.trim(),
           description: f.description.trim(),
-          image: f.image.trim(),
+          image: f.image.trim() || "/flowers/flower-pending.svg",
           active: f.active === "on",
           featured: f.featured === "on",
           ...(store.features.productAlbum ? { images: edit.images || [] } : {}),
@@ -154,6 +169,7 @@ function AdminWorkspace({ store }) {
           bank_account: f.bank_account.trim(),
           bank_name: f.bank_name.trim(),
           account_name: f.account_name.trim(),
+          opens_at:f.opens_at,closes_at:f.closes_at,closed_message:f.closed_message.trim(),reopens_on:f.reopens_on||null,returns_policy:f.returns_policy.trim(),legal_name:f.legal_name.trim(),registration_number:f.registration_number.trim(),
         };
       const table = tab === "shop" ? "gd_shop" : "gd_" + tab;
       let row;
@@ -184,11 +200,18 @@ function AdminWorkspace({ store }) {
       setBusy(false);
     }
   }
+  async function patch(row,fields,refresh=true) {
+    const changed=await result(backend.from('gd_'+tab).update(fields).eq('id',row.id).eq('version',row.version).select('*').maybeSingle());
+    if(!changed)throw Error('Dữ liệu đã đổi. Tải lại trước khi sửa.');
+    if(refresh){await load();await store.refresh();}
+  }
+  async function quickPatch(row,fields){if(busy)return;setBusy(true);setError('');try{await patch(row,fields);}catch(e){setError(e.message);}finally{setBusy(false);}}
+  async function bulk(ids,active){if(busy)return;setBusy(true);setError('');let done=0;try{for(const row of rows.filter(row=>ids.includes(row.id))){await patch(row,{active},false);done++;}setNotice('Đã cập nhật '+done+' mẫu.');}catch(e){setError('Đã lưu '+done+' mẫu; dừng ở mẫu lỗi. '+e.message);}finally{await load();await store.refresh();setBusy(false);}}
   const item = tab === "shop" ? rows[0] : edit;
   return (
     <>
       <div className="portal-title">
-        <span className="eyebrow">THE FLORIST DESK</span>
+        <span className="eyebrow">BÀN CHĂM CỬA HÀNG</span>
         <h1>
           Một cửa hàng.
           <br />
@@ -205,6 +228,7 @@ function AdminWorkspace({ store }) {
           ["products", "Bộ sưu tập"],
           ["shipping", "Giao hoa"],
           ["shop", "Cửa hàng & thanh toán"],
+          ["memories", "Vườn kỷ niệm"],
           ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
           ...(store.features.operationsDesk ? [["desk", "Bàn xử lý đơn"]] : []),
           ...(store.features.reconciliationLedger ? [["reconciliation", "Đối soát tiền"]] : []),
@@ -220,8 +244,8 @@ function AdminWorkspace({ store }) {
           </button>
         ))}
       </nav>
-      {tab === "dashboard" ? <BusinessDashboard /> : tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
-      <div className="portal-section-heading">
+      {tab === "memories" ? <AdminMemories /> : tab === "dashboard" ? <BusinessDashboard onNavigate={(next,id)=>{requestedEdit.current=typeof id==='number'?id:null;if(next==='desk')setDeskQueue(id==='OVERDUE'?'OVERDUE':'ALL');setTab(next);}} /> : tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk initialQueue={deskQueue} /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
+      {!selected && <div className="portal-section-heading">
         <h2>
           {tab === "orders"
             ? "Đơn hoa"
@@ -232,6 +256,7 @@ function AdminWorkspace({ store }) {
                 : "Thông tin cửa hàng"}
         </h2>
         <div>
+          {tab === "orders" && <label>Tìm mã đơn<input type="search" value={search} onChange={event=>setSearch(event.target.value)} placeholder="GD-…" maxLength={40}/></label>}
           {tab === "orders" && (
             <label className="inline-label">
               Trạng thái
@@ -271,6 +296,7 @@ function AdminWorkspace({ store }) {
           )}
         </div>
       </div>
+      }
       {error && (
         <p className="form-error" role="alert">
           {error}
@@ -311,7 +337,7 @@ function AdminWorkspace({ store }) {
                     <th>Mã đơn</th>
                     <th>Người nhận</th>
                     <th>Ngày giao</th>
-                    <th>Tổng</th>
+                    <th>Khu vực</th><th>Thanh toán</th><th>Tổng</th>
                     <th>Trạng thái</th>
                     <th />
                   </tr>
@@ -322,7 +348,7 @@ function AdminWorkspace({ store }) {
                       <td>{row.reference}</td>
                       <td>{row.recipient_name || "Đã xóa thông tin"}</td>
                       <td>{row.delivery_date}</td>
-                      <td>{money(row.total)}</td>
+                      <td>{row.shipping?.name}</td><td>{row.payment_method==='COD'?'COD':'VietQR'}</td><td>{money(row.total)}</td>
                       <td>
                         {orderStatuses[row.status]}
                         <br />
@@ -347,6 +373,8 @@ function AdminWorkspace({ store }) {
                 </tbody>
               </table>
             </div>
+            <p className="fineprint">Đã tải {rows.length} đơn; nút xuất chỉ xuất các đơn đang tải trong bộ lọc này.</p>
+            <button className="button outline" disabled={!rows.length || busy} onClick={()=>downloadCsv([['Mã đơn','Ngày giao','Khu vực','Phương thức','Trạng thái','Tổng'],...rows.map(row=>[row.reference,row.delivery_date,row.shipping?.name,row.payment_method,orderStatuses[row.status],row.total])],'garden-dreams-orders.csv')}>Xuất đơn đã tải</button>
             {!rows.length && !busy && <p>Chưa có đơn phù hợp.</p>}
             {more && (
               <button
@@ -359,7 +387,8 @@ function AdminWorkspace({ store }) {
             )}
           </>
         ))}
-      {["products", "shipping"].includes(tab) && !edit && (
+      {tab==='products' && !edit && <AdminCatalogTable rows={rows} busy={busy} onEdit={row=>setEdit({...row,images:row.images||[]})} onPatch={quickPatch} onBulk={bulk} onReorder={async ids=>{setBusy(true);try{await call('gd_reorder_products',{p_ids:ids});await load();await store.refresh();}catch(e){setError(e.message);}finally{setBusy(false);}}} />}
+      {tab === "shipping" && !edit && (
         <div className="admin-items">
           {rows.map((row) => (
             <article key={row.id}>
@@ -370,7 +399,7 @@ function AdminWorkspace({ store }) {
                 <strong>
                   {money(tab === "products" ? row.price : row.fee)}
                 </strong>
-                <small>{row.active ? "Đang bật" : "Đã tắt"}</small>
+                <button type="button" role="switch" aria-checked={row.active} disabled={busy} className="status-badge" onClick={()=>quickPatch(row,{active:!row.active})}>{row.active ? "Đang hoạt động" : "Đã tắt"}</button>
               </div>
               <button className="button outline" disabled={busy} onClick={() => setEdit(
                 tab === "products" && store.features.productAlbum ? { ...row, images: row.images || [] } : row,
@@ -413,26 +442,21 @@ function AdminWorkspace({ store }) {
                   </label>
                   <label>
                     Giá VNĐ
-                    <input
-                      name="price"
-                      type="number"
-                      step="1"
-                      min="1000"
-                      max="100000000"
-                      defaultValue={item.price}
-                      required
-                    />
+                    <BloomMoney name="price" defaultValue={item.price} min={1000} max={100000000} required/>
                   </label>
                   <label>
-                    Hoa trong bó
+                    Hoa trong bó {item.recipe_managed && '· lấy từ công thức tiêu chuẩn'}
                     <input
                       name="stems"
+                      readOnly={item.recipe_managed}
                       maxLength={200}
                       defaultValue={item.stems}
                       required
                     />
                   </label>
                 </div>
+                <label>Đường dẫn riêng (slug)<input name="slug" defaultValue={item.slug || ''} pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={100} placeholder="ma-hong-bo-hong-phan"/><small>Bỏ trống khi tạo để dùng mã mặc định. Link bo-hoa-ID cũ vẫn chuyển về đường dẫn mới.</small></label>
+                <fieldset className="occasion-tags"><legend>Các dịp phù hợp</legend>{['Sinh nhật','Tình yêu','Chúc mừng','Cưới hỏi','20/10','8/3','20/11','Khai trương','Chia buồn'].map(name=><label className="check-label" key={name}><input type="checkbox" name="occasions" value={name} defaultChecked={(item.occasions?.length?item.occasions:[item.occasion]).includes(name)}/>{name}</label>)}</fieldset>
                 <label>
                   Mô tả
                   <textarea
@@ -441,7 +465,7 @@ function AdminWorkspace({ store }) {
                     defaultValue={item.description}
                   />
                 </label>
-                <label>
+                <details className="advanced-image"><summary>Ảnh bìa từ đường dẫn · Nâng cao</summary><label>
                   {item.images?.length ? "Ảnh bìa (ảnh đầu album)" : "Ảnh bìa dự phòng (đường dẫn /flowers/ hoặc URL HTTPS)"}
                   <input
                     name="image"
@@ -449,11 +473,12 @@ function AdminWorkspace({ store }) {
                     value={item.images?.[0] || item.image}
                     readOnly={Boolean(item.images?.length)}
                     onChange={(e) => setEdit(old => ({ ...old, image: e.target.value }))}
-                    required
                   />
                 </label>
+                </details>
                 {store.features.productAlbum && <ProductPhotosEditor
                   images={item.images || []}
+                  alts={item.image_alts||{}} onAltChange={image_alts=>setEdit(old=>({...old,image_alts}))}
                   onChange={(images) => setEdit(old => ({ ...old, images }))}
                   onBusyChange={setBusy}
                 />}
@@ -471,7 +496,7 @@ function AdminWorkspace({ store }) {
                     type="checkbox"
                     defaultChecked={item.featured}
                   />
-                  Đánh dấu được yêu thích
+                  Mẫu nổi bật
                 </label>
               </>
             )}
@@ -500,15 +525,7 @@ function AdminWorkspace({ store }) {
                 </label>
                 <label>
                   Phí giao VNĐ
-                  <input
-                    name="fee"
-                    type="number"
-                    min="0"
-                    max="10000000"
-                    step="1"
-                    defaultValue={item.fee}
-                    required
-                  />
+                  <BloomMoney name="fee" defaultValue={item.fee} min={0} max={10000000} required/>
                 </label>
                 <label className="check-label">
                   <input
@@ -527,12 +544,7 @@ function AdminWorkspace({ store }) {
             )}
             {tab === "shop" && (
               <>
-                {Object.hasOwn(item, "address") && (
-                  <label>
-                    Địa chỉ cửa hàng
-                    <input name="address" minLength={10} maxLength={300} defaultValue={item.address} required />
-                  </label>
-                )}
+                <h3>Cửa hàng & thanh toán</h3>
                 <div className="form-grid">
                   <label>
                     Tên cửa hàng
@@ -555,6 +567,12 @@ function AdminWorkspace({ store }) {
                     />
                   </label>
                 </div>
+                {Object.hasOwn(item, "address") && (
+                  <label>
+                    Địa chỉ cửa hàng
+                    <input name="address" minLength={10} maxLength={300} defaultValue={item.address} required />
+                  </label>
+                )}
                 <label>
                   Giới thiệu
                   <textarea
@@ -569,8 +587,10 @@ function AdminWorkspace({ store }) {
                     type="checkbox"
                     defaultChecked={item.accepting_orders}
                   />
-                  Mở nhận yêu cầu đặt hoa thật
+                  Đang nhận đơn
                 </label>
+                <div className="form-grid"><label>Mở cửa<input type="time" name="opens_at" defaultValue={item.opens_at?.slice(0,5)||'08:00'} required/></label><label>Đóng cửa<input type="time" name="closes_at" defaultValue={item.closes_at?.slice(0,5)||'17:00'} required/></label><label>Ngày dự kiến mở lại<BloomDate name="reopens_on" defaultValue={item.reopens_on||''}/></label><label>Thông báo khi tạm nghỉ<input name="closed_message" defaultValue={item.closed_message||''} maxLength={500}/></label></div>
+                <label>Chính sách đổi trả<textarea name="returns_policy" defaultValue={item.returns_policy||''} maxLength={4000} rows={6}/></label><div className="form-grid"><label>Tên pháp lý (khi đã có)<input name="legal_name" defaultValue={item.legal_name||''} maxLength={200}/></label><label>Mã đăng ký kinh doanh (khi đã có)<input name="registration_number" defaultValue={item.registration_number||''} maxLength={80}/></label></div>
                 <h3>Thanh toán</h3>
                 <label className="check-label">
                   <input
@@ -588,41 +608,7 @@ function AdminWorkspace({ store }) {
                   />
                   Chuyển khoản VietQR
                 </label>
-                <div className="form-grid">
-                  <label>
-                    Tên ngân hàng
-                    <input
-                      name="bank_name"
-                      maxLength={80}
-                      defaultValue={item.bank_name}
-                    />
-                  </label>
-                  <label>
-                    Mã BIN ngân hàng (6 số)
-                    <input
-                      name="bank_bin"
-                      pattern="[0-9]{6}|^$"
-                      maxLength={6}
-                      defaultValue={item.bank_bin}
-                    />
-                  </label>
-                  <label>
-                    Số tài khoản nhận tiền
-                    <input
-                      name="bank_account"
-                      maxLength={32}
-                      defaultValue={item.bank_account}
-                    />
-                  </label>
-                  <label>
-                    Tên chủ tài khoản
-                    <input
-                      name="account_name"
-                      maxLength={100}
-                      defaultValue={item.account_name}
-                    />
-                  </label>
-                </div>
+                <BankSettings item={item} />
                 <p className="fineprint">
                   Cấu hình ngân hàng là thông tin nhận chuyển khoản, được hiển
                   thị cho khách. Không nhập mật khẩu ngân hàng hay API secret.

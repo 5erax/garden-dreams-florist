@@ -1,22 +1,24 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { backend, backendError, verifyEnvironment } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import { albumLimit, prepareProductImage } from "./product-images.js";
 
-export default function ProductPhotosEditor({ images, onChange, onBusyChange }) {
+export default function ProductPhotosEditor({ images, onChange, onBusyChange, alts={}, onAltChange }) {
   const store = useStore();
+  const uploading=useRef(false);
   const [error, setError] = useState("");
   const [progress, setProgress] = useState("");
   async function upload(event) {
-    const files = [...event.currentTarget.files];
-    event.currentTarget.value = "";
+    if(uploading.current)return;
+    const files = Array.isArray(event) ? event : [...event.currentTarget.files];
+    if (!Array.isArray(event)) event.currentTarget.value = "";
     if (!files.length) return;
     setError("");
     if (images.length + files.length > albumLimit) {
       setError("Mỗi bó hoa có tối đa 8 ảnh. Chọn ít ảnh hơn hoặc bỏ bớt ảnh trong album.");
       return;
     }
-    onBusyChange(true);
+    uploading.current=true;onBusyChange(true);
     let next = [...images];
     try {
       const runtime = await verifyEnvironment();
@@ -38,7 +40,7 @@ export default function ProductPhotosEditor({ images, onChange, onBusyChange }) 
     } catch (e) {
       setProgress("");
       setError(e instanceof Error ? e.message : "Chưa xử lý được ảnh. Thử lại với ảnh khác.");
-    } finally { onBusyChange(false); }
+    } finally { uploading.current=false;onBusyChange(false); }
   }
   function move(index, direction) {
     const next = [...images];
@@ -54,6 +56,7 @@ export default function ProductPhotosEditor({ images, onChange, onBusyChange }) 
         {images.map((src, index) => <li key={src}>
           <img src={src} alt={`Ảnh ${index + 1} của bó hoa`} loading="lazy" decoding="async" />
           <span>{index === 0 ? "Ảnh bìa" : `Ảnh ${index + 1}`}</span>
+          <label>Mô tả ảnh<input value={alts[src]||''} maxLength={200} onChange={event=>onAltChange?.({...alts,[src]:event.target.value})} placeholder="Loại hoa, màu sắc, góc chụp"/></label>
           <div>
             <button type="button" disabled={index === 0} aria-label={`Đưa ảnh ${index + 1} lên trước`} onClick={() => move(index, -1)}>←</button>
             <button type="button" disabled={index === images.length - 1} aria-label={`Đưa ảnh ${index + 1} về sau`} onClick={() => move(index, 1)}>→</button>
@@ -62,9 +65,9 @@ export default function ProductPhotosEditor({ images, onChange, onBusyChange }) 
         </li>)}
       </ol>}
       {!images.length && <p className="fineprint">Album trống: bó hoa dùng ảnh bìa dự phòng bên trên.</p>}
-      {store.features.productImageUpload ? <label>
-        Thêm ảnh ({images.length}/{albumLimit})
-        <input type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= albumLimit} onChange={upload} />
+      {store.features.productImageUpload ? <label className="photo-upload-zone" onDragOver={event=>event.preventDefault()} onDrop={event=>{event.preventDefault();upload([...event.dataTransfer.files]);}}>
+        Kéo ảnh vào đây hoặc chọn ảnh ({images.length}/{albumLimit})
+        <span className="button outline">Chọn ảnh từ thiết bị</span><input className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={images.length >= albumLimit} onChange={upload} />
         <span className="fineprint">JPEG, PNG, WebP · tối đa 20 MB/ảnh. Ảnh được thu nhỏ và nén trước khi tải lên.</span>
       </label> : <p className="fineprint">Upload chưa được kết nối. Bạn vẫn có thể sắp xếp album hiện có.</p>}
       {progress && <p role="status">{progress}</p>}

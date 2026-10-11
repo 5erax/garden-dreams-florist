@@ -19,7 +19,7 @@ test('product URL remains stable after rename and only exact known paths resolve
 });
 test('server HTML exposes actual catalog price, canonical and escaped Product/Florist structured data',()=>{
   const html=renderStorefront({template,shop,products:[product],product});
-  assert.match(html,/<h1>Giấc mơ mẫu đơn<\/h1>/);
+  assert.match(html,/<h1>Giấc mơ mẫu đơn — bó mẫu đơn hồng<\/h1>/);
   assert.match(html,/890/);assert.match(html,/<link rel="canonical" href="https:\/\/garden-dreams-florist.vercel.app\/hoa\/bo-hoa-6">/);
   assert.ok(!html.includes('<script>alert(1)</script>'));
   const graph=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])['@graph'];

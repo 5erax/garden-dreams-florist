@@ -100,6 +100,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
         <div className="receipt">
           <span className="eyebrow">LIÊN HỆ GARDEN DREAMS</span>
           <h2>Bó hoa bạn chọn,<br /><em>cửa hàng sẽ tư vấn.</em></h2>
+          {shop.closed_message && <p>{shop.closed_message}{shop.reopens_on && ` Dự kiến mở lại ${shop.reopens_on}.`}</p>}
           <p>Đặt hoa trực tuyến đang được chuẩn bị. Liên hệ cửa hàng để trao đổi về bó hoa và ngày giao; chưa có đơn nào được gửi từ bước này.</p>
           <address>{shop.address || shopAddress}</address>
           <p>{deliveryCopy(shipping)}. Shop xác nhận địa chỉ và mức phí trước khi nhận giao.</p>
@@ -177,6 +178,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               {service && <p className="fineprint">{service.area}. Shop xác nhận địa chỉ và lịch giao trước khi nhận đơn.</p>}
               <DeliveryPicker shippingId={shippingId} calendar={features.deliveryCalendar} initialDate={draft?.deliveryDate} initialTime={draft?.deliveryTime}
                 onReady={setScheduleReady} revision={scheduleRevision} />
+              <h3>Người đặt để shop liên hệ</h3><div className="form-grid"><label>Tên người đặt<input name="buyerName" defaultValue={draft?.buyerName||''} minLength={2} maxLength={80} required autoComplete="name"/></label><label>Điện thoại người đặt<input name="buyerPhone" type="tel" defaultValue={draft?.buyerPhone||''} maxLength={20} pattern="(0|\+84)[35789][0-9]{8}" required autoComplete="tel"/></label></div>
               <h3>Hoa gửi đến ai?</h3>
               <div className="form-grid">
                 <label>

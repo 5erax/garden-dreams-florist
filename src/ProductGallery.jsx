@@ -13,7 +13,7 @@ export default function ProductGallery({ product }) {
   return <div className="product-detail-photo product-gallery">
     <div className="product-gallery-main">
       {src && !failed.has(src) ?
-        <img src={src} alt={`Bó hoa ${product.name}, ảnh ${selected + 1}`} decoding="async" onError={() => markFailed(src)} /> :
+        <img src={src} alt={product.image_alts?.[src] || `Bó hoa ${product.name}, ảnh ${selected + 1}`} decoding="async" onError={() => markFailed(src)} /> :
         <div className="product-photo-placeholder"><Icon name="flower" /><span>Ảnh đang cập nhật</span></div>}
     </div>
     {!credit && src && !src.endsWith('-pending.svg') && <p className="photo-disclosure">Ảnh minh họa mẫu hoa. Hoa thực tế có thể khác theo mùa; shop trao đổi trước nếu cần thay đổi.</p>}

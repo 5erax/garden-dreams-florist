@@ -56,7 +56,7 @@ export function StoreProvider({ children }) {
       setEnvironmentVerified(true);
       const [cfg, catalog, services, variants] = await Promise.all([
         result(backend.from("gd_shop").select("*").eq("id", 1).single()),
-        result(backend.from("gd_products").select("*").order("id")),
+        result(backend.from("gd_products").select("*").order("sort_order").order("id")),
         result(backend.from("gd_shipping").select("*").order("name")),
         runtime.features?.variantOrders ? result(backend.from("gd_product_variants").select("*").eq("active", true).order("id")) : [],
       ]);

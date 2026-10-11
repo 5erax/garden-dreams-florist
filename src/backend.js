@@ -10,13 +10,14 @@ export const backendReady = Boolean(url && key);
 // Capture the callback marker before the SDK consumes and clears its fragment.
 export const authCallbackPending =
   typeof window !== "undefined" && isAuthCallback(window.location);
-let deviceStorage;
+let deviceStorage, tabStorage;
 try { deviceStorage = globalThis.localStorage; } catch {}
+try { tabStorage = globalThis.sessionStorage; } catch {}
 const storageKey = backendReady ? `sb-${new URL(url).hostname.split(".")[0]}-auth-token` : "gd-demo-session";
-export const guestSessionStorage = guestStorage(storageKey, deviceStorage);
+export const guestSessionStorage = guestStorage(storageKey, deviceStorage, tabStorage);
 export const backend = backendReady
   ? createClient(url, key, {
-      // Only explicitly remembered guest sessions persist; regular accounts stay in memory.
+      // Only explicitly remembered guest sessions persist; regular accounts persist only in their current tab.
       auth: {
         persistSession: true,
         storageKey,
@@ -152,4 +153,4 @@ export const paymentStatuses = {
   REFUNDED: "Đã ghi nhận hoàn tiền",
 };
 export const orderColumns =
-  "id,reference,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";
+  "id,reference,buyer_name,buyer_phone,recipient_name,recipient_phone,address,card_message,delivery_date,delivery_time,items,subtotal,shipping,total,payment_method,bank,status,payment_status,version,created_at,updated_at,contacts_erased_at,is_test";

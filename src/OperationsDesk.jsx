@@ -1,3 +1,4 @@
+import { deliveryRemaining } from "./admin-ux.js";
 import BloomDate from "./BloomDate.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useRef, useState } from "react";
@@ -7,13 +8,21 @@ import { money } from "./catalog.js";
 import OrderDetail from "./OrderDetail.jsx";
 import StaffNotes from "./StaffNotes.jsx";
 
-const queues=[['ALL','Tất cả'],['PENDING','Chờ xác nhận'],['CONFIRMED','Đã nhận'],['PREPARING','Đang bó'],['SHIPPING','Đang giao'],['COLLECTION','Cần đối soát'],['DELIVERED','Đã giao'],['CANCELLED','Đã hủy']];
-export default function OperationsDesk() {
-  const [day,setDay]=useState(vietnamDate()),[queue,setQueue]=useState('ALL'),[search,setSearch]=useState(''),[query,setQuery]=useState('');
+const queues=[['ALL','Tất cả'],['OVERDUE','Qua ngày giao'],['PENDING','Chờ xác nhận'],['PACKING','Cần bó hoa'],['CONFIRMED','Đã xác nhận'],['PREPARING','Đang bó hoa'],['SHIPPING','Đang giao'],['COLLECTION','Cần đối soát'],['DELIVERED','Đã giao'],['CANCELLED','Đã hủy']];
+export default function OperationsDesk({initialQueue='ALL'}) {
+  const [day,setDay]=useState(initialQueue==='OVERDUE'?'':vietnamDate()),[queue,setQueue]=useState(initialQueue),[search,setSearch]=useState(''),[query,setQuery]=useState('');
   const [rows,setRows]=useState([]),[summary,setSummary]=useState(null),[selected,setSelected]=useState(null);
   const [loadedKey,setLoadedKey]=useState('');
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[more,setMore]=useState(false),[revision,setRevision]=useState(0);
-  const sequence=useRef(0);
+  const sequence=useRef(0),pendingPrint=useRef(null);
+  const [now,setNow]=useState(Date.now());
+  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
+  useEffect(()=>{if(selected && pendingPrint.current===selected.id){pendingPrint.current=null;document.documentElement.dataset.printOrder=selected.id;window.print();delete document.documentElement.dataset.printOrder;}},[selected?.id]);
+  async function confirmOrder(order){if(busy)return;setBusy(true);setError('');try{await call('gd_update_order',{p_id:order.id,p_version:order.version,p_status:'CONFIRMED',p_payment:order.payment_status,p_note:''});setRevision(value=>value+1);}catch(e){setError(e.message);}finally{setBusy(false);}}
+  async function openOrder(order,print=false){
+    const key=filterKey,request=++sequence.current;setBusy(true);setError('');
+    try{const detail=await result(backend.from('gd_orders').select(orderColumns).eq('id',order.id).single());if(sequence.current===request&&current.current===key){if(print)pendingPrint.current=detail.id;setSelected(detail);}}catch(e){if(sequence.current===request&&current.current===key)setError(e.message);}finally{if(sequence.current===request&&current.current===key)setBusy(false);}
+  }
   const filterKey=`${queue}:${day}:${query}:${revision}`;
   const current=useRef(filterKey);current.current=filterKey;
   async function load(append=false) {
@@ -53,30 +62,23 @@ export default function OperationsDesk() {
       </form>
     </div>
     {summary && loadedKey===filterKey && <div className="operations-metrics" aria-label={`Công việc ngày ${summary.day}`}>
-      <article><span>Chờ xác nhận</span><strong>{summary.pending}</strong></article>
-      <article><span>Cần bó hoa</span><strong>{summary.preparing}</strong></article>
-      <article><span>Đang giao</span><strong>{summary.shipping}</strong></article>
-      <article><span>Cần đối soát</span><strong>{summary.needsCollection}</strong></article>
-      <article><span>Tiền đã ghi nhận, chưa hoàn</span><strong>{money(summary.heldCash)}</strong></article>
-      <article><span>Còn cần thu</span><strong>{money(summary.outstanding)}</strong></article>
+      <button aria-pressed={queue==='PENDING'} onClick={()=>setQueue('PENDING')}><span>Chờ xác nhận</span><strong>{summary.pending}</strong></button>
+      <button onClick={()=>setQueue('PACKING')}><span>Cần bó hoa</span><strong>{summary.preparing}</strong></button>
+      <button aria-pressed={queue==='SHIPPING'} onClick={()=>setQueue('SHIPPING')}><span>Đang giao</span><strong>{summary.shipping}</strong></button>
+      <button aria-pressed={queue==='COLLECTION'} onClick={()=>setQueue('COLLECTION')}><span>Cần đối soát</span><strong>{summary.needsCollection}</strong></button>
+      <article><span>Tiền đang giữ</span><strong>{money(summary.heldCash)}</strong></article>
+      <article><span>Còn phải thu</span><strong>{money(summary.outstanding)}</strong></article>
     </div>}
     <p className="fineprint">Tổng theo ngày giao {day || 'hôm nay'}, độc lập bộ lọc hàng đợi. Tiền đã ghi nhận không phải lợi nhuận; chỉ thay đổi khi admin đối soát. Môi trường thử chỉ hiển thị dữ liệu thử.</p>
-    <nav className="operations-queues" aria-label="Hàng đợi công việc">{queues.map(([key,label])=><button key={key} aria-pressed={queue===key} onClick={()=>setQueue(key)}>{label}</button>)}</nav>
+    <nav className="operations-queues" aria-label="Hàng đợi công việc">{queues.map(([key,label])=><button key={key} aria-pressed={queue===key} onClick={()=>setQueue(key)}>{label}{summary && key==='PENDING' && ` (${summary.pending})`}{summary && key==='SHIPPING' && ` (${summary.shipping})`}{summary && key==='COLLECTION' && ` (${summary.needsCollection})`}</button>)}</nav>
     {error && <p className="form-error" role="alert">{error}</p>}
     {busy && <BloomLoader compact label="Bàn xử lý đơn" />}
     {!busy && !error && !rows.length && <div className="portal-empty"><h3>Không có đơn trong hàng đợi này.</h3><p>Đổi ngày, bộ lọc hoặc mã đơn để tìm công việc cần xử lý.</p></div>}
-    <div className="operations-orders">{(loadedKey===filterKey ? rows : []).map(order=><button className="operations-order" key={order.id} disabled={busy} onClick={async()=>{
-      const key=filterKey,request=++sequence.current;setBusy(true);setError('');
-      try {
-        const detail=await result(backend.from('gd_orders').select(orderColumns).eq('id',order.id).single());
-        if(sequence.current===request && current.current===key)setSelected(detail);
-      }catch(e){if(sequence.current===request && current.current===key)setError(e.message);}
-      finally{if(sequence.current===request && current.current===key)setBusy(false);}
-    }}>
-      <div><span className="eyebrow">{order.reference}</span><h3>{order.recipient_name || 'Thông tin đã hết hạn lưu'}</h3><p>{order.delivery_date} · {order.delivery_time}</p></div>
-      <div><span className="status-badge">{orderStatuses[order.status]}</span><p>{paymentStatuses[order.payment_status]} · {order.payment_method}</p></div>
-      <div><strong>{money(order.total)}</strong><p>{order.shipping_name}</p><span className="text-link">Xem & xử lý →</span></div>
-    </button>)}</div>
+    <div className="operations-orders">{(loadedKey===filterKey ? rows : []).map(order=><article className="operations-order-wrap" key={order.id}><button className="operations-order" disabled={busy} onClick={()=>openOrder(order)}>
+      <div><span className="eyebrow">{order.reference}</span><h3>{order.recipient_name||'Thông tin đã hết hạn lưu'}</h3><p>{order.delivery_date} · {order.delivery_time}</p>{!['DELIVERED','CANCELLED'].includes(order.status)&&<p>{deliveryRemaining(order,now)}</p>}</div>
+      <div><span className="status-badge">{orderStatuses[order.status]}</span><p><span className="status-badge">{paymentStatuses[order.payment_status]}</span> · {order.payment_method}</p></div><div><strong>{money(order.total)}</strong><p>{order.shipping_name}</p><span className="text-link">Mở và xử lý</span></div></button>
+      <div className="order-tools">{order.status==='PENDING'&&<button className="button primary" disabled={busy} onClick={()=>confirmOrder(order)}>Xác nhận đơn</button>}{(order.buyer_phone||order.recipient_phone)&&<><a className="button outline" href={'tel:'+(order.buyer_phone||order.recipient_phone)}>Gọi {order.buyer_phone?'người đặt':'người nhận'}</a><a className="button outline" href={'https://zalo.me/'+(order.buyer_phone||order.recipient_phone).replace(/^\+84/,'0')} target="_blank" rel="noreferrer">Zalo</a></>}<button className="button outline" disabled={busy} onClick={()=>openOrder(order,true)}>In phiếu giao</button></div>
+    </article>)}</div>
     {more && loadedKey===filterKey && <button className="button outline" disabled={busy} onClick={()=>load(true)}>Tải thêm đơn</button>}
   </section>;
 }

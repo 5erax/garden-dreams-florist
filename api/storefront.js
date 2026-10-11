@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { checkEnvironment } from '../src/environment.js';
-import { productFromPath } from '../src/product-url.js';
+import { productFromPath, productUrl } from '../src/product-url.js';
 import { renderStorefront, renderSitemap } from '../src/storefront-html.js';
 
 export async function publicCatalog(env, fetcher = fetch) {
@@ -18,8 +18,8 @@ export async function publicCatalog(env, fetcher = fetch) {
     if (error.cause?.code !== '42703') throw error;
     return read('gd_shop?select=name,phone,accepting_orders&id=eq.1');
   });
-  const [shops, products] = await Promise.all([shopsRead, read('gd_products?select=id,slug,name,occasion,stems,description,image,price,active,reference_only&or=(active.eq.true,reference_only.eq.true)&order=id.asc')]);
-  if (shops.length !== 1 || !Array.isArray(products) || products.some(item => !Number.isSafeInteger(item.price) || item.price < 0 || !/^bo-hoa-\d+$/.test(item.slug))) throw new Error('CATALOG_INVALID');
+  const [shops, products] = await Promise.all([shopsRead, read('gd_products?select=id,slug,name,occasion,stems,description,image,price,active,reference_only&or=(active.eq.true,reference_only.eq.true)&order=sort_order.asc,id.asc')]);
+  if (shops.length !== 1 || !Array.isArray(products) || products.some(item => !Number.isSafeInteger(item.price) || item.price < 0 || !(/^[a-z0-9]+(-[a-z0-9]+)*$/.test(item.slug) && item.slug.length<=100))) throw new Error('CATALOG_INVALID');
   return { shop: shops[0], products };
 }
 
@@ -50,7 +50,7 @@ export function storefrontHandler({ catalog = readCatalog, template = () => read
   return async (req, res) => {
     if (!['GET', 'HEAD'].includes(req.method)) return res.status(405).setHeader('Allow', 'GET, HEAD').end();
     const path = req.query?.path || '/';
-    if (typeof path !== 'string' || !/^\/(?:hoa\/bo-hoa-[1-9]\d*\/?|sitemap\.xml)?$/.test(path)) return res.status(404).end('Không tìm thấy trang.');
+    if (typeof path !== 'string' || !/^\/(?:hoa\/[a-z0-9]+(?:-[a-z0-9]+)*\/?|sitemap\.xml)?$/.test(path)) return res.status(404).end('Không tìm thấy trang.');
     try {
       const data = await catalog();
       const noindex = preview();
@@ -60,6 +60,7 @@ export function storefrontHandler({ catalog = readCatalog, template = () => read
       if (path === '/sitemap.xml') return res.setHeader('Content-Type', 'application/xml; charset=utf-8').send(req.method === 'HEAD' ? '' : renderSitemap(data.products));
       const product = path === '/' ? undefined : productFromPath(path, data.products);
       if (path !== '/' && !product) return res.status(404).setHeader('Cache-Control', 'no-store').send('Bó hoa này hiện không được bán.');
+      if(product && path.replace(/\/$/,'')!==productUrl(product))return res.status(301).setHeader('Location',productUrl(product)).end();
       if (product?.reference_only && !noindex) res.setHeader('X-Robots-Tag', 'noindex, follow');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.send(req.method === 'HEAD' ? '' : renderStorefront({ template: await template(), ...data, product, preview: noindex }));
