@@ -36,6 +36,7 @@ export function StoreProvider({ children }) {
     [products, setProducts] = useState(initialCatalog?.products || demoProducts),
     [shipping, setShipping] = useState([]);
   const [session, setSession] = useState(null),
+    [authReady, setAuthReady] = useState(!backendReady),
     [adminUserId, setAdminUserId] = useState(null),
     [loading, setLoading] = useState(backendReady),
     [error, setError] = useState("");
@@ -76,10 +77,14 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     if (!backend) return;
     let active = true;
+    let sessionObserved = false;
     const {
       data: { subscription },
     } = backend.auth.onAuthStateChange((event, next) => {
+      if (!active) return;
+      sessionObserved = true;
       setSession(next);
+      setAuthReady(true);
       setAdminUserId(current => sessionIsAdmin(next, current) ? current : null);
       if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY")
         setAuthError("");
@@ -114,7 +119,13 @@ export function StoreProvider({ children }) {
         );
         window.dispatchEvent(new Event("hashchange"));
       });
-    backend.auth.getSession().then(({ data }) => setSession(data.session));
+    backend.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      if (!sessionObserved) setSession(data.session);
+      setAuthReady(true);
+    }).catch(() => {
+      if (active) setAuthReady(true);
+    });
     return () => {
       active = false;
       subscription.unsubscribe();
@@ -151,6 +162,7 @@ export function StoreProvider({ children }) {
         shipping,
         features,
         session,
+        authReady,
         isAdmin: sessionIsAdmin(session, adminUserId),
         loading,
         error,

@@ -17,22 +17,27 @@ test('real auth subscription keeps admin identity on same-user focus events and 
           export const useCallback=value=>value;`;
         if(id.replaceAll('\\','/').endsWith('/src/backend.js'))return `export const backendReady=true,appEnvironment='local',authCallbackPending=false;
           export const result=x=>x,verifyEnvironment=async()=>({features:{}}),guestCheckoutEnabled=async()=>false;
-          export const backend={auth:{onAuthStateChange(listener){globalThis.gdAuthHarness.listener=listener;return {data:{subscription:{unsubscribe(){}}}};},initialize:async()=>({}),getSession:async()=>({data:{session:{user:{id:'alice'}}}})}};`;
+          export const backend={auth:{onAuthStateChange(listener){globalThis.gdAuthHarness.listener=listener;return {data:{subscription:{unsubscribe(){}}}};},initialize:async()=>({}),getSession:()=>new Promise(resolve=>globalThis.gdAuthHarness.resolveSession=resolve)}};`;
       }},react()],server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
   try{
     const {StoreProvider}=await server.ssrLoadModule('/src/Store.jsx');
     StoreProvider({children:null});
-    harness.states[4]='alice';
+    assert.equal(harness.states[4],false);
+    harness.states[5]='alice';
     const cleanup=harness.effects[1]();
     for(const event of ['SIGNED_IN','TOKEN_REFRESHED']){
       harness.listener(event,{user:{id:'alice'}});
-      assert.equal(harness.states[4],'alice');
+      assert.equal(harness.states[5],'alice');
     }
     harness.listener('SIGNED_IN',{user:{id:'bob'}});
-    assert.equal(harness.states[4],null);
-    harness.states[4]='bob';
+    assert.equal(harness.states[5],null);
+    assert.equal(harness.states[4],true);
+    harness.resolveSession({data:{session:{user:{id:'alice'}}}});
+    await Promise.resolve();
+    assert.equal(harness.states[3].user.id,'bob');
+    harness.states[5]='bob';
     harness.listener('SIGNED_OUT',null);
-    assert.equal(harness.states[4],null);
+    assert.equal(harness.states[5],null);
     cleanup();
   }finally{await server.close();delete globalThis.gdAuthHarness;}
 });
