@@ -1,6 +1,6 @@
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useInView } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import StoryPhoto from './StoryPhoto.jsx';
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartChoice, cartKey, removeOrderedItems,vietnamDate } from "./order.js";
@@ -50,7 +50,7 @@ function Reveal({ children, className = "" }) {
       initial={reduced ? false : { transform: "translateY(12px)" }}
       whileInView={{ transform: "translateY(0px)" }}
       viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+      transition={{ duration: reduced ? 0 : 0.35, ease: [0.23, 1, 0.32, 1] }}
     >
       {children}
     </motion.div>
@@ -61,15 +61,11 @@ function Hero() {
   const { shop } = useStore();
   const [first, ...rest] = shop.name.split(/\s+/);
   const reduced = useReducedMotion();
-  const heroRef = useRef(null);
-  const inView = useInView(heroRef, { amount: 0.05 });
   return (
     <section
       className="hero"
-      ref={heroRef}
-      data-in-view={inView}
       id="home"
-      aria-label="Garden Dreams — Hoa mang lời thương"
+      aria-label="Garden Dreams · Hoa mang lời thương"
     >
       <div className="hero-video">
         <img
@@ -80,41 +76,17 @@ function Hero() {
           fetchPriority="high"
         />
       </div>
-      <div className="hero-shade" />
-      <img
-        className="flower-frame frame-left"
-        src="/flowers/cherry_blossom_frame.webp"
-        alt=""
-      />
-      <img
-        className="flower-frame frame-right"
-        src="/flowers/cherry_blossom_frame.webp"
-        alt=""
-      />
-      <div className="petals" aria-hidden="true">
-        {Array.from({ length: 6 }, (_, i) => (
-          <i
-            key={i}
-            style={{
-              "--left": `${(i * 23 + 9) % 100}%`,
-              "--delay": `${-i * 2.7}s`,
-              "--duration": `${15 + (i % 5)}s`,
-            }}
-          />
-        ))}
-      </div>
       <motion.div
         className="hero-copy"
-        initial={reduced ? false : { opacity: 0, transform: "translateY(12px)" }}
-        animate={{ opacity: 1, transform: "translateY(0px)" }}
-        transition={{ duration: 0.65, ease: [0.23, 1, 0.32, 1] }}
+        initial={reduced ? false : { transform: "translateY(12px)" }}
+        animate={{ transform: "translateY(0px)" }}
+        transition={{ duration: reduced ? 0 : 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
         <p className="eyebrow">Hoa tươi · Long Thành, Đồng Nai</p>
         <h1>
           {first}
           <br />
           <em>{rest.join(" ")}</em>
-          <span className="hero-star">✳</span>
         </h1>
         <p className="hero-subtitle">
           Một chút dịu dàng,

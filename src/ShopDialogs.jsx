@@ -12,12 +12,14 @@ import { deliveryCopy } from './delivery-copy.js';
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
   useEffect(() => {
+    const element = dialog.current;
     const previous = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    dialog.current.dataset.motion = previous?.matches?.(":focus-visible") ? "none" : "enter";
-    dialog.current.showModal();
+    element.dataset.motion = previous?.matches?.(":focus-visible") ? "none" : "enter";
+    element.showModal();
     return () => {
+      element.close();
       document.body.style.overflow = previousOverflow;
       previous?.focus();
     };
