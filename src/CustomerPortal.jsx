@@ -49,6 +49,7 @@ function HistoryCard({ order, onOpen, buttonRef }) {
 }
 
 function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
+  const {isAdmin}=useStore();
   const ownerId = session.user.id;
   const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -190,15 +191,7 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
     setPayment("ALL");
   }
 
-  return (
-    <>
-      <div className="portal-title">
-        <span className="eyebrow">Góc nhỏ của bạn</span>
-        <h1>Những bó hoa.<br /><em>Những lời thương.</em></h1>
-        <p>Lịch sử mua hoa được giữ riêng cho bạn. Theo dõi bó hoa, xem lại lời nhắn và tự chọn kỷ niệm muốn chia sẻ.</p>
-      </div>
-      {session.user.is_anonymous && <GuestAccount />}
-      {(recovery || (!session.user.is_anonymous && session.user.user_metadata?.gd_needs_password)) && (
+  const passwordForm = (recovery || (!session.user.is_anonymous && session.user.user_metadata?.gd_needs_password)) && (
         <form className="auth-card" onSubmit={password} aria-busy={passwordBusy}>
           <h2>Đặt mật khẩu mới</h2>
           <p>Chọn mật khẩu từ 12 ký tự, khác mật khẩu hiện tại.</p>
@@ -208,7 +201,17 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
           </fieldset>
           {passwordError && <p className="form-error" role="alert">{passwordError}</p>}
         </form>
-      )}
+      );
+  if(isAdmin) return <>{passwordForm}{notice && <p role="status" className="portal-notice">{notice}</p>}</>;
+  return (
+    <>
+      <div className="portal-title">
+        <span className="eyebrow">Góc nhỏ của bạn</span>
+        <h1>Những bó hoa.<br /><em>Những lời thương.</em></h1>
+        <p>Lịch sử mua hoa được giữ riêng cho bạn. Theo dõi bó hoa, xem lại lời nhắn và tự chọn kỷ niệm muốn chia sẻ.</p>
+      </div>
+      {session.user.is_anonymous && <GuestAccount />}
+      {passwordForm}
       {notice && <p role="status" className="portal-notice">{notice}</p>}
       {selected ? (
         <section className="customer-history-detail" aria-label={`Đơn ${selected.reference}`}>
