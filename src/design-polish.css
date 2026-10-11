@@ -1,8 +1,10 @@
 /* Editorial storefront; compact, stationary controls for daily shop work. */
 :root { --muted: #6f605b; --surface: #fffdfb; --radius: 8px; }
 body { text-rendering: optimizeLegibility; }
-.header, .header.is-scrolled { height: 80px; color: var(--ink); background: var(--cream); border-bottom-color: var(--line); transition: none; }
-.header nav, .header.is-scrolled nav { border: 0; background: transparent; backdrop-filter: none; padding: 12px 0; gap: 32px; }
+.header { height: 80px; color: var(--ink); background: transparent; border-bottom-color: transparent; transition: background-color 200ms ease, border-color 200ms ease; }
+.header.is-scrolled { height: 80px; background: #f8f3eef2; border-bottom-color: var(--line); }
+.header nav { border: 1px solid #392d2930; background: #ffffff55; backdrop-filter: blur(14px); padding: 12px 24px; gap: 32px; }
+.header.is-scrolled nav { border-color: var(--line); background: transparent; backdrop-filter: none; }
 .header nav a { font-size: 14px; padding-block: 10px; }
 .header .cart-count { background: #eee0df; color: var(--rose); }
 .header .icon-button:hover { background: #eee0df; }

@@ -50,7 +50,6 @@
 }
 .hero-star, .flower-frame { animation: none; }
 .hero[data-in-view="false"] .petals i { animation-play-state: paused; }
-.petals i { animation-iteration-count: 1; }
 .cart-trigger .cart-count { transition: background-color 160ms ease, color 160ms ease; }
 .cart-trigger.has-new-items .cart-count { background: var(--pink); color: var(--ink); }
 .product-reveal { min-width: 0; opacity: 1; transform: none; }

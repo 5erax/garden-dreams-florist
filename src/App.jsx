@@ -1,6 +1,6 @@
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, useInView } from "motion/react";
 import StoryPhoto from './StoryPhoto.jsx';
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartChoice, cartKey, removeOrderedItems,vietnamDate } from "./order.js";
@@ -61,9 +61,13 @@ function Hero() {
   const { shop } = useStore();
   const [first, ...rest] = shop.name.split(/\s+/);
   const reduced = useReducedMotion();
+  const heroRef = useRef(null);
+  const inView = useInView(heroRef, { amount: 0.05 });
   return (
     <section
       className="hero"
+      ref={heroRef}
+      data-in-view={inView}
       id="home"
       aria-label="Garden Dreams · Hoa mang lời thương"
     >
@@ -75,6 +79,18 @@ function Hero() {
           height="1024"
           fetchPriority="high"
         />
+      </div>
+      <div className="petals" aria-hidden="true">
+        {Array.from({ length: 6 }, (_, i) => (
+          <i
+            key={i}
+            style={{
+              "--left": `${(i * 23 + 9) % 100}%`,
+              "--delay": `${-i * 2.7}s`,
+              "--duration": `${15 + (i % 5)}s`,
+            }}
+          />
+        ))}
       </div>
       <motion.div
         className="hero-copy"
