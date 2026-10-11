@@ -12,4 +12,4 @@ Còn cần dữ liệu shop: tồn thật, công thức từng mẫu/cỡ, ảnh
 
 Chưa hoàn tất các đề xuất mở rộng: địa chỉ có cấu trúc, nhãn tên từng nhân viên và rút ngắn mã đơn cũ. Mã mới đã ngắn; mã cũ giữ để khách tra cứu. Chưa đo Core Web Vitals hoặc kiểm tra giao diện bằng trình duyệt trong đợt này do quyền truy cập bị chặn.
 
-Kết quả triển khai: 198/198 kiểm tra qua; build production và staging qua, 40 trang sản phẩm/16 URL sitemap. Production đã READY. Kiểm tra SMTP thực tế trả EAUTH: Gmail không chấp nhận mật khẩu ứng dụng đã lưu. Chưa bật Cron hoặc gửi email thử; hàng đợi giữ đơn mới trong lúc chờ thông tin xác thực hợp lệ.
+Kết quả triển khai: 198/198 kiểm tra qua; build production và staging qua, 40 trang sản phẩm/16 URL sitemap. Production đã READY. Sau khi thay mật khẩu ứng dụng và redeploy production, kiểm tra SMTP trả 200 smtpVerified=true; email kiểm tra trả 200 smtpAccepted=true tới dha260803@gmail.com. Đã bật Cron garden-dreams-order-email mỗi phút (job 2). Gmail đã nhận yêu cầu gửi; chưa xác nhận thư vào Inbox hay Spam.
