@@ -136,6 +136,7 @@ export default function App() {
     session,
     authReady,
     isAdmin,
+    recovery,
     loading,
     error: storeError,
   } = useStore();
@@ -325,7 +326,7 @@ export default function App() {
         ))}
   </>;
   if (isAdmin) return <PortalShell>
-    {isProductPage && pageProduct ? <ProductDialog key={pageProduct.id} inline readOnly shipping={shipping} product={pageProduct} /> :
+    {recovery || session.user.user_metadata?.gd_needs_password ? <RouteBoundary load={loadCustomer} title="Đặt mật khẩu quản trị" /> : isProductPage && pageProduct ? <ProductDialog key={pageProduct.id} inline readOnly shipping={shipping} product={pageProduct} /> :
     <RouteBoundary key={session.user.id} load={loadAdmin} title="Quản trị cửa hàng" />}
   </PortalShell>;
   if (

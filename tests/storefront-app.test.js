@@ -54,6 +54,11 @@ test('admin account uses the workspace on the homepage and product previews have
  const home=renderToStaticMarkup(createElement(App));
  assert.doesNotMatch(home,/id="home"|id="collection"|Mở giỏ hoa|hero-cta/);
  assert.match(home,/Quản trị cửa hàng/);
+ globalThis.storefrontFixture.recovery=true;
+ const reset=renderToStaticMarkup(createElement(App));
+ assert.match(reset,/Đặt mật khẩu quản trị/);
+ assert.doesNotMatch(reset,/Mở giỏ hoa|hero-cta/);
+ globalThis.storefrontFixture.recovery=false;
  globalThis.location={pathname:'/hoa/bo-hoa-1',hash:''};
  const detail=renderToStaticMarkup(createElement(App));
  assert.match(detail,/product-page/);
