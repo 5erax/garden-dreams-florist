@@ -8,7 +8,7 @@ export default function FlowerComparison({ products, onClose, onChoose, onRemove
   return <Modal title="So sánh những bó hoa" onClose={onClose} className="flower-comparison">
     <span className="eyebrow">CHỌN MỘT LỜI THƯƠNG</span><h2>Đặt những bó hoa cạnh nhau.</h2>
     <p>So sánh tối đa ba mẫu. Giá dưới đây chưa gồm phí giao; mở mẫu để chọn cỡ bó.</p>
-    <div className="comparison-grid">{products.map(p => <article key={p.id}>
+    <div className="comparison-grid" style={{"--comparison-columns": Math.max(1, products.length)}}>{products.map(p => <article key={p.id}>
       <ProductGallery product={p} />
       <h3>{p.name}</h3><p>{p.occasion || 'Hoa tặng'}</p>
       <strong>{money(p.price)}</strong><small>{p.reference_only ? 'Giá dự kiến · chưa bán' : 'Giá cỡ tiêu chuẩn'}</small>
