@@ -11,6 +11,8 @@ test('notification authentication, SMTP ambiguity and successful dispatch',async
  assert.deepEqual(await (await handle(request('abcd','verify'))).json(),{smtpVerified:true});
  assert.deepEqual(await (await handle(request('abcd','dispatch'))).json(),{sent:1,failed:1});
  assert.deepEqual(outcomes,[[1,'SENT'],[2,'UNKNOWN']]);
+ const badSmtp=notificationHandler({secret:'abcd',verify:async()=>{throw Object.assign(Error('private SMTP details'),{code:'EAUTH'});}});
+ assert.deepEqual(await (await badSmtp(request('abcd','verify'))).json(),{error:'NOTIFICATION_FAILED',code:'EAUTH'});
 });
 
 test('outbox is private, leases once, strips customer information and finishes once',async()=>{
