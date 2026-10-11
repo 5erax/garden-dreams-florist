@@ -1,3 +1,5 @@
+import AdminNavigation from './AdminNavigation.jsx';
+import ShopPolicy from './ShopPolicy.jsx';
 import BloomTime from './BloomTime.jsx';
 import BloomMoney from "./BloomMoney.jsx";
 import BloomDate from "./BloomDate.jsx";
@@ -210,7 +212,7 @@ function AdminWorkspace({ store }) {
   async function bulk(ids,active){if(busy)return;setBusy(true);setError('');let done=0;try{for(const row of rows.filter(row=>ids.includes(row.id))){await patch(row,{active},false);done++;}setNotice('Đã cập nhật '+done+' mẫu.');}catch(e){setError('Đã lưu '+done+' mẫu; dừng ở mẫu lỗi. '+e.message);}finally{await load();await store.refresh();setBusy(false);}}
   const item = tab === "shop" ? rows[0] : edit;
   return (
-    <>
+    <div className="admin-workspace">
       <div className="portal-title">
         <span className="eyebrow">BÀN CHĂM CỬA HÀNG</span>
         <h1>
@@ -220,29 +222,8 @@ function AdminWorkspace({ store }) {
           Theo dõi đơn, hoa, lịch giao và tiền thu.
         </p>
       </div>
-      <nav className="admin-tabs" aria-label="Phần quản trị">
-        {[
-          ["dashboard", "Tổng quan & thống kê"],
-          ["orders", "Đơn hoa"],
-          ["products", "Bộ sưu tập"],
-          ["shipping", "Giao hoa"],
-          ["shop", "Cửa hàng & thanh toán"],
-          ["memories", "Vườn kỷ niệm"],
-          ...(store.features.deliveryCalendar ? [["calendar", "Lịch giao"]] : []),
-          ...(store.features.operationsDesk ? [["desk", "Bàn xử lý đơn"]] : []),
-          ...(store.features.reconciliationLedger ? [["reconciliation", "Đối soát tiền"]] : []),
-          ...(store.features.inventory ? [["inventory", "Kho & công thức"]] : []),
-        ].map(([key, name]) => (
-          <button
-            key={key}
-            disabled={busy}
-            aria-pressed={tab === key}
-            onClick={() => setTab(key)}
-          >
-            {name}
-          </button>
-        ))}
-      </nav>
+      <AdminNavigation tab={tab} features={store.features} busy={busy} onChange={setTab} />
+      <div className="admin-content">
       {tab === "memories" ? <AdminMemories /> : tab === "dashboard" ? <BusinessDashboard onNavigate={(next,id)=>{requestedEdit.current=typeof id==='number'?id:null;if(next==='desk')setDeskQueue(id==='OVERDUE'?'OVERDUE':'ALL');setTab(next);}} /> : tab === "inventory" ? <AdminInventory /> : tab === "calendar" ? <AdminDelivery /> : tab === "desk" ? <OperationsDesk initialQueue={deskQueue} /> : tab === "reconciliation" ? <ReconciliationDesk /> : <>
       {!selected && <div className="portal-section-heading">
         <h2>
@@ -428,7 +409,7 @@ function AdminWorkspace({ store }) {
                     />
                   </label>
                   <label>
-                    Dịp tặng
+                    Dịp hiển thị chính
                     <BloomSelect name="occasion" defaultValue={item.occasion}>
                       {occasions.slice(1).map((o) => (
                         <option key={o}>{o}</option>
@@ -450,8 +431,8 @@ function AdminWorkspace({ store }) {
                     />
                   </label>
                 </div>
-                <label>Đường dẫn riêng (slug)<input name="slug" defaultValue={item.slug || ''} pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={100} placeholder="ma-hong-bo-hong-phan"/><small>Bỏ trống khi tạo để dùng mã mặc định. Link bo-hoa-ID cũ vẫn chuyển về đường dẫn mới.</small></label>
-                <fieldset className="occasion-tags"><legend>Các dịp phù hợp</legend>{['Sinh nhật','Tình yêu','Chúc mừng','Cưới hỏi','20/10','8/3','20/11','Khai trương','Chia buồn'].map(name=><label className="check-label" key={name}><input type="checkbox" name="occasions" value={name} defaultChecked={(item.occasions?.length?item.occasions:[item.occasion]).includes(name)}/>{name}</label>)}</fieldset>
+                <label>Đường dẫn riêng (slug)<input name="slug" defaultValue={item.slug || ''} pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={100} placeholder="ma-hong-bo-hong-phan"/><small>Bỏ trống khi tạo để dùng đường dẫn từ tên bó hoa. Link bo-hoa-ID cũ vẫn chuyển về đường dẫn mới.</small></label>
+                <fieldset className="occasion-tags"><legend>Các dịp dùng để lọc</legend>{['Sinh nhật','Tình yêu','Chúc mừng','Cưới hỏi','20/10','8/3','20/11','Khai trương','Chia buồn'].map(name=><label className="check-label" key={name}><input type="checkbox" name="occasions" value={name} defaultChecked={(item.occasions?.length?item.occasions:[item.occasion]).includes(name)}/>{name}</label>)}</fieldset>
                 <label>
                   Mô tả
                   <textarea
@@ -539,7 +520,7 @@ function AdminWorkspace({ store }) {
             )}
             {tab === "shop" && (
               <>
-                <h3>Cửa hàng & thanh toán</h3>
+                <h3 className="form-section-title">Thông tin cửa hàng</h3>
                 <div className="form-grid">
                   <label>
                     Tên cửa hàng
@@ -576,6 +557,7 @@ function AdminWorkspace({ store }) {
                     defaultValue={item.about}
                   />
                 </label>
+                <h3 className="form-section-title">Giờ hoạt động</h3>
                 <label className="check-label">
                   <input
                     name="accepting_orders"
@@ -585,8 +567,9 @@ function AdminWorkspace({ store }) {
                   Đang nhận đơn
                 </label>
                 <div className="form-grid"><label>Mở cửa<BloomTime name="opens_at" defaultValue={item.opens_at?.slice(0,5)||'08:00'}/></label><label>Đóng cửa<BloomTime name="closes_at" defaultValue={item.closes_at?.slice(0,5)||'17:00'}/></label><label>Ngày dự kiến mở lại<BloomDate name="reopens_on" defaultValue={item.reopens_on||''}/></label><label>Thông báo khi tạm nghỉ<input placeholder="Ví dụ: Shop tạm nghỉ; liên hệ Zalo để được hỗ trợ." name="closed_message" defaultValue={item.closed_message||''} maxLength={500}/></label></div>
-                <label>Chính sách đổi trả<textarea rows={8} onInput={event=>{event.target.style.height='auto';event.target.style.height=event.target.scrollHeight+'px';}} name="returns_policy" defaultValue={item.returns_policy||''} maxLength={4000}/></label><div className="form-grid"><label>Tên pháp lý (khi đã có)<input name="legal_name" defaultValue={item.legal_name||''} maxLength={200}/></label><label>Mã đăng ký kinh doanh (khi đã có)<input name="registration_number" defaultValue={item.registration_number||''} maxLength={80}/></label></div>
-                <h3>Thanh toán</h3>
+                <h3 className="form-section-title">Chính sách & thông tin pháp lý</h3>
+                <ShopPolicy key={item.version} value={item.returns_policy||''} /><div className="form-grid"><label>Tên pháp lý (khi đã có)<input name="legal_name" defaultValue={item.legal_name||''} maxLength={200}/></label><label>Mã đăng ký kinh doanh (khi đã có)<input name="registration_number" defaultValue={item.registration_number||''} maxLength={80}/></label></div>
+                <h3 className="form-section-title">Thanh toán</h3>
                 <label className="check-label">
                   <input
                     name="cod_enabled"
@@ -636,6 +619,7 @@ function AdminWorkspace({ store }) {
         áp dụng cho đơn đặt sau khi lưu.
       </p>
       </>}
-    </>
+      </div>
+    </div>
   );
 }

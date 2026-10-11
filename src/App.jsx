@@ -1,6 +1,7 @@
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useInView } from "motion/react";
+import StoryPhoto from './StoryPhoto.jsx';
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartChoice, cartKey, removeOrderedItems,vietnamDate } from "./order.js";
 import { useCustomerCart } from './customer-cart.js';
@@ -580,27 +581,15 @@ export default function App() {
                 alt=""
                 loading="lazy"
               />
-              <figure className="story-photo first">
-                <img
-                  width="720" height="900" src="/media/story-4.jpg"
-                  alt="Một khu vườn xanh, nơi những mầm hoa bắt đầu"
-                  loading="lazy"
-                />
-                <figcaption>01 — Từ thiên nhiên</figcaption>
-              </figure>
+              <StoryPhoto className="first" src="/media/story-4.jpg"
+                alt="Một khu vườn xanh, nơi những mầm hoa bắt đầu" caption="01 — Từ thiên nhiên" />
               <div className="story-handwriting">
                 bằng tất cả
                 <br />
                 lời thương.
               </div>
-              <figure className="story-photo second">
-                <img
-                  width="720" height="900" src="/media/story-3.jpg"
-                  alt="Hoa được chọn để tạo nên một bó hoa riêng"
-                  loading="lazy"
-                />
-                <figcaption>02 — Bằng cả tấm lòng</figcaption>
-              </figure>
+              <StoryPhoto className="second" src="/media/story-3.jpg"
+                alt="Hoa được chọn để tạo nên một bó hoa riêng" caption="02 — Bằng cả tấm lòng" />
             </Reveal>
             <Reveal className="story-bottom">
               <span>✳</span>

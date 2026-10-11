@@ -48,18 +48,19 @@ export default function BusinessDashboard({onNavigate}) {
     {error ? <p role="alert" className="form-error">{error} <button className="text-button" onClick={() => setRevision(n => n + 1)}>Thử lại</button></p> : !report ? <BloomLoader label="Báo cáo cửa hàng" /> : <>
       {report.staging && <p className="portal-notice">Môi trường thử nghiệm — bao gồm đơn thử, không dùng làm báo cáo kinh doanh thật.</p>}
       <p className="dashboard-note">Kỳ {formatDate(report.from)} → {formatDate(report.to)} · Cập nhật {formatDateTime(report.generatedAt)}</p>
+      {report.overdueNow > 0 && <button className="dashboard-action" onClick={()=>onNavigate?.('desk','OVERDUE')}><strong>{report.overdueNow} đơn quá khung giờ giao chưa hoàn tất</strong><span>Mở bàn xử lý đơn →</span></button>}
       <div className="dashboard-metrics">
         {[
-          ['Giá trị đơn chưa hủy', money(report.orders.bookedValue), `${report.orders.count} đơn tạo, ${report.orders.cancelled} đơn hủy`],
-          ['Tiền đã thu trong kỳ', money(report.cash.received), 'Khoản thu đã được admin đối soát'],
-          ['Tiền đã hoàn trong kỳ', money(report.cash.refunded), 'Khoản hoàn thực tế đã ghi nhận'],
-          ['Thu trừ hoàn trong kỳ', money(report.cash.netCollected), 'Dòng tiền, chưa phải lợi nhuận'],
           ['Còn phải thu hiện tại', money(report.receivableNow), 'Số tiền còn phải thu của mọi đơn chưa hủy; không giới hạn kỳ'],
+          ['Tiền đã thu trong kỳ', money(report.cash.received), 'Khoản thu đã được admin đối soát'],
+          ['Thu trừ hoàn trong kỳ', money(report.cash.netCollected), 'Dòng tiền, chưa phải lợi nhuận'],
+          ['Giá trị đơn chưa hủy', money(report.orders.bookedValue), `${report.orders.count} đơn tạo, ${report.orders.cancelled} đơn hủy`],
+          ['Tiền đã hoàn trong kỳ', money(report.cash.refunded), 'Khoản hoàn thực tế đã ghi nhận'],
           ['Phiên/tài khoản đặt đơn', report.orders.buyers, 'Có đơn chưa hủy trong kỳ; không phải số người duy nhất'],
           ['Giá trị đơn trung bình', money(report.orders.count>report.orders.cancelled?Math.round(report.orders.bookedValue/(report.orders.count-report.orders.cancelled)):0), 'Các đơn chưa hủy theo ngày tạo'],
           ['Tỷ lệ hủy', report.orders.count? (report.orders.cancelled/report.orders.count*100).toLocaleString('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'—', 'Trên các đơn tạo trong kỳ'],
           ['Giá trị đơn kỳ trước', money(report.previous?.bookedValue||0), `${report.previous?.orders||0} đơn tạo trong khoảng liền trước có cùng số ngày`],
-        ].map(([label, value, note]) => <article className="dashboard-metric" key={label}><h3>{label}</h3><strong>{value}</strong><p>{note}</p></article>)}
+        ].map(([label, value, note], index) => <article className={'dashboard-metric'+(index<3?' is-priority':'')} key={label}><h3>{label}</h3><strong>{value}</strong><p>{note}</p></article>)}
       </div>
       <div className="dashboard-columns">
         <article className="dashboard-card"><h3>Đơn hoa theo ngày</h3><p>{report.orders.pending} chờ xác nhận · {report.orders.delivered} đã giao</p>

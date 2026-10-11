@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dateObject, dateISO, dateText, dateFromText } from '../src/date-field.js';
-import { readAdminTab } from '../src/admin-navigation.js';
+import { readAdminTab, adminGroups } from '../src/admin-navigation.js';
 
 test('calendar displays Vietnam date order, round trips without UTC day shifts, rejects nonexistent dates', () => {
   for (const iso of ['2026-10-01','2024-02-29','2030-12-31']) {
@@ -19,4 +19,18 @@ test('admin navigation is scoped to account, recognizes current capabilities, an
   assert.equal(readAdminTab('bob',{},storage),'products');
   assert.equal(readAdminTab('other',{},storage),'orders');
   assert.equal(readAdminTab('alice',{}, {getItem(){throw Error('blocked');}}),'orders');
+});
+
+test('all capability combinations expose only available admin destinations and restore the same set', () => {
+  const optional = { calendar: 'deliveryCalendar', desk: 'operationsDesk', reconciliation: 'reconciliationLedger', inventory: 'inventory' };
+  for (let mask = 0; mask < 16; mask++) {
+    const features = Object.fromEntries(Object.values(optional).map((name, i) => [name, Boolean(mask & (1 << i))]));
+    const destinations = adminGroups(features).flatMap(([, tabs]) => tabs.map(([key]) => key));
+    assert.equal(new Set(destinations).size, destinations.length);
+    for (const key of ['dashboard', 'orders', 'products', 'shipping', 'shop', 'memories', ...Object.keys(optional)]) {
+      const available = !optional[key] || features[optional[key]];
+      assert.equal(destinations.includes(key), available);
+      assert.equal(readAdminTab('admin', features, { getItem: () => key }), available ? key : 'orders');
+    }
+  }
 });

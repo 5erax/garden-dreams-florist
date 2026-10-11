@@ -5,6 +5,7 @@ import { StoreProvider } from "./Store.jsx";
 import './form-controls.css';
 import './shopping-polish.css';
 import './admin-audit.css';
+import './design-polish.css';
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

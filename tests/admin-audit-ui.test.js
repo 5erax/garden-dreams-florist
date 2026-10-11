@@ -4,11 +4,28 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {createServer} from 'vite';
 import react from '@vitejs/plugin-react';
-let server,money,tools,Catalog,Time,Reschedule;
+let server,money,tools,Catalog,Time,Reschedule,Navigation,Policy;
 before(async()=>{
  server=await createServer({configFile:false,envDir:false,plugins:[react()],define:{'import.meta.env.VITE_APP_ENV':'"demo"','import.meta.env.VITE_SUPABASE_URL':'""','import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY':'""'},server:{middlewareMode:true,hmr:false,ws:false,watch:null}});
  money=await server.ssrLoadModule('/src/BloomMoney.jsx');tools=await server.ssrLoadModule('/src/OrderTools.jsx');Catalog=(await server.ssrLoadModule('/src/AdminCatalogTable.jsx')).default;
  Time=(await server.ssrLoadModule('/src/BloomTime.jsx')).default;Reschedule=(await server.ssrLoadModule('/src/RescheduleOrder.jsx')).default;
+ Navigation=(await server.ssrLoadModule('/src/AdminNavigation.jsx')).default;
+ Policy=(await server.ssrLoadModule('/src/ShopPolicy.jsx')).default;
+});
+
+test('grouped navigation marks one current destination and hides unavailable features on desktop and mobile',()=>{
+ const html=renderToStaticMarkup(createElement(Navigation,{tab:'orders',features:{inventory:true},busy:false,onChange(){}}));
+ assert.equal((html.match(/aria-current="page"/g)||[]).length,1);
+ assert.match(html,/<optgroup label="Vận hành">/);
+ assert.match(html,/<option value="orders" selected="">/);
+ assert.match(html,/Kho &amp; công thức/);
+ assert.doesNotMatch(html,/Bàn xử lý đơn|Lịch giao|Đối soát tiền/);
+ const busy=renderToStaticMarkup(createElement(Navigation,{tab:'shop',features:{},busy:true,onChange(){}}));
+ assert.match(busy,/<select disabled="">/);
+ assert.equal((busy.match(/<button disabled=""/g)||[]).length,6);
+ const policy=renderToStaticMarkup(createElement(Policy,{value:'Hoa theo mùa.'}));
+ assert.match(policy,/name="returns_policy" maxLength="4000"/);
+ assert.match(policy,/13\/4.000 ký tự/);
 });
 test('shop time stays in 24-hour form values and reschedule requires customer agreement',()=>{
  const html=renderToStaticMarkup(createElement(Time,{name:'closes_at',defaultValue:'17:30'}));

@@ -55,7 +55,8 @@ export default function Garden() {
           <strong>{new Intl.NumberFormat("vi-VN").format(count)}</strong>
           <span>dấu hoa từ những đơn hoàn tất</span>
         </div>}
-        {!busy && count === 0 && <a className="button primary garden-first" href="/#collection">Chọn hoa, bắt đầu một lời thương <Icon name="arrow" /></a>}
+        {!busy && !memories.length && !error && <p className="garden-empty-status">Khu vườn đang chờ lời thương đầu tiên. Chưa có thông điệp công khai.</p>}
+        {!busy && count === 0 && !error && <a className="button primary garden-first" href="/#collection">Chọn hoa, bắt đầu một lời thương <Icon name="arrow" /></a>}
         <small>
           Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỷ niệm riêng
           vẫn được giữ riêng.
@@ -86,21 +87,6 @@ export default function Garden() {
           </a>
         ))}
       </section>
-      {!busy && !memories.length && !error && (
-        <div className="portal-empty">
-          <Icon name="flower" />
-          <h2>
-            Khu vườn đang chờ
-            <br />
-            <em>lời thương đầu tiên.</em>
-          </h2>
-          <p>
-            {connected
-              ? "Chưa có thông điệp được công khai."
-              : "Cửa hàng đang ở bản trải nghiệm; chưa có đơn thật hoặc kỷ niệm thật được lưu."}
-          </p>
-        </div>
-      )}
       {more && (
         <button
           className="button outline garden-more"
