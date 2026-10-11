@@ -134,7 +134,7 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
       </blockquote>
       {memory.revoked ? (
         <p>
-          Kỉ niệm được giữ trong lịch sử riêng; đơn đã hoàn tiền nên không còn
+          Kỷ niệm được giữ trong lịch sử riêng; đơn đã hoàn tiền nên không còn
           chia sẻ công khai.
         </p>
       ) : (
@@ -149,7 +149,7 @@ export function MemorySharing({ memory, cardMessage, onChange }) {
             <BloomSelect value={mode} onChange={(e) => setMode(e.target.value)}>
               <option value="PRIVATE">Giữ riêng / rút chia sẻ</option>
               <option value="LINK">Chia sẻ bằng đường dẫn</option>
-              <option value="GARDEN">Đường dẫn + đưa vào Vườn kỉ niệm</option>
+              <option value="GARDEN">Đường dẫn + đưa vào Vườn kỷ niệm</option>
             </BloomSelect>
           </label>
           {mode !== "PRIVATE" && (

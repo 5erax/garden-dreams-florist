@@ -89,3 +89,9 @@ export function historyNextStep(order) {
   };
   return hints[order.status] || "Mở chi tiết để xem tiến trình mới nhất từ shop.";
 }
+export function watchHistoryUpdates(refresh) {
+  const update = () => { if (document.visibilityState === 'visible') refresh(); };
+  const timer = setInterval(update, 60000);
+  document.addEventListener('visibilitychange', update);
+  return () => { clearInterval(timer); document.removeEventListener('visibilitychange', update); };
+}

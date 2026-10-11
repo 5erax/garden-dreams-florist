@@ -11,7 +11,7 @@ import { beforeCursor } from "./cursor.js";
 import GuestAccount from "./GuestAccount.jsx";
 import ReorderFlowers from "./ReorderFlowers.jsx";
 import {
-  historyPageSize, historyLimit, historyViews, historySummary,
+  historyPageSize, historyLimit, historyViews, historySummary, watchHistoryUpdates,
   filterHistory, mergeHistoryPage, historyDate, historyItemTitle, historyNextStep,
 } from "./customer-history.js";
 import "./customer-history.css";
@@ -76,11 +76,11 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
   const filters = useRef("");
   filters.current = JSON.stringify([view, search, payment]);
 
-  async function load(last = null) {
+  async function load(last = null, background = false) {
     if (!mounted.current || loadingList.current) return;
     loadingList.current = true;
     const request = ++listRequest.current;
-    setBusy(true);
+    if (!background) setBusy(true);
     setError("");
     try {
       let query = backend.from("gd_orders").select(orderColumns)
@@ -91,8 +91,8 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
       if (last) query = beforeCursor(query, last);
       const rows = await result(query);
       if (!mounted.current || request !== listRequest.current) return;
-      setMore(rows.length > historyPageSize);
-      setOrders(previous => mergeHistoryPage(last ? previous : [], rows.slice(0, historyPageSize)));
+      if (!background || rows.length > historyPageSize) setMore(rows.length > historyPageSize);
+      setOrders(previous => mergeHistoryPage(last || background ? previous : [], rows.slice(0, historyPageSize)));
       setLoadedAt(new Date());
     } catch (failure) {
       if (mounted.current && request === listRequest.current) setError(failure.message);
@@ -108,7 +108,9 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
     mounted.current = true;
     loadingList.current = false;
     load();
+    const stopRefresh = watchHistoryUpdates(() => load(null, true));
     return () => {
+      stopRefresh();
       mounted.current = false;
       loadingList.current = false;
       listRequest.current += 1;
@@ -191,9 +193,9 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
   return (
     <>
       <div className="portal-title">
-        <span className="eyebrow">YOUR LITTLE CORNER</span>
+        <span className="eyebrow">Góc nhỏ của bạn</span>
         <h1>Những bó hoa.<br /><em>Những lời thương.</em></h1>
-        <p>Lịch sử mua hoa được giữ riêng cho bạn. Theo dõi bó hoa, xem lại lời nhắn và tự chọn kỉ niệm muốn chia sẻ.</p>
+        <p>Lịch sử mua hoa được giữ riêng cho bạn. Theo dõi bó hoa, xem lại lời nhắn và tự chọn kỷ niệm muốn chia sẻ.</p>
       </div>
       {session.user.is_anonymous && <GuestAccount />}
       {(recovery || (!session.user.is_anonymous && session.user.user_metadata?.gd_needs_password)) && (
@@ -227,17 +229,16 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
         <section className="customer-history" aria-labelledby="customer-history-title" aria-busy={busy}>
           <div className="portal-section-heading customer-history-heading">
             <div><h2 id="customer-history-title">Lịch sử mua hoa</h2><p>{loadedAt ? `Cập nhật lúc ${new Intl.DateTimeFormat("vi-VN", { timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(loadedAt)}` : "Đơn của bạn sẽ được lấy từ cửa hàng."}</p></div>
-            <button type="button" className="button outline" disabled={busy} onClick={() => load()}>Làm mới lịch sử</button>
           </div>
           {!!orders.length && <>
             <dl className="customer-history-summary" aria-label="Tóm tắt các đơn đã tải">
-              <div><dt>Đơn đã tải</dt><dd>{summary.loaded}</dd></div>
+              <div><dt>Đơn trong lịch sử</dt><dd>{summary.loaded}</dd></div>
               <div><dt>Đang thực hiện</dt><dd>{summary.active}</dd></div>
               <div><dt>Chờ chuyển khoản</dt><dd>{summary.transfer}</dd></div>
               <div><dt>Đã giao & nhận tiền</dt><dd>{summary.memories}</dd></div>
             </dl>
           </>}
-          <p id="history-scope" className="customer-history-scope">Bộ lọc và số liệu chỉ tính {orders.length} đơn đã tải{incomplete ? "; lịch sử còn những đơn cũ hơn" : ""}. Chỉ thông điệp bạn đồng ý chia sẻ mới được công khai.</p>
+          <p id="history-scope" className="customer-history-scope">Chỉ lời nhắn bạn chọn chia sẻ mới được công khai.{incomplete ? " Còn các lần mua trước bên dưới; xem thêm để tìm trong lịch sử cũ." : ""}</p>
           {(orders.length > 0 || hasFilters) && (
             <div className="customer-history-filters">
               <fieldset className="customer-history-views">
@@ -248,7 +249,7 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
                 </label>)}
               </fieldset>
               <div className="customer-history-search-row">
-                <label className="customer-history-search">Tìm trong đơn đã tải<input type="search" value={search} maxLength={100} onChange={event => { closeDetail(); setSearch(event.target.value); }} placeholder="Mã đơn, tên hoa hoặc người nhận" aria-describedby="history-scope" /></label>
+                <label className="customer-history-search">Tìm trong lịch sử đang xem<input type="search" value={search} maxLength={100} onChange={event => { closeDetail(); setSearch(event.target.value); }} placeholder="Mã đơn, tên hoa hoặc người nhận" aria-describedby="history-scope" /></label>
                 <label>Thanh toán<BloomSelect value={payment} onChange={event => { closeDetail(); setPayment(event.target.value); }}>
                   <option value="ALL">Mọi trạng thái tiền</option>
                   {Object.entries(paymentStatuses).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
@@ -260,9 +261,9 @@ function CustomerHistory({ session, recovery, setRecovery, cart, onReorder }) {
           {error && <div className="customer-history-error" role="alert"><p>{error}</p><button type="button" className="text-button" disabled={busy} onClick={() => load()}>Thử tải lại từ đầu</button>{orders.length > 0 && <p>Các đơn đang hiển thị vẫn là dữ liệu lần tải trước.</p>}</div>}
           {busy && <BloomLoader compact={orders.length > 0} label="Những bó hoa của bạn" />}
           {!busy && !orders.length && !error && <div className="portal-empty customer-history-empty"><span aria-hidden="true">✳</span><h3>Câu chuyện đầu tiên đang chờ bạn.</h3><p>Khi đặt hoa, đơn xuất hiện ở đây cùng tiến trình giao và lời nhắn trên thiệp.</p><a className="button outline" href="/#collection">Chọn một bó hoa</a></div>}
-          {!!orders.length && !shown.length && <div className="portal-empty customer-history-empty"><h3>Chưa có đơn phù hợp trong phần đã tải.</h3><p>Thử tên hoa khác hoặc xóa bộ lọc{incomplete ? ", rồi tải thêm những đơn cũ hơn bên dưới" : ""}.</p><button type="button" className="button outline" onClick={resetFilters}>Xem các đơn đã tải</button></div>}
+          {!!orders.length && !shown.length && <div className="portal-empty customer-history-empty"><h3>Chưa có đơn phù hợp trong phần đã tải.</h3><p>Thử tên hoa khác hoặc xóa bộ lọc{incomplete ? ", rồi tải thêm những đơn cũ hơn bên dưới" : ""}.</p><button type="button" className="button outline" onClick={resetFilters}>Xem lịch sử mua</button></div>}
           {!!shown.length && <>
-            <p className="customer-history-result" role="status">Hiển thị {shown.length} / {orders.length} đơn đã tải.</p>
+            <p className="customer-history-result" role="status">Hiển thị {shown.length} / {orders.length} đơn trong lịch sử đang xem.</p>
             <ul className="customer-history-list">
               {shown.map(order => <HistoryCard key={order.id} order={order} onOpen={openDetail} buttonRef={element => {
                 if (element) historyButtons.current.set(order.id, element);

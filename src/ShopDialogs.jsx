@@ -7,6 +7,7 @@ import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import ProductGallery from "./ProductGallery.jsx";
 import { productUrl } from './product-url.js';
+import { deliveryCopy } from './delivery-copy.js';
 
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
@@ -56,12 +57,14 @@ export function ProductDialog({
   favorite,
   onFavorite,
   inline = false,
+  shipping = [],
 }) {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState(null);
   const [shareNotice, setShareNotice] = useState('');
   const choice = cartChoice({ id: product.id, variantId }, [product]);
   const Wrapper = inline ? 'section' : Modal;
+  const Heading = inline ? 'h1' : 'h2';
   return (
     <Wrapper {...(inline ? { className: 'product-page' } : { title: product.name, onClose, className: 'product-dialog' })}>
       <ProductGallery key={product.id} product={product} />
@@ -69,7 +72,7 @@ export function ProductDialog({
         <span className="eyebrow">
           Một món quà cho {(product.occasion || "người bạn thương").toLocaleLowerCase("vi")}
         </span>
-        <h2>{product.name}</h2>
+        <Heading>{product.name}</Heading>
         {choice && <p className="detail-price">{money(choice.price)} <span>/ bó</span></p>}
         {(product.variants?.length > 0 || variantId !== null) && <label className="variant-choice">
           Cỡ bó hoa
@@ -83,13 +86,33 @@ export function ProductDialog({
         <p>{product.description}</p>
         <dl>
           <dt>Trong bó hoa</dt>
-          <dd>{product.stems}</dd>
+          <dd>{product.stems?.replace(/hoa phụ/gi, 'hoa nhỏ phối cùng')}</dd>
+          <dt>Quy cách</dt><dd>Số cành, chiều cao và giấy gói được shop xác nhận trước khi thực hiện.</dd>
           <dt>Lời nhắn</dt>
           <dd>Thêm lời nhắn của bạn khi đặt hoa</dd>
         </dl>
         <p className="fineprint">
           Hoa được chọn theo mùa. Nếu cần thay hoa hoặc màu sắc, shop sẽ trao đổi trước khi thực hiện.
         </p>
+        <p className="product-delivery">{deliveryCopy(shipping)}. Chọn địa chỉ và ca giao ở bước đặt hoa để kiểm tra phí và lịch còn nhận.</p>
+        <button
+          className="text-button favorite-detail"
+          onClick={onFavorite}
+          aria-pressed={favorite}
+        >
+          <Icon name="heart" />
+          {favorite ? "Đã lưu vào yêu thích" : "Lưu bó hoa này"}
+        </button>
+        <div className="product-share">
+          <button className="text-button" onClick={async () => {
+            try { await navigator.clipboard.writeText(new URL(productUrl(product), location.origin).href); setShareNotice('Đã sao chép liên kết bó hoa.'); }
+            catch { setShareNotice('Chưa sao chép được. Thử lại hoặc dùng chức năng chia sẻ của trình duyệt.'); }
+          }}>Sao chép liên kết bó hoa</button>
+          {shareNotice && <p role="status">{shareNotice}</p>}
+        </div>
+        <p className="product-care">Giữ hoa nơi mát, tránh nắng trực tiếp; thay nước và cắt gốc thường xuyên nếu cắm bình.</p>
+      </div>
+      <div className="product-purchase-footer">
         {choice && <div className="detail-summary" aria-live="polite" aria-atomic="true">
           <span>Tạm tính</span>
           <strong>{money(subtotal([{ id: product.id, quantity, variantId }], [product]))}</strong>
@@ -110,27 +133,11 @@ export function ProductDialog({
               onClose?.();
             }}
           >
-            Thêm vào giỏ <Icon name="bag" />
+            Thêm vào giỏ hoa <Icon name="bag" />
           </button>
           <button className="button primary" disabled={!choice} onClick={() => onBuy(product.id, quantity, variantId)}>
-            Thêm & đặt ngay <Icon name="arrow" />
+            Đặt ngay <Icon name="arrow" />
           </button>
-        </div>
-        <button
-          className="text-button favorite-detail"
-          onClick={onFavorite}
-          aria-pressed={favorite}
-        >
-          <Icon name="heart" />
-          {favorite ? "Đã lưu vào yêu thích" : "Lưu bó hoa này"}
-        </button>
-        <div className="product-share">
-          <button className="text-button" onClick={async () => {
-            try { await navigator.clipboard.writeText(new URL(productUrl(product), location.origin).href); setShareNotice('Đã sao chép liên kết bó hoa.'); }
-            catch { setShareNotice('Chưa sao chép được. Bạn có thể mở liên kết và sao chép địa chỉ.'); }
-          }}>Sao chép liên kết bó hoa</button>
-          {!inline && <a href={productUrl(product)}>Mở liên kết ↗</a>}
-          {shareNotice && <p role="status">{shareNotice}</p>}
         </div>
       </div>
     </Wrapper>
