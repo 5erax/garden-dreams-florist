@@ -1,5 +1,6 @@
 import { Children, useState } from 'react';
 import { Select } from '@base-ui/react/select';
+import Icon from './Icons.jsx';
 
 export default function BloomSelect({ children, value, defaultValue, onChange, name, required, disabled, className='', ...props }) {
   const [trigger, setTrigger] = useState(null);
@@ -12,7 +13,7 @@ export default function BloomSelect({ children, value, defaultValue, onChange, n
     value={value === undefined ? undefined : String(value)} defaultValue={String(defaultValue ?? options[0]?.value ?? '')}
     onValueChange={next => onChange?.({ target: { value: next, name } })}>
     <Select.Trigger {...props} ref={setTrigger} className={`bloom-select-trigger ${className}`} onPointerDown={() => setKeyboard(false)} onKeyDown={() => setKeyboard(true)}>
-      <Select.Value /><Select.Icon className="bloom-chevron">⌄</Select.Icon>
+      <Select.Value /><Select.Icon className="bloom-chevron"><Icon name="arrow" /></Select.Icon>
     </Select.Trigger>
     <Select.Portal container={trigger?.closest('dialog') || undefined}>
       <Select.Positioner sideOffset={6} alignItemWithTrigger={false} className="bloom-positioner">

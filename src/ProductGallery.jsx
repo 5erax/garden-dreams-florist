@@ -16,6 +16,7 @@ export default function ProductGallery({ product }) {
         <img src={src} alt={`Bó hoa ${product.name}, ảnh ${selected + 1}`} decoding="async" onError={() => markFailed(src)} /> :
         <div className="product-photo-placeholder"><Icon name="flower" /><span>Ảnh đang cập nhật</span></div>}
     </div>
+    {!credit && src && !src.endsWith('-pending.svg') && <p className="photo-disclosure">Ảnh minh họa mẫu hoa. Hoa thực tế có thể khác theo mùa; shop trao đổi trước nếu cần thay đổi.</p>}
     {credit && <p className="photo-credit">Ảnh tham khảo · <a href={credit.source} target="_blank" rel="noreferrer">{credit.author || "Wikimedia Commons"}</a> · <a href={credit.licenseUrl} target="_blank" rel="noreferrer">{credit.license}</a>. Ảnh không phải bó hoa thực tế của shop.</p>}
     {src?.endsWith('-pending.svg') && <p className="photo-pending">Ảnh thực tế của mẫu này đang cập nhật. Hình đang hiển thị là nhãn giữ chỗ, không phải ảnh bó hoa.</p>}
     {photos.length > 1 && <>

@@ -39,24 +39,25 @@ export default function Garden() {
   return (
     <>
       <section className="garden-intro">
-        <span className="eyebrow">A GARDEN OF WORDS</span>
+        <span className="eyebrow">Một khu vườn của lời thương</span>
         <h1>
           Có những lời,
           <br />
           <em>ở lại thành hoa.</em>
         </h1>
         <p>
-          Mỗi bó hoa đã đến tay người nhận, mỗi lời thương đã được gửi đi.
+          Những lời nhắn được khách tự nguyện chia sẻ sau khi hoàn tất đơn hoa.
           <br />
-          Một khu vườn lớn dần bằng những kỉ niệm.
+          Một khu vườn lớn dần bằng những kỷ niệm.
         </p>
-        <div className="garden-count">
+        {count > 0 && <div className="garden-count">
           <Icon name="flower" />
           <strong>{new Intl.NumberFormat("vi-VN").format(count)}</strong>
           <span>dấu hoa từ những đơn hoàn tất</span>
-        </div>
+        </div>}
+        {!busy && count === 0 && <a className="button primary garden-first" href="/#collection">Chọn hoa, bắt đầu một lời thương <Icon name="arrow" /></a>}
         <small>
-          Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỉ niệm riêng
+          Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỷ niệm riêng
           vẫn được giữ riêng.
         </small>
       </section>
@@ -96,11 +97,8 @@ export default function Garden() {
           <p>
             {connected
               ? "Chưa có thông điệp được công khai."
-              : "Cửa hàng đang ở bản trải nghiệm; chưa có đơn thật hoặc kỉ niệm thật được lưu."}
+              : "Cửa hàng đang ở bản trải nghiệm; chưa có đơn thật hoặc kỷ niệm thật được lưu."}
           </p>
-          <a className="button outline" href="#collection">
-            Chọn hoa cho một câu chuyện
-          </a>
         </div>
       )}
       {more && (
@@ -112,7 +110,7 @@ export default function Garden() {
           Gặp thêm những lời thương
         </button>
       )}
-      {busy && <BloomLoader label="Vườn kỉ niệm" />}
+      {busy && <BloomLoader label="Vườn kỷ niệm" />}
       {error && (
         <p className="form-error" role="alert">
           {error}
@@ -170,7 +168,7 @@ export function SharedMemory({ token }) {
             "Đường dẫn không tồn tại, đã được rút chia sẻ hoặc cửa hàng chưa kết nối backend."}
         </p>
         <a className="button outline" href="#garden">
-          Về vườn kỉ niệm
+          Về vườn kỷ niệm
         </a>
       </div>
     );

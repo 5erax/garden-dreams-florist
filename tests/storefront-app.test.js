@@ -28,7 +28,9 @@ test('homepage renders its hero and collection from the public snapshot',()=>{
   globalThis.location={pathname:'/',hash:'#home'};
   const html=renderToStaticMarkup(createElement(App));
   assert.match(html,/id="home"/);assert.match(html,/id="collection"/);
-  assert.match(html,/40 bó hoa dành cho bạn/);
+  assert.match(html,/20\/40 bó hoa phù hợp/);
+  assert.match(html,/<details class="flower-finder" open=""/);
+  assert.doesNotMatch(html,/class="quick-add"/);
   assert.match(html,/class="button hero-cta" href="#collection"/);
 });
 
@@ -39,5 +41,6 @@ test('cold product route has readable navigation and tolerates legacy snapshot d
   assert.match(html,/href="\/#home"/);
   assert.match(html,/người bạn thương/);
   assert.match(html,/id="buy"/);
+  assert.equal((html.match(/<h1[ >]/g)||[]).length,1);
   assert.doesNotMatch(html,/id="home"/);
 });

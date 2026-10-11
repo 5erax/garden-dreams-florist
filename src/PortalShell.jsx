@@ -2,11 +2,11 @@ import { useState } from "react";
 import { backend, guestSessionStorage } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
-import { shopAddress } from "./shop-contact.js";
+import { shopAddress, displayPhone } from "./shop-contact.js";
 import { Modal } from "./ShopDialogs.jsx";
 import { authErrorMessage } from "./auth-error.js";
 
-export function PortalShell({ children }) {
+export function PortalShell({ children, cartCount = 0, onCart }) {
   const { shop, session, isAdmin } = useStore();
   const [error, setError] = useState("");
   const [leaving, setLeaving] = useState(false), [busy, setBusy] = useState(false);
@@ -28,14 +28,16 @@ export function PortalShell({ children }) {
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng cửa hàng">
-          <a href="/#collection">Chọn hoa</a>
-          <a href="#garden">Vườn kỉ niệm</a>
-          <a href="#account">Góc của tôi</a>
+          <a href="/#collection">Bộ sưu tập</a>
+          <a href="/#story">Câu chuyện</a>
+          <a href="#garden" aria-current={location.hash === '#garden' ? 'page' : undefined}>Vườn kỷ niệm</a>
+          <a href="#account" aria-current={location.hash === '#account' ? 'page' : undefined}>Góc của tôi</a>
           {isAdmin && <a href="#admin">Quản trị</a>}
         </nav>
+        <button className="cart-trigger portal-cart" onClick={onCart} aria-label={`Mở giỏ hoa, ${cartCount} bó`}><Icon name="bag" /><span>Giỏ hoa</span><span className="cart-count">{cartCount}</span></button>
         {session && (
           <button
-            className="text-button"
+            className="portal-signout"
             disabled={busy}
             onClick={() => session.user.is_anonymous ? setLeaving(true) : signOut()}
           >
@@ -58,7 +60,8 @@ export function PortalShell({ children }) {
       </Modal>}
       <footer className="portal-footer">
         {shop.name} · Những lời thương được giữ lại.
-        <a href={`tel:${shop.phone}`}>{shop.phone}</a>
+        <a href={`tel:${shop.phone}`}>{displayPhone(shop.phone)}</a>
+        <a href={`https://zalo.me/${shop.phone.replace(/^\+84/, '0')}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
         <address>{shop.address || shopAddress}</address>
       </footer>
     </div>
@@ -70,7 +73,7 @@ export function BackendNotice() {
       <Icon name="flower" />
       <h2>Một góc đang được chăm chút.</h2>
       <p>
-        Tài khoản, đơn hoa và kỉ niệm sẽ khả dụng khi cửa hàng kết nối backend.
+        Tài khoản, đơn hoa và kỷ niệm sẽ khả dụng khi cửa hàng kết nối backend.
         Hiện chưa có dữ liệu khách hàng được lưu.
       </p>
       <a className="button outline" href="/#collection">

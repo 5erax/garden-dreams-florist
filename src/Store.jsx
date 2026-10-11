@@ -180,7 +180,7 @@ export function StoreProvider({ children }) {
       )}
       {backendReady && appEnvironment !== "production" && (
         <p className="portal-notice" role="status">
-          Môi trường thử nghiệm · Đơn hoa và kỉ niệm ở đây là dữ liệu thử. Không
+          Môi trường thử nghiệm · Đơn hoa và kỷ niệm ở đây là dữ liệu thử. Không
           chuyển tiền hoặc giao hoa theo các đơn này.
         </p>
       )}

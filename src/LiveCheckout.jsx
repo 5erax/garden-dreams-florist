@@ -1,4 +1,5 @@
 import BloomSelect from "./BloomSelect.jsx";
+import { deliveryCopy } from './delivery-copy.js';
 import BloomLoader from "./BloomLoader.jsx";
 import { useEffect, useState } from "react";
 import { useStore } from "./Store.jsx";
@@ -101,9 +102,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
           <h2>Bó hoa bạn chọn,<br /><em>cửa hàng sẽ tư vấn.</em></h2>
           <p>Đặt hoa trực tuyến đang được chuẩn bị. Liên hệ cửa hàng để trao đổi về bó hoa và ngày giao; chưa có đơn nào được gửi từ bước này.</p>
           <address>{shop.address || shopAddress}</address>
-          <p>{shipping.length
-            ? shipping.map(service => `${service.name}: ${money(service.fee)}`).join(" · ")
-            : "Miễn phí giao trong Long Thành. Ngoài khu vực: 30.000đ; khu vực xa hơn: 50.000đ."} Shop xác nhận địa chỉ và mức phí trước khi nhận giao.</p>
+          <p>{deliveryCopy(shipping)}. Shop xác nhận địa chỉ và mức phí trước khi nhận giao.</p>
           <a className="button primary" href={`tel:${shop.phone}`}>Gọi {shop.phone}</a>
           <a className="button outline" href={`https://zalo.me/${shop.phone}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
         </div>

@@ -16,10 +16,13 @@ import { useStore } from "./Store.jsx";
 import { PortalShell } from "./PortalShell.jsx";
 import RouteBoundary from "./RouteBoundary.jsx";
 import BloomLoader from "./BloomLoader.jsx";
+import { deliveryCopy } from './delivery-copy.js';
+import { quickViewUrl, quickViewFromUrl } from './quick-view.js';
+import FlowerCard from './FlowerCard.jsx';
 import FlowerComparison from './FlowerComparison.jsx';
-import { withinBudget, toggleComparison } from './flower-selection.js';
+import { withinBudget, toggleComparison, matchesFlowerDescription } from './flower-selection.js';
 import LiveCheckout from "./LiveCheckout.jsx";
-import { shopAddress } from "./shop-contact.js";
+import { shopAddress, displayPhone } from "./shop-contact.js";
 import { prepareReorder } from "./reorder.js";
 import { normalizeSearch, productUrl, productFromPath } from "./product-url.js";
 import "./styles.css";
@@ -127,6 +130,7 @@ function Hero() {
 export default function App() {
   const {
     products,
+    shipping,
     shop,
     connected,
     session,
@@ -146,7 +150,7 @@ export default function App() {
     return () => window.removeEventListener("hashchange", changed);
   }, []);
   useEffect(() => {
-    const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỉ niệm', '#collection': 'Bộ sưu tập hoa tươi' }[route];
+    const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỷ niệm', '#collection': 'Bộ sưu tập hoa tươi' }[route];
     document.title = `${section || pageProduct?.name || 'Hoa tươi, giao hoa Long Thành, Đồng Nai'} | Garden Dreams`;
     let robots = document.querySelector('meta[name="robots"]');
     if (['#account', '#admin'].includes(route)) {
@@ -162,13 +166,30 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
   const [budget, setBudget] = useState(0);
-  const [saleOnly, setSaleOnly] = useState(false);
+  const [flowerColor, setFlowerColor] = useState('');
+  const [flowerType, setFlowerType] = useState('');
+  const [saleOnly, setSaleOnly] = useState(true);
   const [comparison, setComparison] = useState([]);
   const compared = products.filter(p => comparison.includes(p.id));
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [animateCollection, setAnimateCollection] = useState(false);
   const [selected, setSelected] = useState(null);
+  useEffect(() => {
+    const restore = () => setSelected(quickViewFromUrl(location.search, products));
+    restore();
+    window.addEventListener('popstate', restore);
+    return () => window.removeEventListener('popstate', restore);
+  }, [products]);
+  function openProduct(product) {
+    history.pushState({ ...history.state, gdQuickView: true }, '', quickViewUrl(location.href, product));
+    setSelected(product);
+  }
+  function closeProduct() {
+    setSelected(null);
+    if (history.state?.gdQuickView) history.back();
+    else history.replaceState(history.state, '', quickViewUrl(location.href, null));
+  }
   const selectedProduct = products.find(p => p.id === selected?.id);
   const [panel, setPanel] = useState(null);
   const pendingCheckout = useRef(null);
@@ -236,7 +257,7 @@ export default function App() {
   }
   function buy(id, quantity, variantId) {
     add(id, quantity, variantId);
-    setSelected(null);
+    if (selected) closeProduct();
     setPanel("checkout");
     setNotice("");
   }
@@ -260,6 +281,7 @@ export default function App() {
       (occasion === "Tất cả" || p.occasion === occasion) &&
       (!onlyFavorites || favorites.includes(p.id)) &&
       withinBudget(p, budget, saleOnly) &&
+      matchesFlowerDescription(p, flowerColor, flowerType) &&
       normalizeSearch(`${p.name} ${p.stems}`).includes(normalizeSearch(query)),
   );
   if (sort === "low")
@@ -273,6 +295,33 @@ export default function App() {
       Bạn có một yêu cầu đặt hoa cần kiểm tra. <button className="text-button" onClick={() => { location.hash = "#collection"; setPanel("checkout"); }}>Tiếp tục kiểm tra đơn</button>
     </p>
   );
+  const shoppingDialogs = <>
+      {panel === "cart" && (
+        <CartDialog
+          cart={cart}
+          onClose={() => setPanel(null)}
+          onChange={changeCart}
+          onCheckout={() => setPanel("checkout")}
+        />
+      )}
+
+      {panel === "checkout" &&
+        (connected ? (
+          <LiveCheckout
+            key={session?.user.id || "guest"}
+            cart={cart}
+            pending={pendingCheckout}
+            onClose={() => setPanel(null)}
+            onComplete={(request) => setCart(current => removeOrderedItems(current, request.items, products))}
+          />
+        ) : (
+          <CheckoutDialog
+            cart={cart}
+            onClose={() => setPanel(null)}
+            onComplete={() => setCart([])}
+          />
+        ))}
+  </>;
   if (
     route === "#account" ||
     route === "#admin" ||
@@ -280,15 +329,15 @@ export default function App() {
     route.startsWith("#memory/")
   )
     return (
-      <PortalShell>
+      <><PortalShell cartCount={count} onCart={() => setPanel("cart")}>
         {pendingNotice}
         <RouteBoundary
           key={`${route}:${session?.user.id || "signed-out"}`}
           load={route === "#account" ? loadCustomer : route === "#admin" ? loadAdmin : route === "#garden" ? loadGarden : loadMemory}
-          title={route === "#account" ? "Góc của bạn" : route === "#admin" ? "Quản trị cửa hàng" : "Vườn kỉ niệm"}
+          title={route === "#account" ? "Góc của bạn" : route === "#admin" ? "Quản trị cửa hàng" : "Vườn kỷ niệm"}
           pageProps={route.startsWith("#memory/") ? { token: route.slice(8) } : route === "#account" ? { cart, onReorder: reorder } : {}}
         />
-      </PortalShell>
+      </PortalShell>{shoppingDialogs}</>
     );
 
   return (
@@ -306,9 +355,9 @@ export default function App() {
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng chính">
-          <a href={isProductPage ? '/#collection' : '#collection'}>Bộ sưu tập</a>
+          <a href={isProductPage ? '/#collection' : '#collection'} aria-current={route === '#collection' ? 'page' : undefined}>Bộ sưu tập</a>
           <a href={isProductPage ? '/#story' : '#story'}>Câu chuyện</a>
-          <a href="#garden" onPointerEnter={() => { loadGarden().catch(() => {}); }} onFocus={() => { loadGarden().catch(() => {}); }}>Vườn kỉ niệm</a>
+          <a href="#garden" aria-current={route === "#garden" ? "page" : undefined} onPointerEnter={() => { loadGarden().catch(() => {}); }} onFocus={() => { loadGarden().catch(() => {}); }}>Vườn kỷ niệm</a>
         </nav>
         <div className="header-actions">
           <a
@@ -316,7 +365,7 @@ export default function App() {
             onPointerEnter={() => { loadCustomer().catch(() => {}); }} onFocus={() => { loadCustomer().catch(() => {}); }}
             className="icon-button account-link"
             aria-label={
-              session ? "Góc kỉ niệm của tôi" : "Tài khoản & lịch sử mua"
+              session ? "Góc kỷ niệm của tôi" : "Tài khoản & lịch sử mua"
             }
           >
             <Icon name="user" />
@@ -350,13 +399,13 @@ export default function App() {
       <main>
         {isProductPage ? <section className="product-route section-shell">
           <a className="text-link" href="/#collection">← Bộ sưu tập hoa</a>
-          {pageProduct ? <><h1>{pageProduct.name}</h1><ProductDialog key={pageProduct.id} inline product={pageProduct} onAdd={add} onBuy={buy} favorite={favorites.includes(pageProduct.id)} onFavorite={() => favorite(pageProduct.id)} /></> : loading ? <BloomLoader label="Bó hoa của bạn" /> : <p>Bó hoa này hiện không được bán.</p>}
+          {pageProduct ? <><ProductDialog key={pageProduct.id} inline shipping={shipping} product={pageProduct} onAdd={add} onBuy={buy} favorite={favorites.includes(pageProduct.id)} onFavorite={() => favorite(pageProduct.id)} /></> : loading ? <BloomLoader label="Bó hoa của bạn" /> : <p>Bó hoa này hiện không được bán.</p>}
         </section> : <Hero />}
         {panel !== "checkout" && pendingNotice}
         {storeError ? <p className="store-status" role="alert">{storeError}</p> : loading && !products.length && <BloomLoader />}
         <div className="service-strip">
           <span>
-            <Icon name="flower" /> Miễn phí giao trong Long Thành
+            <Icon name="flower" /> {deliveryCopy(shipping)}
           </span>
           <i>✳</i>
           <span>
@@ -425,7 +474,7 @@ export default function App() {
             <span>
               {onlyFavorites
                 ? "Những bó hoa bạn đã yêu thích"
-                : `${filtered.length} bó hoa dành cho bạn`}
+                : `${filtered.length}/${products.length} bó hoa phù hợp`}
               {onlyFavorites && (
                 <button
                   className="text-button"
@@ -448,73 +497,25 @@ export default function App() {
               </BloomSelect>
             </label>
           </div>
-          <details className="flower-finder">
+          <details className="flower-finder" open>
             <summary>Tìm hoa vừa ý — chọn theo ngân sách</summary>
             <div className="flower-finder-fields">
+              <label>Dịp tặng<BloomSelect aria-label="Dịp tặng" value={occasion} onChange={e => selectOccasion(e.target.value)}>{occasions.map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
+              <label>Sắc hoa<BloomSelect aria-label="Sắc hoa" value={flowerColor} onChange={e => { setFlowerColor(e.target.value); setShowAll(true); }}><option value="">Mọi sắc hoa</option>{['hồng','đỏ','trắng','vàng','tím','xanh'].map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
+              <label>Loại hoa<BloomSelect aria-label="Loại hoa" value={flowerType} onChange={e => { setFlowerType(e.target.value); setShowAll(true); }}><option value="">Mọi loại hoa</option>{['hồng','mẫu đơn','ly','cẩm tú cầu','cẩm chướng','hướng dương','tulip'].map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
               <label>Ngân sách bó hoa<BloomSelect aria-label="Ngân sách bó hoa" value={budget} onChange={e => { setBudget(Number(e.target.value)); setShowAll(true); }}>
                 <option value="0">Mọi mức giá</option>{[300000,500000,800000,1500000].map(value => <option key={value} value={value}>Tối đa {money(value)}</option>)}
               </BloomSelect></label>
               <label><input type="checkbox" checked={saleOnly} onChange={e => { setSaleOnly(e.target.checked); setShowAll(true); }} />Chỉ mẫu đang nhận đặt</label>
-              <button className="text-button" onClick={() => { setBudget(0); setSaleOnly(false); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>
+              <button className="button outline finder-reset" onClick={() => { setBudget(0); setFlowerColor(''); setFlowerType(''); setSaleOnly(true); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>
             </div>
-            <p>Chọn dịp tặng ở phía trên, rồi so sánh các bó hoa bên dưới. Ngân sách chưa gồm phí giao; mẫu tham khảo dùng giá dự kiến và chưa nhận đặt.</p>
+            <p>Tìm theo dịp tặng, tên hoa hoặc ngân sách. Bỏ chọn trạng thái nhận đặt để xem thêm mẫu tham khảo. Ngân sách chưa gồm phí giao; mẫu tham khảo dùng giá dự kiến và chưa nhận đặt.</p>
           </details>
           <div className="product-grid" data-motion={animateCollection}>
             {shown.map((product, index) => (
               <div key={product.id} className="product-reveal" style={{ transitionDelay: `${Math.min(index, 2) * 40}ms` }}>
-                <article className="product-card">
-                  <div className={`product-image tone-${index % 4}`}>
-                    <button
-                      className="product-open"
-                      onClick={() => setSelected(product)}
-                      aria-label={`Xem ${product.name}`}
-                    >
-                      <img
-                        src={product.image}
-                        alt={`Bó hoa ${product.name}`}
-                        loading="lazy"
-                        width="600"
-                        height="700"
-                      />
-                    </button>
-                    <button
-                      className={`favorite-button ${favorites.includes(product.id) ? "is-favorite" : ""}`}
-                      aria-label={`${favorites.includes(product.id) ? "Bỏ lưu" : "Lưu"} ${product.name}`}
-                      aria-pressed={favorites.includes(product.id)}
-                      onClick={() => favorite(product.id)}
-                    >
-                      <Icon name="heart" />
-                    </button>
-                    <button
-                      className="quick-add"
-                      onClick={() => product.reference_only || product.variants?.length ? setSelected(product) : add(product.id)}
-                      aria-label={product.reference_only ? `Xem mẫu tham khảo ${product.name}` : product.variants?.length ? `Chọn cỡ ${product.name}` : `Thêm ${product.name} vào giỏ`}
-                    >
-                      {product.reference_only ? "Xem mẫu hoa" : product.variants?.length ? "Chọn cỡ bó" : "Thêm vào giỏ"} <Icon name="plus" />
-                    </button>
-                  </div>
-                  <div className="product-copy">
-                    <span className="eyebrow">{product.occasion}</span>
-                    {product.featured && (
-                      <span className="product-label">Được yêu thích</span>
-                    )}
-                    <h3>
-                      <button onClick={() => setSelected(product)}>
-                        {product.name}
-                      </button>
-                    </h3>
-                    <div className="product-details">
-                      <span>{product.stems}</span>
-                      <div className="product-price">
-                        <span>{product.reference_only ? "Giá dự kiến" : "Tiêu chuẩn"}</span>
-                        <strong>{money(product.price)}</strong>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="compare-choice" aria-pressed={comparison.includes(product.id)} disabled={!comparison.includes(product.id) && comparison.length >= 3} onClick={() => setComparison(ids => toggleComparison(ids, product.id))}>
-                    {comparison.includes(product.id) ? 'Đã chọn so sánh' : 'So sánh bó hoa'}<span className="sr-only"> {product.name}</span>
-                  </button>
-                </article>
+                <FlowerCard product={product} tone={index % 4} favorite={favorites.includes(product.id)} compared={comparison.includes(product.id)} comparisonFull={comparison.length >= 3}
+                  onView={() => openProduct(product)} onAdd={() => add(product.id)} onFavorite={() => favorite(product.id)} onCompare={() => setComparison(ids => toggleComparison(ids, product.id))} />
               </div>
             ))}
           </div>
@@ -649,7 +650,7 @@ export default function App() {
         <section className="closing">
           <Reveal>
             <span className="eyebrow">
-              Some things are better said with flowers
+              Để hoa thay lời muốn nói
             </span>
             <h2>
               Có những lời,
@@ -678,12 +679,12 @@ export default function App() {
             <h3>Cửa hàng</h3>
             <a href={isProductPage ? '/#collection' : '#collection'}>Chọn hoa</a>
             <a href="#account">Đơn hoa của tôi</a>
-            <a href="#garden">Vườn kỉ niệm</a>
+            <a href="#garden">Vườn kỷ niệm</a>
             {isAdmin && <a href="#admin">Quản trị</a>}
           </nav>
           <div className="footer-contact">
             <h3>Gặp Garden Dreams</h3>
-            <a className="footer-phone" href={`tel:${shop.phone}`}>{shop.phone}</a>
+            <a className="footer-phone" href={`tel:${shop.phone}`}>{displayPhone(shop.phone)}</a>
             <a
               className="text-link"
               href={`https://zalo.me/${shop.phone.replace(/^\+84/, "0")}`}
@@ -728,39 +729,17 @@ export default function App() {
       {selectedProduct && (
         <ProductDialog
           key={selectedProduct.id}
+          shipping={shipping}
           product={selectedProduct}
-          onClose={() => setSelected(null)}
+          onClose={closeProduct}
           onAdd={add}
           onBuy={buy}
           favorite={favorites.includes(selected.id)}
           onFavorite={() => favorite(selected.id)}
         />
       )}
-      {panel === "cart" && (
-        <CartDialog
-          cart={cart}
-          onClose={() => setPanel(null)}
-          onChange={changeCart}
-          onCheckout={() => setPanel("checkout")}
-        />
-      )}
-      {panel === 'compare' && <FlowerComparison products={compared} onClose={() => setPanel(null)} onChoose={p => { setPanel(null); setSelected(p); }} onRemove={id => setComparison(ids => toggleComparison(ids, id))} />}
-      {panel === "checkout" &&
-        (connected ? (
-          <LiveCheckout
-            key={session?.user.id || "guest"}
-            cart={cart}
-            pending={pendingCheckout}
-            onClose={() => setPanel(null)}
-            onComplete={(request) => setCart(current => removeOrderedItems(current, request.items, products))}
-          />
-        ) : (
-          <CheckoutDialog
-            cart={cart}
-            onClose={() => setPanel(null)}
-            onComplete={() => setCart([])}
-          />
-        ))}
+      {shoppingDialogs}
+      {panel === 'compare' && <FlowerComparison products={compared} onClose={() => setPanel(null)} onChoose={p => { setPanel(null); openProduct(p); }} onRemove={id => setComparison(ids => toggleComparison(ids, id))} />}
       {["privacy", "terms"].includes(panel) && (
         <Modal
           title={

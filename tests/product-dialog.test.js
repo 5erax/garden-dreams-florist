@@ -54,7 +54,7 @@ test("product detail identifies the standard size and subtotal before adding", (
   assert.match(html, /1 bó · Tiêu chuẩn/);
   assert.ok(html.includes(money(products[0].price)));
   assert.match(html, /Chưa gồm phí giao hoa/);
-  assert.match(html, /Thêm &amp; đặt ngay/);
+  assert.match(html, /Đặt ngay/);
   assert.doesNotMatch(html, /class="button primary" disabled/);
 });
 
