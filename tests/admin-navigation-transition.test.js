@@ -64,5 +64,24 @@ test('changing admin sections clears incompatible rows and detail before the nex
     find(render(), 'BusinessDashboard').props.onNavigate('products', 1);
     assert.equal(harness.states[0], 'products'); assert.deepEqual(harness.states[1], []);
     assert.equal(harness.refs[0].current, 1);
+    const nodes = node => !node || typeof node !== 'object' ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
+    harness.states[0] = 'products'; harness.states[1] = [];
+    harness.states[2] = false; harness.states[3] = 'Lưu thất bại; giữ nội dung đang sửa.';
+    harness.states[5] = { id: 16, name: 'Đồng hoa', image: '/flowers/bouquet_16-pending.svg', images: [], description: 'Nội dung đang sửa.' };
+    harness.states[6] = null;
+    let tree = nodes(render());
+    const saveBar = tree.find(node => node.props?.className === 'form-actions admin-save-bar');
+    assert.equal(nodes(saveBar).filter(node => node.props?.role === 'alert').length, 1);
+    assert.equal(tree.filter(node => node.props?.role === 'alert').length, 1);
+    assert.equal(tree.find(node => node.type === 'textarea').props.defaultValue, 'Nội dung đang sửa.');
+    assert.equal(tree.find(node => node.props?.['aria-label'] === 'Nguồn ảnh tham khảo')?.type, 'aside');
+    assert.ok(tree.some(node => node.props?.href === 'https://hoayeuthuong.com/hoa-tuoi/hoa-cuc/10675_garden-style-05'));
+    for (const replacement of [{ image: '/flowers/own-photo.webp' }, { images: ['/flowers/own-photo.webp'] }, { name: 'Mẫu đã đổi' }]) {
+      const original = harness.states[5]; harness.states[5] = { ...original, ...replacement };
+      assert.ok(!nodes(render()).some(node => node.props?.['aria-label'] === 'Nguồn ảnh tham khảo'));
+      harness.states[5] = original;
+    }
+    harness.states[5] = null;
+    assert.equal(nodes(render()).filter(node => node.props?.role === 'alert').length, 1);
   } finally { await server.close(); delete globalThis.adminNavigationHarness; }
 });
