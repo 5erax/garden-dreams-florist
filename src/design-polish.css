@@ -209,7 +209,7 @@ dialog { border-radius: 12px; }
 
 /* Keep the purchase controls outside the single scrolling detail body. */
 .product-dialog .dialog-content { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-.product-detail-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rose) var(--paper); }
+.product-detail-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: max-content; align-items: start; align-content: start; min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--rose) var(--paper); }
 .product-dialog .product-gallery, .product-dialog .product-detail-copy { overflow: visible; }
 .product-dialog .product-gallery { height: auto; padding: 24px 20px; }
 .product-dialog .product-gallery-main { height: clamp(160px, 40dvh, 360px); aspect-ratio: auto; flex: none; }
