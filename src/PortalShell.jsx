@@ -6,7 +6,7 @@ import { shopAddress, displayPhone } from "./shop-contact.js";
 import { Modal } from "./ShopDialogs.jsx";
 import { authErrorMessage } from "./auth-error.js";
 
-export function PortalShell({ children, cartCount = 0, onCart }) {
+export function PortalShell({ children, header }) {
   const { shop, session, isAdmin } = useStore();
   const [error, setError] = useState("");
   const [leaving, setLeaving] = useState(false), [busy, setBusy] = useState(false);
@@ -21,20 +21,15 @@ export function PortalShell({ children, cartCount = 0, onCart }) {
     finally { setBusy(false); }
   }
   return (
-    <div className={'portal'+(isAdmin||location.hash==='#admin'?' admin-shell':'')}>
-      <header className="portal-header">
+    <div className={'portal'+(isAdmin||location.hash==='#admin'?' admin-shell':' customer-shell')}>
+      {header || <header className="portal-header">
         <a className="brand" href={isAdmin ? "/#admin" : "/"}>
           <Icon name="flower" />
           <span>{shop.name}</span>
         </a>
         <nav aria-label="Điều hướng cửa hàng">
-          {!isAdmin&&location.hash!=='#admin'&&<a href="/#collection">Bộ sưu tập</a>}
-          {!isAdmin&&location.hash!=='#admin'&&<a href="/#story">Câu chuyện</a>}
-          {!isAdmin&&location.hash!=='#admin'&&<a href="#garden" aria-current={location.hash === '#garden' ? 'page' : undefined}>Vườn kỷ niệm</a>}
-          {!isAdmin&&location.hash!=='#admin'&&<a href="#account" aria-current={location.hash === '#account' ? 'page' : undefined}>Góc của tôi</a>}
           {isAdmin && <a href="#admin" aria-current={isAdmin||location.hash==='#admin'?'page':undefined}>Quản trị cửa hàng</a>}
         </nav>
-        {!isAdmin&&location.hash!=='#admin'&&<button className="cart-trigger portal-cart" onClick={onCart} aria-label={`Mở giỏ hoa, ${cartCount} bó`}><Icon name="bag" /><span>Giỏ hoa</span><span className="cart-count">{cartCount}</span></button>}
         {session && (
           <button
             className="portal-signout"
@@ -44,7 +39,7 @@ export function PortalShell({ children, cartCount = 0, onCart }) {
             Đăng xuất
           </button>
         )}
-      </header>
+      </header>}
       {error && (
         <p className="portal-error" role="alert">
           {error}
@@ -63,6 +58,7 @@ export function PortalShell({ children, cartCount = 0, onCart }) {
         <a href={`tel:${shop.phone}`}>{displayPhone(shop.phone)}</a>
         <a href={`https://zalo.me/${shop.phone.replace(/^\+84/, '0')}`} target="_blank" rel="noreferrer">Trao đổi qua Zalo</a>
         <address>{shop.address || shopAddress}</address><span className="shop-hours">Mở cửa {(shop.opens_at||'08:00').slice(0,5)}–{(shop.closes_at||'17:00').slice(0,5)}</span>
+        {header && session && <button className="portal-signout" disabled={busy} onClick={() => session.user.is_anonymous ? setLeaving(true) : signOut()}>Đăng xuất</button>}
       </footer>
     </div>
   );

@@ -10,7 +10,7 @@ import { deliveryCopy } from '../src/delivery-copy.js';
 import { quickViewUrl, quickViewFromUrl } from '../src/quick-view.js';
 import { watchHistoryUpdates } from '../src/customer-history.js';
 import { matchesFlowerDescription } from '../src/flower-selection.js';
-let server, FlowerCard, Garden, PortalShell;
+let server, FlowerCard, Garden, PortalShell, ShopHeader;
 before(async () => {
   server = await createServer({ root: fileURLToPath(new URL('../', import.meta.url)), configFile: false, envDir: false,
     cacheDir: fileURLToPath(new URL('../node_modules/.vite/tests/shopping-polish', import.meta.url)),
@@ -20,6 +20,7 @@ before(async () => {
   ({ default: FlowerCard } = await server.ssrLoadModule('/src/FlowerCard.jsx'));
   ({ default: Garden } = await server.ssrLoadModule('/src/Garden.jsx'));
   ({ PortalShell } = await server.ssrLoadModule('/src/PortalShell.jsx'));
+  ({ default: ShopHeader } = await server.ssrLoadModule('/src/ShopHeader.jsx'));
 });
 after(async () => { await server?.close(); delete globalThis.shoppingFixture; delete globalThis.location; });
 const flower = { id: 1, slug: 'bo-hoa-1', name: 'Má hồng', stems: 'Hồng phấn, hoa phụ', price: 550000, image: '/flowers/bouquet_7.webp', active: true };
@@ -41,11 +42,12 @@ test('garden with no public messages hides zero counter and has an immediate way
   assert.match(html, /garden-first/); assert.match(html, /href="\/#collection"/);
 });
 test('account shell keeps consistent navigation, active page, cart and contact links', () => {
-  globalThis.location = { hash: '#garden' };
+  globalThis.location = { pathname:'/', hash: '#garden' };
   globalThis.shoppingFixture = { shop: { name: 'Garden Dreams', phone: '0832345780' }, session: { user: { id: 'alice' } }, isAdmin: false };
-  const html = renderToStaticMarkup(createElement(PortalShell, { cartCount: 2, onCart() {} }));
-  assert.match(html, /Bộ sưu tập/); assert.match(html, /Câu chuyện/);
-  assert.match(html, /href="#garden" aria-current="page"/);
+  const header = createElement(ShopHeader, { route:'#garden',cartCount:2,onCart(){},onFavorites(){},onlyFavorites:false });
+  const html = renderToStaticMarkup(createElement(PortalShell, { header }));
+  assert.match(html, /Bộ sưu tập/); assert.match(html, /Đặt &amp; giao hoa/);
+  assert.match(html, /href="#garden"[^>]*aria-current="page"/);
   assert.match(html, /Mở giỏ hoa, 2 bó/); assert.match(html, /class="portal-signout"/);
   assert.match(html, /tel:0832345780/); assert.match(html, /zalo.me\/0832345780/);
 });
