@@ -7,6 +7,8 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 import {cartChoice} from '../src/order.js';
 import { products } from '../src/catalog.js';
+import sampleOrders from '../src/garden-orders.json' with { type: 'json' };
+import { existsSync } from 'node:fs';
 
 let server, App;
 before(async()=>{
@@ -33,6 +35,10 @@ test('homepage renders its hero and collection from the public snapshot',()=>{
   assert.match(html,/<details class="flower-finder">/);
   assert.doesNotMatch(html,/class="quick-add"/);
   assert.match(html,/class="button hero-cta" href="#collection"/);
+  assert.match(html,/<h2>Bộ sưu tập hoa<\/h2>/);
+  assert.match(html,/class="ordering-guide" id="story"/);
+  assert.match(html,/Xem khu vực &amp; phí giao/);
+  assert.doesNotMatch(html,/Rooted in love|Thay ngàn lời|story-composition/);
 });
 
 test('cold product route has readable navigation and tolerates legacy snapshot data',()=>{
@@ -44,6 +50,42 @@ test('cold product route has readable navigation and tolerates legacy snapshot d
   assert.match(html,/id="buy"/);
   assert.equal((html.match(/<h1[ >]/g)||[]).length,1);
   assert.doesNotMatch(html,/id="home"/);
+});
+
+test('customers keep the same header across shop, garden and account routes',()=>{
+ const previous=globalThis.storefrontFixture;
+ globalThis.storefrontFixture={...previous,session:{user:{id:'customer-test',email:'customer@example.test',is_anonymous:false}}};
+ try {
+   const headers=['#home','#garden','#account'].map(hash=>{
+     globalThis.location={pathname:'/',hash};
+     const html=renderToStaticMarkup(createElement(App));
+     assert.equal((html.match(/<header[ >]/g)||[]).length,1);
+     assert.doesNotMatch(html,/class="portal-header"/);
+     return html.match(/<header[\s\S]*?<\/header>/)[0].replace('header is-scrolled','header ').replace(/ aria-current="page"/g,'');
+   });
+   assert.equal(headers[0],headers[1]); assert.equal(headers[1],headers[2]);
+   assert.match(headers[0],/Đặt &amp; giao hoa/);
+ }finally{globalThis.storefrontFixture=previous;}
+});
+
+test('forty synthetic completed orders carry original cards and no customer identity',async()=>{
+ assert.equal(sampleOrders.length,40);
+ assert.equal(new Set(sampleOrders.map(o=>o.id)).size,40);
+ assert.equal(new Set(sampleOrders.map(o=>o.memory.token)).size,40);
+ assert.equal(new Set(sampleOrders.map(o=>o.memory.message)).size,40);
+ for(const order of sampleOrders){
+   assert.equal(order.is_test,true); assert.equal(order.status,'DELIVERED'); assert.equal(order.payment_status,'PAID');
+   assert.equal(order.owner_id,null); assert.equal(order.total,order.items[0].price);
+   assert.equal(order.memory.signature,'Garden Dreams');
+   assert.ok(existsSync(new URL('../public'+order.memory.flowerImage,import.meta.url)));
+   assert.ok(!('recipient_phone' in order) && !('address' in order));
+ }
+ const {SharedMemory}=await server.ssrLoadModule('/src/Garden.jsx');
+ const html=renderToStaticMarkup(createElement(SharedMemory,{token:sampleOrders[0].memory.token}));
+ assert.match(html,/Một lời nhắn gợi ý tại/); assert.match(html,/Garden Dreams/);
+ const privateCard=renderToStaticMarkup(createElement(SharedMemory,{token:'70000000-0000-4000-8000-000000000001'}));
+ assert.match(privateCard,/đang được giữ riêng/);
+ assert.doesNotMatch(privateCard,/Một lời nhắn gợi ý tại/);
 });
 
 test('admin account uses the workspace on the homepage and product previews have no purchasing controls',()=>{

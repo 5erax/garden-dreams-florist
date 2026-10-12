@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { call } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
+import sampleOrders from './garden-orders.json' with { type: 'json' };
+const greetingCards = sampleOrders.map(order => order.memory);
 
 export default function Garden() {
   const { connected } = useStore();
@@ -11,6 +13,10 @@ export default function Garden() {
     [busy, setBusy] = useState(connected),
     [error, setError] = useState(""),
     [more, setMore] = useState(false);
+  const [exampleLimit, setExampleLimit] = useState(24);
+  const examples = connected && !busy && !error && count === 0 && memories.length === 0;
+  const shown = examples ? greetingCards.slice(0, exampleLimit) : memories;
+  const total = examples ? greetingCards.length : count;
   async function load(append = false) {
     setBusy(true);
     setError("");
@@ -45,28 +51,27 @@ export default function Garden() {
           <br />
           <em>ở lại thành hoa.</em>
         </h1>
-        <p>
+        {examples ? <p>Những gợi ý lời nhắn để bạn gửi cùng bó hoa.<br />Chọn một bông hoa để đọc tấm thiệp.</p> : <p>
           Những lời nhắn được khách tự nguyện chia sẻ sau khi hoàn tất đơn hoa.
           <br />
           Một khu vườn lớn dần bằng những kỷ niệm.
-        </p>
-        {count > 0 && <div className="garden-count">
+        </p>}
+        {total > 0 && <div className="garden-count">
           <Icon name="flower" />
-          <strong>{new Intl.NumberFormat("vi-VN").format(count)}</strong>
-          <span>dấu hoa từ những đơn hoàn tất</span>
+          <strong>{new Intl.NumberFormat("vi-VN").format(total)}</strong>
+          <span>{examples ? 'gợi ý lời nhắn' : 'dấu hoa từ những đơn hoàn tất'}</span>
         </div>}
-        {!busy && !memories.length && !error && <p className="garden-empty-status">Khu vườn đang chờ lời thương đầu tiên. Chưa có thông điệp công khai.</p>}
-        {!busy && count === 0 && !error && <a className="button primary garden-first" href="/#collection">Chọn hoa, bắt đầu một lời thương <Icon name="arrow" /></a>}
+        {!busy && !shown.length && !error && <p className="garden-empty-status">Khu vườn đang chờ lời thương đầu tiên. Chưa có thông điệp công khai.</p>}
+        {!busy && total === 0 && !error && <a className="button primary garden-first" href="/#collection">Chọn hoa, bắt đầu một lời thương <Icon name="arrow" /></a>}
         <small>
-          Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỷ niệm riêng
-          vẫn được giữ riêng.
+          {examples ? 'Gợi ý được viết bởi Garden Dreams. Kỷ niệm từ đơn hoa chỉ được công khai khi người gửi đồng ý.' : 'Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỷ niệm riêng vẫn được giữ riêng.'}
         </small>
       </section>
       <section
         className="memory-garden"
-        aria-label="Những thông điệp được khách chia sẻ"
+        aria-label={examples ? 'Gợi ý lời nhắn cho thiệp hoa' : 'Những thông điệp được khách chia sẻ'}
       >
-        {memories.map((m, i) => (
+        {shown.map((m, i) => (
           <a
             className={`memory-flower flower-tone-${i % 4}`}
             href={"#memory/" + m.token}
@@ -78,20 +83,20 @@ export default function Garden() {
             </div>
             <blockquote>{m.message}</blockquote>
             <span>{m.signature || "Một người gửi thương"}</span>
-            <small>
+            {!examples && <small>
               {new Intl.DateTimeFormat("vi-VN", {
                 month: "long",
                 year: "numeric",
               }).format(new Date(m.createdAt))}
-            </small>
+            </small>}
           </a>
         ))}
       </section>
-      {more && (
+      {(more || (examples && exampleLimit < greetingCards.length)) && (
         <button
           className="button outline garden-more"
           disabled={busy}
-          onClick={() => load(true)}
+          onClick={() => examples ? setExampleLimit(limit => Math.min(limit + 24, greetingCards.length)) : load(true)}
         >
           Gặp thêm những lời thương
         </button>
@@ -107,11 +112,13 @@ export default function Garden() {
 }
 export function SharedMemory({ token }) {
   const { connected, shop } = useStore();
-  const [memory, setMemory] = useState(null),
-    [busy, setBusy] = useState(connected),
+  const example = greetingCards.find(card => card.token === token);
+  const [memory, setMemory] = useState(example || null),
+    [busy, setBusy] = useState(connected && !example),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
+    if (example) { setMemory(example); setBusy(false); return; }
     if (!connected) {
       setBusy(false);
       return;
@@ -160,7 +167,7 @@ export function SharedMemory({ token }) {
     );
   return (
     <article className="shared-card">
-      <span className="eyebrow">A LITTLE LOVE, SENT WITH FLOWERS</span>
+      <span className="eyebrow">{example ? 'Lời nhắn để bạn gửi cùng hoa' : 'A LITTLE LOVE, SENT WITH FLOWERS'}</span>
       <div className="shared-flower">
         <img src={memory.flowerImage} alt={memory.flowerName} />
       </div>
@@ -173,9 +180,9 @@ export function SharedMemory({ token }) {
       <div className="shared-card-footer">
         <Icon name="flower" />
         <p>
-          Một dấu hoa tại {shop.name}
+          {example ? 'Một lời nhắn gợi ý tại' : 'Một dấu hoa tại'} {shop.name}
           <br />
-          {new Intl.DateTimeFormat("vi-VN", {
+          {!example && new Intl.DateTimeFormat("vi-VN", {
             month: "long",
             year: "numeric",
           }).format(new Date(memory.createdAt))}

@@ -1,7 +1,7 @@
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useInView } from "motion/react";
-import StoryPhoto from './StoryPhoto.jsx';
+import ShopHeader from './ShopHeader.jsx';
 import { occasions, money } from "./catalog.js";
 import { normalizeCart, cartChoice, cartKey, removeOrderedItems,vietnamDate } from "./order.js";
 import { useCustomerCart } from './customer-cart.js';
@@ -140,7 +140,7 @@ export default function App() {
     return () => window.removeEventListener("hashchange", changed);
   }, []);
   useEffect(() => {
-    const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỷ niệm', '#collection': 'Bộ sưu tập hoa tươi' }[route];
+    const section = { '#account': 'Tài khoản & đơn hoa', '#admin': 'Quản trị', '#garden': 'Vườn kỷ niệm', '#collection': 'Bộ sưu tập hoa tươi', '#story': 'Đặt & giao hoa' }[route];
     document.title = `${section || (pageProduct && productTitle(pageProduct)) || 'Hoa tươi, giao hoa Long Thành, Đồng Nai'} | Garden Dreams`;
     let robots = document.querySelector('meta[name="robots"]');
     if (['#account', '#admin'].includes(route)) {
@@ -194,7 +194,6 @@ export default function App() {
     previousCustomer.current = session?.user.id || null;
   }, [session?.user.id]);
   const [notice, setNotice] = useState("");
-  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     try {
       localStorage.setItem("gd-favorites", JSON.stringify(favorites));
@@ -208,11 +207,9 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [notice]);
   useEffect(() => {
-    const scroll = () => setScrolled(window.scrollY > 60);
-    scroll();
-    window.addEventListener("scroll", scroll, { passive: true });
-    return () => window.removeEventListener("scroll", scroll);
-  }, []);
+    if (['#collection', '#story', '#home'].includes(route)) document.getElementById(route.slice(1))?.scrollIntoView({ behavior: 'instant' });
+    else if (['#account', '#garden'].includes(route) || route.startsWith('#memory/')) window.scrollTo(0, 0);
+  }, [route]);
   function changeCart(id, quantity, variantId) {
     const key = cartKey({ id, variantId });
     setCart((current) =>
@@ -314,6 +311,12 @@ export default function App() {
           />
         ))}
   </>;
+  const customerHeader = <ShopHeader route={route} cartCount={count} onCart={() => setPanel('cart')} onlyFavorites={onlyFavorites} notice={notice} onFavorites={() => {
+    setOnlyFavorites(!onlyFavorites); setAnimateCollection(false); setShowAll(true); setOccasion('Tất cả');
+    const collection = document.getElementById('collection');
+    if (collection) collection.scrollIntoView({ behavior: 'smooth' });
+    else location.hash = '#collection';
+  }} />;
   if (isAdmin) return <PortalShell>
     {recovery || session.user.user_metadata?.gd_needs_password ? <RouteBoundary load={loadCustomer} title="Đặt mật khẩu quản trị" /> : isProductPage && pageProduct ? <ProductDialog key={pageProduct.id} inline readOnly shipping={shipping} product={pageProduct} /> :
     <RouteBoundary key={session.user.id} load={loadAdmin} title="Quản trị cửa hàng" />}
@@ -325,7 +328,7 @@ export default function App() {
     route.startsWith("#memory/")
   )
     return (
-      <><PortalShell cartCount={count} onCart={() => setPanel("cart")}>
+      <><PortalShell header={customerHeader}>
         {pendingNotice}
         <RouteBoundary
           key={`${route}:${session?.user.id || "signed-out"}`}
@@ -341,57 +344,7 @@ export default function App() {
       <a href={isProductPage ? '/#collection' : '#collection'} className="skip-link">
         Đến bộ sưu tập hoa
       </a>
-      <header className={`header ${scrolled || isProductPage ? "is-scrolled" : ""}`}>
-        <a
-          className="brand"
-          href={isProductPage ? '/#home' : '#home'}
-          aria-label="Garden Dreams — về đầu trang"
-        >
-          <Icon name="flower" />
-          <span>{shop.name}</span>
-        </a>
-        <nav aria-label="Điều hướng chính">
-          <a href={isProductPage ? '/#collection' : '#collection'} aria-current={route === '#collection' ? 'page' : undefined}>Bộ sưu tập</a>
-          <a href={isProductPage ? '/#story' : '#story'}>Câu chuyện</a>
-          <a href="#garden" aria-current={route === "#garden" ? "page" : undefined} onPointerEnter={() => { loadGarden().catch(() => {}); }} onFocus={() => { loadGarden().catch(() => {}); }}>Vườn kỷ niệm</a>
-        </nav>
-        <div className="header-actions">
-          <a
-            href="#account"
-            onPointerEnter={() => { loadCustomer().catch(() => {}); }} onFocus={() => { loadCustomer().catch(() => {}); }}
-            className="icon-button account-link"
-            aria-label={
-              session ? "Góc kỷ niệm của tôi" : "Tài khoản & lịch sử mua"
-            }
-          >
-            <Icon name="user" />
-          </a>
-          <button
-            className={`icon-button ${onlyFavorites ? "is-favorite" : ""}`}
-            aria-label="Xem hoa yêu thích"
-            onClick={() => {
-              setOnlyFavorites(!onlyFavorites);
-              setAnimateCollection(false);
-              setShowAll(true);
-              setOccasion("Tất cả");
-              document
-                .getElementById("collection")
-                .scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <Icon name="heart" />
-          </button>
-          <button
-            className={`cart-trigger ${notice ? "has-new-items" : ""}`}
-            onClick={() => setPanel("cart")}
-            aria-label={`Mở giỏ hoa, ${count} bó`}
-          >
-            <Icon name="bag" />
-            <span className="cart-label">Giỏ hoa</span>
-            <span className="cart-count">{count}</span>
-          </button>
-        </div>
-      </header>
+      {customerHeader}
       <main>
         {isProductPage ? <section className="product-route section-shell">
           <a className="text-link" href="/#collection">← Bộ sưu tập hoa</a>
@@ -413,25 +366,7 @@ export default function App() {
           </span>
         </div>
         <section className="collection section-shell" id="collection">{products.some(p=>p.active&&p.occasions?.includes('20/10'))&&vietnamDate().slice(5)<='10-20'&&vietnamDate().slice(5)>='10-01'&&<div className="holiday-banner"><p><strong>20/10 · Một bó hoa cho người bạn thương</strong><br/>Còn {Math.ceil((Date.parse(vietnamDate().slice(0,4)+'-10-20T00:00:00+07:00')-Date.parse(vietnamDate()+'T00:00:00+07:00'))/86400000)} ngày. Ngày giao và giờ chốt được kiểm tra khi đặt.</p><button className="button outline" onClick={()=>selectOccasion('20/10')}>Chọn hoa 20/10</button></div>}
-          <Reveal className="section-heading">
-            <div>
-              <span className="eyebrow">Bộ sưu tập hoa tươi / 01</span>
-              <h2>
-                Một bó hoa.
-                <br />
-                <em>Thay ngàn lời.</em>
-              </h2>
-            </div>
-            <div className="section-intro">
-              <Icon name="flower" />
-              <p>
-                Cho ngày đặc biệt. Cho một người đặc biệt.
-                <br />
-                Hay đơn giản, cho chính bạn.
-              </p>
-              <span>Chọn một bó hoa để bắt đầu câu chuyện.</span>
-            </div>
-          </Reveal>
+          <div className="collection-heading"><h2>Bộ sưu tập hoa</h2><p>Chọn dịp tặng, tìm tên hoa hoặc lọc theo ngân sách.</p></div>
           <div className="collection-tools">
             <div
               className="filters"
@@ -545,53 +480,16 @@ export default function App() {
           )}
           {compared.length > 0 && <div className="comparison-bar"><span>{compared.length}/3 bó hoa để so sánh{compared.length === 3 ? ' · Bỏ một mẫu để chọn mẫu khác' : ''}</span><button className="button primary" onClick={() => setPanel('compare')}>So sánh ngay</button><button className="text-button" onClick={() => setComparison([])}>Bỏ chọn tất cả</button></div>}
         </section>
-        <section className="story" id="story">
-          <div className="section-shell">
-            <Reveal className="story-top">
-              <span className="eyebrow">Rooted in love / 02</span>
-              <h2>
-                Từ một khu vườn nhỏ,
-                <br />
-                <em>đến những trái tim.</em>
-              </h2>
-              <p>
-                Hoa không cần nói nhiều.
-                <br />
-                Một cánh mềm, một sắc hồng, một mùi hương quen.
-                <br />
-                Đôi khi, thế là đủ để ai đó biết mình được thương.
-              </p>
-            </Reveal>
-            <Reveal className="story-composition">
-              <img
-                className="story-floral"
-                src="/flowers/cherry_blossom_frame.webp"
-                alt=""
-                loading="lazy"
-              />
-              <StoryPhoto className="first" src="/media/story-4.jpg"
-                alt="Một khu vườn xanh, nơi những mầm hoa bắt đầu" caption="01 — Từ thiên nhiên" />
-              <div className="story-handwriting">
-                bằng tất cả
-                <br />
-                lời thương.
-              </div>
-              <StoryPhoto className="second" src="/media/story-3.jpg"
-                alt="Hoa được chọn để tạo nên một bó hoa riêng" caption="02 — Bằng cả tấm lòng" />
-            </Reveal>
-            <Reveal className="story-bottom">
-              <span>✳</span>
-              <p>
-                Mỗi bó hoa là một lời nhắn nhỏ.
-                <br />
-                <em>Và mỗi người nhận, là một câu chuyện riêng.</em>
-              </p>
-              <a className="text-link" href={isProductPage ? '/#collection' : '#collection'}>
-                Tìm lời nhắn của bạn <Icon name="arrow" />
-              </a>
-            </Reveal>
-          </div>
-        </section>
+        <section className="ordering-guide" id="story"><div className="section-shell">
+          <h2>Đặt & giao hoa</h2>
+          <p className="ordering-intro">Từ bó hoa bạn chọn đến lời nhắn được giữ lại.</p>
+          <ol>
+            <li><h3>Chọn bó & lời nhắn</h3><p>Chọn mẫu đang nhận đặt, cỡ bó và lời nhắn trên thiệp.</p></li>
+            <li><h3>Xem phí & ca giao</h3><p>Nhập địa chỉ, chọn khu vực và ngày giao. Phí, lịch còn nhận và tổng tiền hiển thị trước khi gửi đơn.</p></li>
+            <li><h3>Theo dõi & giữ kỷ niệm</h3><p>Theo dõi đơn trong Góc của tôi. Khi hoàn tất, bạn có thể giữ riêng hoặc chia sẻ lời nhắn.</p></li>
+          </ol>
+          <div className="ordering-links"><span>{deliveryCopy(shipping)}</span><button className="text-link" onClick={() => setPanel('delivery-zones')}>Xem khu vực & phí giao <Icon name="arrow" /></button><a className="text-link" href={isProductPage ? '/#account' : '#account'}>Góc của tôi <Icon name="arrow" /></a></div>
+        </div></section>
         <section className="care section-shell" id="care">
           <Reveal className="care-heading">
             <span className="eyebrow">A little flower care / 03</span>

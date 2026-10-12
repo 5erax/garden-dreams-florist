@@ -1,0 +1,1242 @@
+[
+  {
+    "id": "40000000-0000-4000-8000-000000000040",
+    "reference": "GD-SAMPLE-0040",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-10T02:00:00.000Z",
+    "delivery_date": "2026-10-10",
+    "items": [
+      {
+        "id": 10,
+        "name": "Hồng nhung",
+        "image": "/flowers/bouquet_10.webp",
+        "price": 790000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 790000,
+    "total": 790000,
+    "card_message": "Mong lời thương này ở lại lâu hơn một mùa hoa.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000040",
+      "token": "60000000-0000-4000-8000-000000000040",
+      "message": "Mong lời thương này ở lại lâu hơn một mùa hoa.",
+      "signature": "Garden Dreams",
+      "flowerName": "Hồng nhung",
+      "flowerImage": "/flowers/bouquet_10.webp",
+      "createdAt": "2026-10-10T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000039",
+    "reference": "GD-SAMPLE-0039",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-09T02:00:00.000Z",
+    "delivery_date": "2026-10-09",
+    "items": [
+      {
+        "id": 9,
+        "name": "Giai điệu vườn",
+        "image": "/flowers/bouquet_9.webp",
+        "price": 520000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 520000,
+    "total": 520000,
+    "card_message": "Gửi bạn sắc hoa tươi và một lời chúc mọi việc thuận lành.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000039",
+      "token": "60000000-0000-4000-8000-000000000039",
+      "message": "Gửi bạn sắc hoa tươi và một lời chúc mọi việc thuận lành.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giai điệu vườn",
+      "flowerImage": "/flowers/bouquet_9.webp",
+      "createdAt": "2026-10-09T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000038",
+    "reference": "GD-SAMPLE-0038",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-08T02:00:00.000Z",
+    "delivery_date": "2026-10-08",
+    "items": [
+      {
+        "id": 8,
+        "name": "Nhớ thương",
+        "image": "/flowers/bouquet_8.webp",
+        "price": 650000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 650000,
+    "total": 650000,
+    "card_message": "Chúc mừng kỷ niệm. Mong còn nhiều câu chuyện đẹp để cùng nhớ.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000038",
+      "token": "60000000-0000-4000-8000-000000000038",
+      "message": "Chúc mừng kỷ niệm. Mong còn nhiều câu chuyện đẹp để cùng nhớ.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nhớ thương",
+      "flowerImage": "/flowers/bouquet_8.webp",
+      "createdAt": "2026-10-08T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000037",
+    "reference": "GD-SAMPLE-0037",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-07T02:00:00.000Z",
+    "delivery_date": "2026-10-07",
+    "items": [
+      {
+        "id": 7,
+        "name": "Má hồng",
+        "image": "/flowers/bouquet_7.webp",
+        "price": 550000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 550000,
+    "total": 550000,
+    "card_message": "Mong hôm nay bạn tìm được một điều khiến lòng mình nhẹ hơn.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000037",
+      "token": "60000000-0000-4000-8000-000000000037",
+      "message": "Mong hôm nay bạn tìm được một điều khiến lòng mình nhẹ hơn.",
+      "signature": "Garden Dreams",
+      "flowerName": "Má hồng",
+      "flowerImage": "/flowers/bouquet_7.webp",
+      "createdAt": "2026-10-07T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000036",
+    "reference": "GD-SAMPLE-0036",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-06T02:00:00.000Z",
+    "delivery_date": "2026-10-06",
+    "items": [
+      {
+        "id": 6,
+        "name": "Giấc mơ mẫu đơn",
+        "image": "/flowers/bouquet_6.webp",
+        "price": 890000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 890000,
+    "total": 890000,
+    "card_message": "Cảm ơn vì những bữa cơm, những cuộc gọi và sự quan tâm lặng lẽ.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000036",
+      "token": "60000000-0000-4000-8000-000000000036",
+      "message": "Cảm ơn vì những bữa cơm, những cuộc gọi và sự quan tâm lặng lẽ.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giấc mơ mẫu đơn",
+      "flowerImage": "/flowers/bouquet_6.webp",
+      "createdAt": "2026-10-06T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000035",
+    "reference": "GD-SAMPLE-0035",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-05T02:00:00.000Z",
+    "delivery_date": "2026-10-05",
+    "items": [
+      {
+        "id": 5,
+        "name": "Mộng hoa",
+        "image": "/flowers/bouquet_5.webp",
+        "price": 590000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 590000,
+    "total": 590000,
+    "card_message": "Không có lời nào đủ, nên mình gửi thêm một chút hoa.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000035",
+      "token": "60000000-0000-4000-8000-000000000035",
+      "message": "Không có lời nào đủ, nên mình gửi thêm một chút hoa.",
+      "signature": "Garden Dreams",
+      "flowerName": "Mộng hoa",
+      "flowerImage": "/flowers/bouquet_5.webp",
+      "createdAt": "2026-10-05T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000034",
+    "reference": "GD-SAMPLE-0034",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-04T02:00:00.000Z",
+    "delivery_date": "2026-10-04",
+    "items": [
+      {
+        "id": 4,
+        "name": "Tình ca",
+        "image": "/flowers/bouquet_4.webp",
+        "price": 690000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 690000,
+    "total": 690000,
+    "card_message": "Chúc bạn gặp những điều tốt đẹp trên hành trình riêng của mình.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000034",
+      "token": "60000000-0000-4000-8000-000000000034",
+      "message": "Chúc bạn gặp những điều tốt đẹp trên hành trình riêng của mình.",
+      "signature": "Garden Dreams",
+      "flowerName": "Tình ca",
+      "flowerImage": "/flowers/bouquet_4.webp",
+      "createdAt": "2026-10-04T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000033",
+    "reference": "GD-SAMPLE-0033",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-03T02:00:00.000Z",
+    "delivery_date": "2026-10-03",
+    "items": [
+      {
+        "id": 3,
+        "name": "Lời thì thầm",
+        "image": "/flowers/bouquet_3.webp",
+        "price": 450000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 450000,
+    "total": 450000,
+    "card_message": "Gửi một lời xin lỗi chân thành và mong có cơ hội lắng nghe.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000033",
+      "token": "60000000-0000-4000-8000-000000000033",
+      "message": "Gửi một lời xin lỗi chân thành và mong có cơ hội lắng nghe.",
+      "signature": "Garden Dreams",
+      "flowerName": "Lời thì thầm",
+      "flowerImage": "/flowers/bouquet_3.webp",
+      "createdAt": "2026-10-03T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000032",
+    "reference": "GD-SAMPLE-0032",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-02T02:00:00.000Z",
+    "delivery_date": "2026-10-02",
+    "items": [
+      {
+        "id": 2,
+        "name": "Khúc hồng",
+        "image": "/flowers/bouquet_2.webp",
+        "price": 490000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 490000,
+    "total": 490000,
+    "card_message": "Chúc gia đình một mùa sum vầy ấm áp và thật nhiều tiếng cười.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000032",
+      "token": "60000000-0000-4000-8000-000000000032",
+      "message": "Chúc gia đình một mùa sum vầy ấm áp và thật nhiều tiếng cười.",
+      "signature": "Garden Dreams",
+      "flowerName": "Khúc hồng",
+      "flowerImage": "/flowers/bouquet_2.webp",
+      "createdAt": "2026-10-02T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000031",
+    "reference": "GD-SAMPLE-0031",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-10-01T02:00:00.000Z",
+    "delivery_date": "2026-10-01",
+    "items": [
+      {
+        "id": 1,
+        "name": "Nắng dịu",
+        "image": "/flowers/bouquet_1.webp",
+        "price": 390000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 390000,
+    "total": 390000,
+    "card_message": "Mong mỗi lần nhìn những bông hoa, bạn nhớ mình được yêu thương.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000031",
+      "token": "60000000-0000-4000-8000-000000000031",
+      "message": "Mong mỗi lần nhìn những bông hoa, bạn nhớ mình được yêu thương.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nắng dịu",
+      "flowerImage": "/flowers/bouquet_1.webp",
+      "createdAt": "2026-10-01T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000030",
+    "reference": "GD-SAMPLE-0030",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-30T02:00:00.000Z",
+    "delivery_date": "2026-09-30",
+    "items": [
+      {
+        "id": 15,
+        "name": "Hòa nhịp",
+        "image": "/flowers/bouquet_15.webp",
+        "price": 850000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 850000,
+    "total": 850000,
+    "card_message": "Cảm ơn bạn đã bước cùng mình qua một đoạn đường đáng nhớ.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000030",
+      "token": "60000000-0000-4000-8000-000000000030",
+      "message": "Cảm ơn bạn đã bước cùng mình qua một đoạn đường đáng nhớ.",
+      "signature": "Garden Dreams",
+      "flowerName": "Hòa nhịp",
+      "flowerImage": "/flowers/bouquet_15.webp",
+      "createdAt": "2026-09-30T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000029",
+    "reference": "GD-SAMPLE-0029",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-29T02:00:00.000Z",
+    "delivery_date": "2026-09-29",
+    "items": [
+      {
+        "id": 14,
+        "name": "Lời hẹn tulip",
+        "image": "/flowers/bouquet_14.webp",
+        "price": 720000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 720000,
+    "total": 720000,
+    "card_message": "Chúc công việc mới mang đến những người đồng hành tử tế.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000029",
+      "token": "60000000-0000-4000-8000-000000000029",
+      "message": "Chúc công việc mới mang đến những người đồng hành tử tế.",
+      "signature": "Garden Dreams",
+      "flowerName": "Lời hẹn tulip",
+      "flowerImage": "/flowers/bouquet_14.webp",
+      "createdAt": "2026-09-29T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000028",
+    "reference": "GD-SAMPLE-0028",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-28T02:00:00.000Z",
+    "delivery_date": "2026-09-28",
+    "items": [
+      {
+        "id": 13,
+        "name": "Mẫu đơn kiêu sa",
+        "image": "/flowers/bouquet_13.webp",
+        "price": 950000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 950000,
+    "total": 950000,
+    "card_message": "Một bó hoa cho chính mình, vì những ngày đã không bỏ cuộc.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000028",
+      "token": "60000000-0000-4000-8000-000000000028",
+      "message": "Một bó hoa cho chính mình, vì những ngày đã không bỏ cuộc.",
+      "signature": "Garden Dreams",
+      "flowerName": "Mẫu đơn kiêu sa",
+      "flowerImage": "/flowers/bouquet_13.webp",
+      "createdAt": "2026-09-28T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000027",
+    "reference": "GD-SAMPLE-0027",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-27T02:00:00.000Z",
+    "delivery_date": "2026-09-27",
+    "items": [
+      {
+        "id": 12,
+        "name": "Khoảng trời xanh",
+        "image": "/flowers/bouquet_12.webp",
+        "price": 620000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 620000,
+    "total": 620000,
+    "card_message": "Mong bạn sớm khỏe và lại có những ngày đầy năng lượng.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000027",
+      "token": "60000000-0000-4000-8000-000000000027",
+      "message": "Mong bạn sớm khỏe và lại có những ngày đầy năng lượng.",
+      "signature": "Garden Dreams",
+      "flowerName": "Khoảng trời xanh",
+      "flowerImage": "/flowers/bouquet_12.webp",
+      "createdAt": "2026-09-27T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000026",
+    "reference": "GD-SAMPLE-0026",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-26T02:00:00.000Z",
+    "delivery_date": "2026-09-26",
+    "items": [
+      {
+        "id": 11,
+        "name": "Nắng mùa hè",
+        "image": "/flowers/bouquet_11.webp",
+        "price": 480000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 480000,
+    "total": 480000,
+    "card_message": "Gửi lời thương đến người đã làm ngôi nhà trở nên ấm áp.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000026",
+      "token": "60000000-0000-4000-8000-000000000026",
+      "message": "Gửi lời thương đến người đã làm ngôi nhà trở nên ấm áp.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nắng mùa hè",
+      "flowerImage": "/flowers/bouquet_11.webp",
+      "createdAt": "2026-09-26T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000025",
+    "reference": "GD-SAMPLE-0025",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-25T02:00:00.000Z",
+    "delivery_date": "2026-09-25",
+    "items": [
+      {
+        "id": 10,
+        "name": "Hồng nhung",
+        "image": "/flowers/bouquet_10.webp",
+        "price": 790000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 790000,
+    "total": 790000,
+    "card_message": "Chúc mừng tốt nghiệp. Một hành trình đẹp đang chờ phía trước.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000025",
+      "token": "60000000-0000-4000-8000-000000000025",
+      "message": "Chúc mừng tốt nghiệp. Một hành trình đẹp đang chờ phía trước.",
+      "signature": "Garden Dreams",
+      "flowerName": "Hồng nhung",
+      "flowerImage": "/flowers/bouquet_10.webp",
+      "createdAt": "2026-09-25T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000024",
+    "reference": "GD-SAMPLE-0024",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-24T02:00:00.000Z",
+    "delivery_date": "2026-09-24",
+    "items": [
+      {
+        "id": 9,
+        "name": "Giai điệu vườn",
+        "image": "/flowers/bouquet_9.webp",
+        "price": 520000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 520000,
+    "total": 520000,
+    "card_message": "Mong bạn giữ được điều mình yêu, cả trong những ngày bận rộn.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000024",
+      "token": "60000000-0000-4000-8000-000000000024",
+      "message": "Mong bạn giữ được điều mình yêu, cả trong những ngày bận rộn.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giai điệu vườn",
+      "flowerImage": "/flowers/bouquet_9.webp",
+      "createdAt": "2026-09-24T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000023",
+    "reference": "GD-SAMPLE-0023",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-23T02:00:00.000Z",
+    "delivery_date": "2026-09-23",
+    "items": [
+      {
+        "id": 8,
+        "name": "Nhớ thương",
+        "image": "/flowers/bouquet_8.webp",
+        "price": 650000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 650000,
+    "total": 650000,
+    "card_message": "Cảm ơn vì sự kiên nhẫn, bao dung và những lần lắng nghe.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000023",
+      "token": "60000000-0000-4000-8000-000000000023",
+      "message": "Cảm ơn vì sự kiên nhẫn, bao dung và những lần lắng nghe.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nhớ thương",
+      "flowerImage": "/flowers/bouquet_8.webp",
+      "createdAt": "2026-09-23T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000022",
+    "reference": "GD-SAMPLE-0022",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-22T02:00:00.000Z",
+    "delivery_date": "2026-09-22",
+    "items": [
+      {
+        "id": 7,
+        "name": "Má hồng",
+        "image": "/flowers/bouquet_7.webp",
+        "price": 550000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 550000,
+    "total": 550000,
+    "card_message": "Gửi bạn một lời động viên: những cố gắng nhỏ vẫn đang lớn lên.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000022",
+      "token": "60000000-0000-4000-8000-000000000022",
+      "message": "Gửi bạn một lời động viên: những cố gắng nhỏ vẫn đang lớn lên.",
+      "signature": "Garden Dreams",
+      "flowerName": "Má hồng",
+      "flowerImage": "/flowers/bouquet_7.webp",
+      "createdAt": "2026-09-22T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000021",
+    "reference": "GD-SAMPLE-0021",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-21T02:00:00.000Z",
+    "delivery_date": "2026-09-21",
+    "items": [
+      {
+        "id": 6,
+        "name": "Giấc mơ mẫu đơn",
+        "image": "/flowers/bouquet_6.webp",
+        "price": 890000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 890000,
+    "total": 890000,
+    "card_message": "Chúc bạn một sáng mới nhẹ lòng và một buổi tối an yên.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000021",
+      "token": "60000000-0000-4000-8000-000000000021",
+      "message": "Chúc bạn một sáng mới nhẹ lòng và một buổi tối an yên.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giấc mơ mẫu đơn",
+      "flowerImage": "/flowers/bouquet_6.webp",
+      "createdAt": "2026-09-21T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000020",
+    "reference": "GD-SAMPLE-0020",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-20T02:00:00.000Z",
+    "delivery_date": "2026-09-20",
+    "items": [
+      {
+        "id": 5,
+        "name": "Mộng hoa",
+        "image": "/flowers/bouquet_5.webp",
+        "price": 590000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 590000,
+    "total": 590000,
+    "card_message": "Mong ngày trở về của bạn luôn có người chờ và hoa nở.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000020",
+      "token": "60000000-0000-4000-8000-000000000020",
+      "message": "Mong ngày trở về của bạn luôn có người chờ và hoa nở.",
+      "signature": "Garden Dreams",
+      "flowerName": "Mộng hoa",
+      "flowerImage": "/flowers/bouquet_5.webp",
+      "createdAt": "2026-09-20T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000019",
+    "reference": "GD-SAMPLE-0019",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-19T02:00:00.000Z",
+    "delivery_date": "2026-09-19",
+    "items": [
+      {
+        "id": 4,
+        "name": "Tình ca",
+        "image": "/flowers/bouquet_4.webp",
+        "price": 690000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 690000,
+    "total": 690000,
+    "card_message": "Chúc đôi bạn có thật nhiều ngày cùng nhau trồng niềm vui.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000019",
+      "token": "60000000-0000-4000-8000-000000000019",
+      "message": "Chúc đôi bạn có thật nhiều ngày cùng nhau trồng niềm vui.",
+      "signature": "Garden Dreams",
+      "flowerName": "Tình ca",
+      "flowerImage": "/flowers/bouquet_4.webp",
+      "createdAt": "2026-09-19T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000018",
+    "reference": "GD-SAMPLE-0018",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-18T02:00:00.000Z",
+    "delivery_date": "2026-09-18",
+    "items": [
+      {
+        "id": 3,
+        "name": "Lời thì thầm",
+        "image": "/flowers/bouquet_3.webp",
+        "price": 450000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 450000,
+    "total": 450000,
+    "card_message": "Cảm ơn thầy cô vì những điều được gieo bằng sự tận tâm.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000018",
+      "token": "60000000-0000-4000-8000-000000000018",
+      "message": "Cảm ơn thầy cô vì những điều được gieo bằng sự tận tâm.",
+      "signature": "Garden Dreams",
+      "flowerName": "Lời thì thầm",
+      "flowerImage": "/flowers/bouquet_3.webp",
+      "createdAt": "2026-09-18T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000017",
+    "reference": "GD-SAMPLE-0017",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-17T02:00:00.000Z",
+    "delivery_date": "2026-09-17",
+    "items": [
+      {
+        "id": 2,
+        "name": "Khúc hồng",
+        "image": "/flowers/bouquet_2.webp",
+        "price": 490000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 490000,
+    "total": 490000,
+    "card_message": "Mong bạn luôn tìm thấy niềm vui trong những điều giản dị.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000017",
+      "token": "60000000-0000-4000-8000-000000000017",
+      "message": "Mong bạn luôn tìm thấy niềm vui trong những điều giản dị.",
+      "signature": "Garden Dreams",
+      "flowerName": "Khúc hồng",
+      "flowerImage": "/flowers/bouquet_2.webp",
+      "createdAt": "2026-09-17T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000016",
+    "reference": "GD-SAMPLE-0016",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-16T02:00:00.000Z",
+    "delivery_date": "2026-09-16",
+    "items": [
+      {
+        "id": 1,
+        "name": "Nắng dịu",
+        "image": "/flowers/bouquet_1.webp",
+        "price": 390000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 390000,
+    "total": 390000,
+    "card_message": "Một lời chúc bình an, gửi cùng những cánh hoa mềm.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000016",
+      "token": "60000000-0000-4000-8000-000000000016",
+      "message": "Một lời chúc bình an, gửi cùng những cánh hoa mềm.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nắng dịu",
+      "flowerImage": "/flowers/bouquet_1.webp",
+      "createdAt": "2026-09-16T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000015",
+    "reference": "GD-SAMPLE-0015",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-15T02:00:00.000Z",
+    "delivery_date": "2026-09-15",
+    "items": [
+      {
+        "id": 15,
+        "name": "Hòa nhịp",
+        "image": "/flowers/bouquet_15.webp",
+        "price": 850000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 850000,
+    "total": 850000,
+    "card_message": "Chúc mừng cột mốc mới. Những nỗ lực của bạn thật đáng trân trọng.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000015",
+      "token": "60000000-0000-4000-8000-000000000015",
+      "message": "Chúc mừng cột mốc mới. Những nỗ lực của bạn thật đáng trân trọng.",
+      "signature": "Garden Dreams",
+      "flowerName": "Hòa nhịp",
+      "flowerImage": "/flowers/bouquet_15.webp",
+      "createdAt": "2026-09-15T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000014",
+    "reference": "GD-SAMPLE-0014",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-14T02:00:00.000Z",
+    "delivery_date": "2026-09-14",
+    "items": [
+      {
+        "id": 14,
+        "name": "Lời hẹn tulip",
+        "image": "/flowers/bouquet_14.webp",
+        "price": 720000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 720000,
+    "total": 720000,
+    "card_message": "Mong căn phòng của bạn có thêm một góc thật tươi sáng.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000014",
+      "token": "60000000-0000-4000-8000-000000000014",
+      "message": "Mong căn phòng của bạn có thêm một góc thật tươi sáng.",
+      "signature": "Garden Dreams",
+      "flowerName": "Lời hẹn tulip",
+      "flowerImage": "/flowers/bouquet_14.webp",
+      "createdAt": "2026-09-14T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000013",
+    "reference": "GD-SAMPLE-0013",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-13T02:00:00.000Z",
+    "delivery_date": "2026-09-13",
+    "items": [
+      {
+        "id": 13,
+        "name": "Mẫu đơn kiêu sa",
+        "image": "/flowers/bouquet_13.webp",
+        "price": 950000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 950000,
+    "total": 950000,
+    "card_message": "Cảm ơn bạn đã làm những ngày bình thường trở nên đáng nhớ.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000013",
+      "token": "60000000-0000-4000-8000-000000000013",
+      "message": "Cảm ơn bạn đã làm những ngày bình thường trở nên đáng nhớ.",
+      "signature": "Garden Dreams",
+      "flowerName": "Mẫu đơn kiêu sa",
+      "flowerImage": "/flowers/bouquet_13.webp",
+      "createdAt": "2026-09-13T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000012",
+    "reference": "GD-SAMPLE-0012",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-12T02:00:00.000Z",
+    "delivery_date": "2026-09-12",
+    "items": [
+      {
+        "id": 12,
+        "name": "Khoảng trời xanh",
+        "image": "/flowers/bouquet_12.webp",
+        "price": 620000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 620000,
+    "total": 620000,
+    "card_message": "Dù ngày hôm nay thế nào, vẫn có người nghĩ đến bạn.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000012",
+      "token": "60000000-0000-4000-8000-000000000012",
+      "message": "Dù ngày hôm nay thế nào, vẫn có người nghĩ đến bạn.",
+      "signature": "Garden Dreams",
+      "flowerName": "Khoảng trời xanh",
+      "flowerImage": "/flowers/bouquet_12.webp",
+      "createdAt": "2026-09-12T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000011",
+    "reference": "GD-SAMPLE-0011",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-11T02:00:00.000Z",
+    "delivery_date": "2026-09-11",
+    "items": [
+      {
+        "id": 11,
+        "name": "Nắng mùa hè",
+        "image": "/flowers/bouquet_11.webp",
+        "price": 480000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 480000,
+    "total": 480000,
+    "card_message": "Chúc bạn đủ can đảm bắt đầu, đủ kiên nhẫn đi đến nơi.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000011",
+      "token": "60000000-0000-4000-8000-000000000011",
+      "message": "Chúc bạn đủ can đảm bắt đầu, đủ kiên nhẫn đi đến nơi.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nắng mùa hè",
+      "flowerImage": "/flowers/bouquet_11.webp",
+      "createdAt": "2026-09-11T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000010",
+    "reference": "GD-SAMPLE-0010",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-10T02:00:00.000Z",
+    "delivery_date": "2026-09-10",
+    "items": [
+      {
+        "id": 10,
+        "name": "Hồng nhung",
+        "image": "/flowers/bouquet_10.webp",
+        "price": 790000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 790000,
+    "total": 790000,
+    "card_message": "Mong hôm nay bạn có thời gian nghỉ ngơi và chăm sóc chính mình.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000010",
+      "token": "60000000-0000-4000-8000-000000000010",
+      "message": "Mong hôm nay bạn có thời gian nghỉ ngơi và chăm sóc chính mình.",
+      "signature": "Garden Dreams",
+      "flowerName": "Hồng nhung",
+      "flowerImage": "/flowers/bouquet_10.webp",
+      "createdAt": "2026-09-10T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000009",
+    "reference": "GD-SAMPLE-0009",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-09T02:00:00.000Z",
+    "delivery_date": "2026-09-09",
+    "items": [
+      {
+        "id": 9,
+        "name": "Giai điệu vườn",
+        "image": "/flowers/bouquet_9.webp",
+        "price": 520000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 520000,
+    "total": 520000,
+    "card_message": "Một bó hoa nhỏ thay lời cảm ơn chưa kịp nói.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000009",
+      "token": "60000000-0000-4000-8000-000000000009",
+      "message": "Một bó hoa nhỏ thay lời cảm ơn chưa kịp nói.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giai điệu vườn",
+      "flowerImage": "/flowers/bouquet_9.webp",
+      "createdAt": "2026-09-09T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000008",
+    "reference": "GD-SAMPLE-0008",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-08T02:00:00.000Z",
+    "delivery_date": "2026-09-08",
+    "items": [
+      {
+        "id": 8,
+        "name": "Nhớ thương",
+        "image": "/flowers/bouquet_8.webp",
+        "price": 650000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 650000,
+    "total": 650000,
+    "card_message": "Chúc mừng sinh nhật. Mong năm mới của bạn có thật nhiều niềm vui.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000008",
+      "token": "60000000-0000-4000-8000-000000000008",
+      "message": "Chúc mừng sinh nhật. Mong năm mới của bạn có thật nhiều niềm vui.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nhớ thương",
+      "flowerImage": "/flowers/bouquet_8.webp",
+      "createdAt": "2026-09-08T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000007",
+    "reference": "GD-SAMPLE-0007",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-07T02:00:00.000Z",
+    "delivery_date": "2026-09-07",
+    "items": [
+      {
+        "id": 7,
+        "name": "Má hồng",
+        "image": "/flowers/bouquet_7.webp",
+        "price": 550000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 550000,
+    "total": 550000,
+    "card_message": "Không cần một dịp đặc biệt để nói rằng mình nhớ bạn.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000007",
+      "token": "60000000-0000-4000-8000-000000000007",
+      "message": "Không cần một dịp đặc biệt để nói rằng mình nhớ bạn.",
+      "signature": "Garden Dreams",
+      "flowerName": "Má hồng",
+      "flowerImage": "/flowers/bouquet_7.webp",
+      "createdAt": "2026-09-07T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000006",
+    "reference": "GD-SAMPLE-0006",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-06T02:00:00.000Z",
+    "delivery_date": "2026-09-06",
+    "items": [
+      {
+        "id": 6,
+        "name": "Giấc mơ mẫu đơn",
+        "image": "/flowers/bouquet_6.webp",
+        "price": 890000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 890000,
+    "total": 890000,
+    "card_message": "Bạn xứng đáng với những ngày bình yên và những điều tử tế.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000006",
+      "token": "60000000-0000-4000-8000-000000000006",
+      "message": "Bạn xứng đáng với những ngày bình yên và những điều tử tế.",
+      "signature": "Garden Dreams",
+      "flowerName": "Giấc mơ mẫu đơn",
+      "flowerImage": "/flowers/bouquet_6.webp",
+      "createdAt": "2026-09-06T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000005",
+    "reference": "GD-SAMPLE-0005",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-05T02:00:00.000Z",
+    "delivery_date": "2026-09-05",
+    "items": [
+      {
+        "id": 5,
+        "name": "Mộng hoa",
+        "image": "/flowers/bouquet_5.webp",
+        "price": 590000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 590000,
+    "total": 590000,
+    "card_message": "Chúc mừng bước khởi đầu mới. Cứ tự tin đi theo điều bạn yêu.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000005",
+      "token": "60000000-0000-4000-8000-000000000005",
+      "message": "Chúc mừng bước khởi đầu mới. Cứ tự tin đi theo điều bạn yêu.",
+      "signature": "Garden Dreams",
+      "flowerName": "Mộng hoa",
+      "flowerImage": "/flowers/bouquet_5.webp",
+      "createdAt": "2026-09-05T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000004",
+    "reference": "GD-SAMPLE-0004",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-04T02:00:00.000Z",
+    "delivery_date": "2026-09-04",
+    "items": [
+      {
+        "id": 4,
+        "name": "Tình ca",
+        "image": "/flowers/bouquet_4.webp",
+        "price": 690000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 690000,
+    "total": 690000,
+    "card_message": "Gửi mẹ một chút sắc hoa và thật nhiều lời thương.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000004",
+      "token": "60000000-0000-4000-8000-000000000004",
+      "message": "Gửi mẹ một chút sắc hoa và thật nhiều lời thương.",
+      "signature": "Garden Dreams",
+      "flowerName": "Tình ca",
+      "flowerImage": "/flowers/bouquet_4.webp",
+      "createdAt": "2026-09-04T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000003",
+    "reference": "GD-SAMPLE-0003",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-03T02:00:00.000Z",
+    "delivery_date": "2026-09-03",
+    "items": [
+      {
+        "id": 3,
+        "name": "Lời thì thầm",
+        "image": "/flowers/bouquet_3.webp",
+        "price": 450000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 450000,
+    "total": 450000,
+    "card_message": "Mong mọi điều nhỏ bé hôm nay đều khiến bạn mỉm cười.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000003",
+      "token": "60000000-0000-4000-8000-000000000003",
+      "message": "Mong mọi điều nhỏ bé hôm nay đều khiến bạn mỉm cười.",
+      "signature": "Garden Dreams",
+      "flowerName": "Lời thì thầm",
+      "flowerImage": "/flowers/bouquet_3.webp",
+      "createdAt": "2026-09-03T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000002",
+    "reference": "GD-SAMPLE-0002",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-02T02:00:00.000Z",
+    "delivery_date": "2026-09-02",
+    "items": [
+      {
+        "id": 2,
+        "name": "Khúc hồng",
+        "image": "/flowers/bouquet_2.webp",
+        "price": 490000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 490000,
+    "total": 490000,
+    "card_message": "Cảm ơn vì đã luôn ở đây, ngay cả những ngày mình ít lời.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000002",
+      "token": "60000000-0000-4000-8000-000000000002",
+      "message": "Cảm ơn vì đã luôn ở đây, ngay cả những ngày mình ít lời.",
+      "signature": "Garden Dreams",
+      "flowerName": "Khúc hồng",
+      "flowerImage": "/flowers/bouquet_2.webp",
+      "createdAt": "2026-09-02T02:00:00.000Z"
+    }
+  },
+  {
+    "id": "40000000-0000-4000-8000-000000000001",
+    "reference": "GD-SAMPLE-0001",
+    "is_test": true,
+    "status": "DELIVERED",
+    "payment_status": "PAID",
+    "owner_id": null,
+    "created_at": "2026-09-01T02:00:00.000Z",
+    "delivery_date": "2026-09-01",
+    "items": [
+      {
+        "id": 1,
+        "name": "Nắng dịu",
+        "image": "/flowers/bouquet_1.webp",
+        "price": 390000,
+        "quantity": 1
+      }
+    ],
+    "subtotal": 390000,
+    "total": 390000,
+    "card_message": "Chúc bạn một ngày thật dịu dàng, như những bông hoa này.",
+    "memory": {
+      "id": "50000000-0000-4000-8000-000000000001",
+      "token": "60000000-0000-4000-8000-000000000001",
+      "message": "Chúc bạn một ngày thật dịu dàng, như những bông hoa này.",
+      "signature": "Garden Dreams",
+      "flowerName": "Nắng dịu",
+      "flowerImage": "/flowers/bouquet_1.webp",
+      "createdAt": "2026-09-01T02:00:00.000Z"
+    }
+  }
+]
