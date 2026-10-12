@@ -30,7 +30,7 @@ test('homepage renders its hero and collection from the public snapshot',()=>{
   const html=renderToStaticMarkup(createElement(App));
   assert.match(html,/id="home"/);assert.match(html,/id="collection"/);
   assert.ok(html.includes(`${products.filter(p=>cartChoice({id:p.id},[p])).length} bó hoa phù hợp`));
-  assert.match(html,/<details class="flower-finder" open=""/);
+  assert.match(html,/<details class="flower-finder">/);
   assert.doesNotMatch(html,/class="quick-add"/);
   assert.match(html,/class="button hero-cta" href="#collection"/);
 });

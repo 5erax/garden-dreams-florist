@@ -493,7 +493,7 @@ export default function App() {
               </BloomSelect>
             </label>
           </div>
-          <details className="flower-finder" open={typeof window==='undefined'||window.innerWidth>650}>
+          <details className="flower-finder">
             <summary><span className="flower-finder-desktop-label">Tìm hoa vừa ý — sắc hoa, loại hoa & ngân sách</span><span className="flower-finder-mobile-label">Bộ lọc ({[occasion!=='Tất cả',budget>0,Boolean(flowerColor),Boolean(flowerType),!saleOnly].filter(Boolean).length})</span></summary>
             <div className="flower-finder-fields">
               <label>Sắc hoa<BloomSelect aria-label="Sắc hoa" value={flowerColor} onChange={e => { setFlowerColor(e.target.value); setShowAll(true); }}><option value="">Mọi sắc hoa</option>{['hồng','đỏ','trắng','vàng','tím','xanh'].map(value => <option key={value} value={value}>{value}</option>)}</BloomSelect></label>
