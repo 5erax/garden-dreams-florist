@@ -34,6 +34,7 @@ export default function BusinessDashboard({onNavigate}) {
   }
   return <section className="business-dashboard" aria-label="Thống kê cửa hàng">
     <div className="portal-section-heading"><div><span className="eyebrow">CỬA HÀNG TRONG NHỮNG CON SỐ</span><h2>Tổng quan kinh doanh</h2></div></div>
+    <details className="dashboard-filters"><summary>Chọn kỳ báo cáo & xuất CSV</summary>
     <div className="reconciliation-quick-period">{datePresets(today).map(([label,from,to])=><button className="period-preset" key={label} aria-pressed={period.from===from&&period.to===to} onClick={()=>setPeriod({from,to})}>{label}</button>)}</div>
     <form key={period.from+period.to} className="dashboard-period" onSubmit={e => {
       e.preventDefault(); const data = new FormData(e.currentTarget);
@@ -45,6 +46,7 @@ export default function BusinessDashboard({onNavigate}) {
       {report && <button type="button" className="button outline" onClick={exportDaily}>Xuất CSV đơn & dòng tiền theo ngày</button>}
     </form>
     <p className="dashboard-note">Tối đa 92 ngày, theo giờ Việt Nam. Đơn theo ngày tạo; tiền theo ngày ghi nhận thu/hoàn. Báo cáo không chứa thông tin giao hàng.</p>
+    </details>
     {error ? <p role="alert" className="form-error">{error} <button className="text-button" onClick={() => setRevision(n => n + 1)}>Thử lại</button></p> : !report ? <BloomLoader label="Báo cáo cửa hàng" /> : <>
       {report.staging && <p className="portal-notice">Môi trường thử nghiệm — bao gồm đơn thử, không dùng làm báo cáo kinh doanh thật.</p>}
       <p className="dashboard-note">Kỳ {formatDate(report.from)} → {formatDate(report.to)} · Cập nhật {formatDateTime(report.generatedAt)}</p>
