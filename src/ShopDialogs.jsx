@@ -1,6 +1,6 @@
 import BloomDate from "./BloomDate.jsx";
 import BloomSelect from "./BloomSelect.jsx";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { money } from "./catalog.js";
 import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
 import Icon from "./Icons.jsx";
@@ -67,9 +67,11 @@ export function ProductDialog({
   const [shareNotice, setShareNotice] = useState('');
   const choice = cartChoice({ id: product.id, variantId }, [product]);
   const Wrapper = inline ? 'section' : Modal;
+  const Body = inline ? Fragment : 'div';
   const Heading = inline ? 'h1' : 'h2';
   return (
     <Wrapper {...(inline ? { className: 'product-page' } : { title: product.name, onClose, className: 'product-dialog' })}>
+      <Body {...(inline ? {} : { className: 'product-detail-body' })}>
       <ProductGallery key={product.id} product={product} />
       <div className="product-detail-copy">
         <span className="eyebrow">
@@ -115,6 +117,7 @@ export function ProductDialog({
         </div>
         <p className="product-care">Giữ hoa nơi mát, tránh nắng trực tiếp; thay nước và cắt gốc thường xuyên nếu cắm bình.</p>
       </div>
+      </Body>
       {!readOnly && <div className="product-purchase-footer">
         {choice && <div className="detail-summary" aria-live="polite" aria-atomic="true">
           <span>Tạm tính</span>

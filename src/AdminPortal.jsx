@@ -24,6 +24,7 @@ import ReconciliationDesk from "./ReconciliationDesk.jsx";
 import AdminInventory from './AdminInventory.jsx';
 import BusinessDashboard from './BusinessDashboard.jsx';
 import { readAdminTab } from './admin-navigation.js';
+import shopPhotoSources from './shop-photo-sources.json' with { type: 'json' };
 
 const newProduct = {
   name: "",
@@ -218,6 +219,7 @@ function AdminWorkspace({ store }) {
   async function quickPatch(row,fields){if(busy)return;setBusy(true);setError('');try{await patch(row,fields);}catch(e){setError(e.message);}finally{setBusy(false);}}
   async function bulk(ids,active){if(busy)return;setBusy(true);setError('');let done=0;try{for(const row of rows.filter(row=>ids.includes(row.id))){await patch(row,{active},false);done++;}setNotice('Đã cập nhật '+done+' mẫu.');}catch(e){setError('Đã lưu '+done+' mẫu; dừng ở mẫu lỗi. '+e.message);}finally{await load();await store.refresh();setBusy(false);}}
   const item = tab === "shop" ? rows[0] : edit;
+  const photoSource = tab === 'products' && item?.image?.endsWith('-pending.svg') && !item.images?.length ? shopPhotoSources[item.name] : null;
   return (
     <div className="admin-workspace">
       <div className="portal-title">
@@ -284,7 +286,7 @@ function AdminWorkspace({ store }) {
         </div>
       </div>
       }
-      {error && (
+      {error && !item && (
         <p className="form-error" role="alert">
           {error}
         </p>
@@ -318,7 +320,7 @@ function AdminWorkspace({ store }) {
         ) : (
           <>
             <div className="admin-table-wrap">
-              <table>
+              <table className="admin-orders-table" role="table" aria-label="Danh sách đơn hoa">
                 <thead>
                   <tr>
                     <th>Mã đơn</th>
@@ -332,18 +334,18 @@ function AdminWorkspace({ store }) {
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.id}>
-                      <td>{row.reference}</td>
-                      <td>{row.recipient_name || "Đã xóa thông tin"}</td>
-                      <td>{formatDate(row.delivery_date)}</td>
-                      <td>{row.shipping?.name}</td><td>{row.payment_method==='COD'?'COD':'VietQR'}</td><td>{money(row.total)}</td>
-                      <td>
+                      <td data-label="Mã đơn">{row.reference}</td>
+                      <td data-label="Người nhận">{row.recipient_name || "Đã xóa thông tin"}</td>
+                      <td data-label="Ngày giao">{formatDate(row.delivery_date)}</td>
+                      <td data-label="Khu vực">{row.shipping?.name}</td><td data-label="Thanh toán">{row.payment_method==='COD'?'COD':'VietQR'}</td><td data-label="Tổng">{money(row.total)}</td>
+                      <td data-label="Trạng thái">
                         {orderStatuses[row.status]}
                         <br />
                         <small>
                           {paymentStatuses[row.payment_status]}
                         </small>
                       </td>
-                      <td>
+                      <td data-label="Thao tác">
                         <button
                           className="text-button"
                           onClick={() => setSelected(row)}
@@ -403,6 +405,7 @@ function AdminWorkspace({ store }) {
             {tab === "products" && (
               <>
                 <h3>{edit.id ? "Chỉnh sửa bó hoa" : "Thêm bó hoa"}</h3>
+                <h4 className="form-section-title">Thông tin cơ bản</h4>
                   {edit.reference_only && <p className="reference-note">Mẫu tham khảo: xác nhận hoa thực tế, ảnh, quy cách và giá trước khi bật nhận đặt. Bật bán sẽ chuyển mẫu này sang danh mục bán chính thức.</p>}
                 <div className="form-grid">
                   <label>
@@ -444,10 +447,18 @@ function AdminWorkspace({ store }) {
                   Mô tả
                   <textarea
                     name="description"
+                    aria-describedby="product-description-help"
                     maxLength={1000}
                     defaultValue={item.description}
                   />
                 </label>
+                <p id="product-description-help" className="fineprint">Mô tả loại hoa, sắc hoa và những thông tin shop đã xác nhận; không cần kéo dài cho đủ ký tự.</p>
+                <h4 className="form-section-title">Hình ảnh</h4>
+                {photoSource && <aside className="photo-source-note" aria-label="Nguồn ảnh tham khảo">
+                  <strong>Mẫu này cần ảnh thực tế của shop</strong>
+                  <p>{photoSource.note} <a href={photoSource.url} target="_blank" rel="noreferrer">Xem ảnh tại {photoSource.shop}</a></p>
+                  <p className="fineprint">Nguồn để tham khảo loại và màu hoa. Dùng ảnh của Garden Dreams hoặc ảnh được chủ nguồn cho phép; không sao chép giá hay quy cách sang mẫu này.</p>
+                </aside>}
                 <details className="advanced-image"><summary>Ảnh bìa từ đường dẫn · Nâng cao</summary><label>
                   {item.images?.length ? "Ảnh bìa (ảnh đầu album)" : "Ảnh bìa dự phòng (đường dẫn /flowers/ hoặc URL HTTPS)"}
                   <input
@@ -601,7 +612,8 @@ function AdminWorkspace({ store }) {
                 </p>
               </>
             )}
-            <div className="form-actions">
+            <div className="form-actions admin-save-bar">
+              {error && <p className="form-error" role="alert">{error}</p>}
               <button className="button primary">
                 {tab === "shop" ? "Lưu cửa hàng" : tab === "products" ? edit?.id ? "Lưu bó hoa" : "Tạo bó hoa" : edit?.id ? "Lưu khu vực giao" : "Tạo khu vực giao"}
               </button>
