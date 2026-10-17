@@ -265,6 +265,14 @@ export default function App() {
     setShowAll(false);
     setOnlyFavorites(false);
   }
+  function resetFilters() {
+    setQuery("");
+    setBudget(0);
+    setFlowerColor("");
+    setFlowerType("");
+    setSaleOnly(true);
+    selectOccasion("Tất cả");
+  }
   let filtered = products.filter(
     (p) =>
       (occasion === "Tất cả" || p.occasion === occasion || p.occasions?.includes(occasion)) &&
@@ -437,7 +445,7 @@ export default function App() {
                 <option value="0">Mọi mức giá</option>{[300000,500000,800000,1500000].map(value => <option key={value} value={value}>Tối đa {money(value)}</option>)}
               </BloomSelect></label>
               <label><input type="checkbox" checked={saleOnly} onChange={e => { setSaleOnly(e.target.checked); setShowAll(true); }} />Chỉ mẫu đang nhận đặt</label>
-              {(occasion!=='Tất cả'||budget||flowerColor||flowerType||!saleOnly||query)&&<button className="button outline finder-reset" onClick={() => { setBudget(0); setFlowerColor(''); setFlowerType(''); setSaleOnly(true); setQuery(''); selectOccasion('Tất cả'); }}>Đặt lại lựa chọn</button>}
+              {(occasion!=='Tất cả'||budget||flowerColor||flowerType||!saleOnly||query)&&<button className="button outline finder-reset" onClick={resetFilters}>Đặt lại lựa chọn</button>}
             </div>
             <p>Tìm theo dịp tặng, tên hoa hoặc ngân sách. Bỏ chọn trạng thái nhận đặt để xem thêm mẫu tham khảo. Ngân sách chưa gồm phí giao; mẫu tham khảo dùng giá dự kiến và chưa nhận đặt.</p>
           </details>
@@ -456,12 +464,7 @@ export default function App() {
               <p>Thử một từ khóa khác hoặc khám phá lại bộ sưu tập.</p>
               <button
                 className="button primary"
-                onClick={() => {
-                  setQuery("");
-                  setOccasion("Tất cả");
-                  setOnlyFavorites(false);
-                  setBudget(0); setSaleOnly(false);
-                }}
+                onClick={resetFilters}
               >
                 Xem tất cả hoa
               </button>
