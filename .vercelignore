@@ -1,6 +1,7 @@
 scripts/*
 !scripts/prepare-storefront.mjs
 !scripts/check-storefront-build.mjs
+!scripts/check-entry-budget.mjs
 tests/
 supabase/
 tasks/

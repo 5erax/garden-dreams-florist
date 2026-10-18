@@ -4,7 +4,7 @@ Scope: #10, #17–29, #31–45 (29 issues). Preserve the transparent initial nav
 
 ## Verification
 
-- `npm test`: 219/219 passed, no skipped tests. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
+- `npm test`: 219/219 passed, no skipped tests, plus a deployment-packaging regression added after the first Preview exposed an omitted build script. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
 - `npm run build`: SEO build contract and initial dependency budget passed. All static initial imports are counted once; dynamic checkout/QR modules are excluded because they load on demand.
 - Production dependency audit: zero known vulnerabilities (`npm audit --omit=dev`).
 - Chromium browser checks at 320 × 712, 390 × 844 and 1440 × 1000. No horizontal overflow at 320/390. Header is 88 px after scrolling, all occasion buttons visible. Desktop initial header background remains transparent; six decorative petals remain.
@@ -25,7 +25,7 @@ Same local demo build configuration and baseline `7fe9c41`, counting all static 
 | Gzipped initial JS | 268,882 | 197,546 | −26.5% |
 | Initial CSS | 128,431 | 118,573 | −7.7% |
 
-The final staging-configured build was 667,226 JS / 197,554 gzipped JS / 118,734 CSS bytes before the last CSS spacing adjustment. Exact build values vary slightly by environment and copy. Enforced ceilings are 700,000 JS, 210,000 gzipped JS and 160,000 CSS bytes. Vite's single-chunk 500 kB warning remains; the budget does not suppress it or hide dependencies in vendor chunks.
+Final production-configured local build: 667,232 JS / 197,554 gzipped JS / 118,909 CSS bytes. Exact build values vary slightly by environment and copy. Enforced ceilings are 700,000 JS, 210,000 gzipped JS and 160,000 CSS bytes. Vite's single-chunk 500 kB warning remains; the budget does not suppress it or hide dependencies in vendor chunks.
 
 One cold-cache mobile lab run of the built local preview: Chromium, 390 × 844, CPU slowdown 4×, network latency 150 ms, download 200,000 B/s, upload 93,750 B/s. FCP 1,048 ms, LCP 9,596 ms, CLS 0.071. Local TTFB 15 ms is not production latency. The slow LCP includes contention from the initial server-rendered catalog images; this result does **not** establish a passing field CWV score or mobile LCP target. Production HTTP and a hosted lab measurement are recorded in the release verification after deployment.
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname, resolve } from 'node:path';
 import { entrySize } from '../scripts/check-entry-budget.mjs';
@@ -14,4 +14,10 @@ test('entry budget counts shared static dependencies once and excludes deferred 
     assert.equal(result.js,11);assert.equal(result.css,6);assert.ok(result.gzip>0);
     assert.deepEqual(result.files,['entry.js','shared.js','style.css']);
   } finally { assert.equal(dirname(resolve(directory)),resolve(tmpdir())); await rm(directory,{recursive:true,force:true}); }
+});
+
+test('Vercel includes every build script excluded by the scripts wildcard',async()=>{
+  const ignored=await readFile(new URL('../.vercelignore',import.meta.url),'utf8');
+  const {scripts}=JSON.parse(await readFile(new URL('../package.json',import.meta.url),'utf8'));
+  for(const [,script] of scripts.build.matchAll(/node (scripts\/[\w.-]+)/g))assert.ok(ignored.split(/\r?\n/).includes('!'+script),`${script} must be uploaded`);
 });
