@@ -13,7 +13,7 @@ export function useUnsavedForms(root) {
   const [hasChanges,setHasChanges] = useState(false);
   const confirmDiscard = () => {
     if (dirty.current && !window.confirm('Bạn có chỉnh sửa chưa lưu. Bỏ thay đổi và tiếp tục?')) return false;
-    records.current.clear(); dirty.current=false; setHasChanges(false); return true;
+    return true;
   };
   useEffect(() => {
     const element=root.current;
@@ -28,13 +28,18 @@ export function useUnsavedForms(root) {
     const schedule = () => {cancelAnimationFrame(frame); frame=requestAnimationFrame(check);};
     const saved = event => { records.current.set(event.target,formSnapshot(event.target)); check(); };
     const beforeUnload = event => {check();if(dirty.current){event.preventDefault();event.returnValue='';}};
+    let allowedUrl = null;
     const click = event => {
       const target=event.target.closest?.('[data-discard-changes],a[href],.portal-signout,.portal-header button');
       if(target?.tagName==='A' && (target.hasAttribute('download') || target.target==='_blank' || target.href===location.href)) return;
-      if(target && dirty.current && !confirmDiscard()){event.preventDefault();event.stopImmediatePropagation();}
+      if(target && dirty.current) {
+        if(!confirmDiscard()){event.preventDefault();event.stopImmediatePropagation();}
+        else if(target.tagName==='A') allowedUrl=target.href;
+      }
     };
     let currentUrl=location.href;
     const navigate = () => {
+      if(location.href===allowedUrl){allowedUrl=null;currentUrl=location.href;return;}
       if(dirty.current && !confirmDiscard()) history.replaceState(history.state,'',currentUrl);
       else currentUrl=location.href;
     };

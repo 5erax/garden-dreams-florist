@@ -7,7 +7,7 @@ import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { products } from "../src/catalog.js";
 
-let server, Checkout, BankPayment, DeliveryPicker, selectedDelivery, ReorderFlowers;
+let server, Checkout, DemoCheckout, BankPayment, DeliveryPicker, selectedDelivery, ReorderFlowers;
 before(async () => {
   server = await createServer({
     root: fileURLToPath(new URL("../",import.meta.url)),configFile:false,envDir:false,
@@ -20,6 +20,7 @@ before(async () => {
     server:{middlewareMode:true,hmr:false,ws:false,watch:null},
   });
   ({default:Checkout}=await server.ssrLoadModule('/src/LiveCheckout.jsx'));
+  ({CheckoutDialog:DemoCheckout}=await server.ssrLoadModule('/src/DemoCheckout.jsx'));
   ({BankPayment}=await server.ssrLoadModule('/src/OrderDetail.jsx'));
   ({default:DeliveryPicker,selectedDelivery}=await server.ssrLoadModule('/src/DeliveryPicker.jsx'));
   ({default:ReorderFlowers}=await server.ssrLoadModule('/src/ReorderFlowers.jsx'));
@@ -33,6 +34,13 @@ function render(store, pending = {current:null}) {
   };
   return renderToStaticMarkup(createElement(Checkout,{cart:[{id:1,quantity:1}],pending,onClose(){},onComplete(){}}));
 }
+
+test('disconnected checkout renders cart choices and controls without a backend',()=>{
+  globalThis.checkoutTestStore={products};
+  const html=renderToStaticMarkup(createElement(DemoCheckout,{cart:[{id:1,quantity:1}],onClose(){}}));
+  assert.match(html,/Nắng dịu/);assert.match(html,/name="deliveryDate"/);
+  assert.doesNotMatch(html,/route-error/);
+});
 test("closed checkout offers the real shop contact before requesting customer signup", () => {
   const html=render({shop:{name:"Garden Dreams",phone:"0832345780",accepting_orders:false},session:null,shipping:[]});
   assert.match(html,/tel:0832345780/);
