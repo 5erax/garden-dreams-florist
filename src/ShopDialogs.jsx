@@ -258,5 +258,3 @@ export function CartDialog({ cart, onClose, onChange, onCheckout, onView, focusK
     </Modal>
   );
 }
-
-

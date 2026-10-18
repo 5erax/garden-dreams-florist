@@ -31,7 +31,7 @@ test('homepage renders its hero and collection from the public snapshot',()=>{
   globalThis.location={pathname:'/',hash:'#home'};
   const html=renderToStaticMarkup(createElement(App));
   assert.match(html,/id="home"/);assert.match(html,/id="collection"/);
-  assert.ok(html.includes(`${products.filter(p=>cartChoice({id:p.id},[p])).length} bó hoa phù hợp`));
+  assert.ok(html.includes(`Đang xem 8/${products.filter(p=>cartChoice({id:p.id},[p])).length} mẫu`));
   assert.match(html,/<details class="flower-finder">/);
   assert.doesNotMatch(html,/class="quick-add"/);
   assert.match(html,/class="button hero-cta" href="#collection"/);

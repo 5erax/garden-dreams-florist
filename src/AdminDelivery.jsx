@@ -72,7 +72,7 @@ export default function AdminDelivery() {
   return <section className="delivery-admin" aria-label="Quản lý lịch giao hoa">
     <div className="portal-section-heading">
       <div><h2>Khung giờ & sức chứa</h2><p>Khung giờ giao, sức chứa và ngày nghỉ theo từng khu vực.</p></div>
-      <button className="button outline" disabled={busy} data-discard-changes data-discard-changes onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại</button>
+      <button className="button outline" disabled={busy} data-discard-changes onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
     {notice && <p className="portal-notice" role="status">{notice}</p>}
@@ -147,7 +147,7 @@ export default function AdminDelivery() {
         {!holiday.id && <label>Đến ngày (tối đa 31 ngày)<BloomDate name="endDate" min={vietnamDate()} max={vietnamDate(new Date(Date.now()+365*86400000))} required/></label>}
         <label>Lý do nội bộ<input name="reason" placeholder="Ví dụ: nghỉ Tết, bảo trì hoặc thiếu nhân sự" minLength={5} required maxLength={200} defaultValue={holiday.reason} /></label>
         {holiday.id ? <label className="check-label"><input type="checkbox" name="active" defaultChecked={holiday.active} />Không nhận đơn mới ngày này (không tự hủy đơn đã đặt)</label> : <p>Toàn bộ khoảng ngày sẽ ngừng nhận đơn mới. Nếu ngày nào đã giữ chỗ cho đơn, thao tác sẽ dừng và không lưu một phần.</p>}
-        <div className="form-actions"><button className="button primary">Lưu ngày nghỉ</button><button type="button" className="button outline" onClick={() => setHoliday(null)}>Hủy sửa</button></div>
+        <div className="form-actions"><button className="button primary">Lưu ngày nghỉ</button><button type="button" className="button outline" data-discard-changes onClick={() => setHoliday(null)}>Hủy sửa</button></div>
       </fieldset>
     </form>}
   </section>;

@@ -31,7 +31,6 @@ import { normalizeSearch, productUrl, productFromPath, productTitle } from "./pr
 import "./styles.css";
 import "./portal.css";
 import './commerce-upgrade.css';
-import './uiux-issues.css';
 
 const loadCustomer = () => import("./CustomerPortal.jsx");
 const loadAdmin = () => import("./AdminPortal.jsx");
@@ -446,10 +445,8 @@ export default function App() {
             </label>
           </div>
           <div className="collection-meta">
-            <span>
-              {onlyFavorites
-                ? "Những bó hoa bạn đã yêu thích"
-                : `${filtered.length} bó hoa phù hợp${saleOnly?' đang nhận đặt':' (gồm mẫu tham khảo)'}`}
+            <span role="status">
+              Đang xem {shown.length}/{filtered.length} mẫu{onlyFavorites ? ' đã lưu' : saleOnly ? ' đang nhận đặt' : ' (gồm mẫu tham khảo)'}
               {onlyFavorites && (
                 <button
                   className="text-button"
@@ -472,7 +469,6 @@ export default function App() {
               </BloomSelect>
             </label>
           </div>
-          <p className="results-progress" role="status">Đang xem {shown.length}/{filtered.length} mẫu</p>
           {activeFilters.length > 0 && <div className="filter-chips" aria-label="Các bộ lọc đang áp dụng">
             {activeFilters.map(filter => <button key={filter.label} className="filter-chip" aria-label={`Bỏ ${filter.label}`} onClick={() => {filter.clear();setShowAll(true);}}>{filter.label} <span aria-hidden="true">×</span></button>)}
             <button className="text-button" onClick={resetFilters}>Xóa tất cả bộ lọc</button>

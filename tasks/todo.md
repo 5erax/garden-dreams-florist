@@ -283,11 +283,11 @@ Trạng thái: chuẩn bị lát cắt storefront theo các skill chủ shop g�
 
 # Delivery ledger
 
-- [ ] Payment, SEO, price and account-storage correctness
-- [ ] Storefront navigation, filtering and mobile layouts
-- [ ] Cart, checkout and authentication guidance
-- [ ] Garden discovery, return state and sharing
-- [ ] Admin dirty forms, specifications and performance
+- [x] Payment, SEO, price and account-storage correctness
+- [x] Storefront navigation, filtering and mobile layouts
+- [x] Cart, checkout and authentication guidance
+- [x] Garden discovery, return state and sharing
+- [x] Admin dirty forms, specifications and performance
 - [ ] Full regression, browser audit, production deployment and issue evidence
 
-External confirmation: actual product/size specifications (#24); Search Console indexing and field Core Web Vitals (#10).
+Scope confirmed by owner: normal editable bouquet descriptions without invented exact measurements (#24); technical SEO only for #10, excluding Search Console/Google indexing. Field Core Web Vitals cannot be inferred from lab measurements.

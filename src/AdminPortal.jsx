@@ -275,6 +275,7 @@ function AdminWorkspace({ store }) {
           <button
             className="text-button"
             disabled={busy}
+            data-discard-changes
             onClick={() => load()}
           >
             Tải lại

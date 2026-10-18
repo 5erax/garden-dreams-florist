@@ -52,7 +52,7 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
     <h3>Các cỡ bó hoa</h3>
     <p className="fineprint">Giá trên sản phẩm là cỡ Tiêu chuẩn. Thêm cỡ khác tại đây; tắt cỡ chỉ ngừng các đơn đặt mới.</p>
     <div className="form-actions">
-      <button className="button outline" disabled={busy || disabled} onClick={() => { setEdit({ ...newVariant }); setNotice(""); }}>Thêm cỡ bó</button>
+      <button className="button outline" disabled={busy || disabled} data-discard-changes onClick={() => { setEdit({ ...newVariant }); setNotice(""); }}>Thêm cỡ bó</button>
       <button className="text-button" disabled={busy || disabled} data-discard-changes onClick={() => { setEdit(null); load(); }}>Tải lại cỡ bó</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
@@ -60,7 +60,7 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
     <ul className="variant-list">
       {rows.map(row => <li key={row.id}>
         <div><strong>{row.size_name}</strong><p>{row.sku} · {money(row.price)} · {row.active ? "Đang bán" : "Đã tắt"}</p></div>
-        <button className="text-button" disabled={busy || disabled} onClick={() => { setEdit(row); setNotice(""); }} aria-label={`Sửa cỡ ${row.size_name}`}>Chỉnh sửa</button>
+        <button className="text-button" disabled={busy || disabled} data-discard-changes onClick={() => { setEdit(row); setNotice(""); }} aria-label={`Sửa cỡ ${row.size_name}`}>Chỉnh sửa</button>
       </li>)}
     </ul>
     {!busy && !rows.length && <p>Chưa có cỡ bổ sung. Bó hoa vẫn dùng cỡ Tiêu chuẩn.</p>}

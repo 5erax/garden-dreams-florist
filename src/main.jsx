@@ -6,6 +6,7 @@ import './form-controls.css';
 import './shopping-polish.css';
 import './admin-audit.css';
 import './design-polish.css';
+import './uiux-issues.css';
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

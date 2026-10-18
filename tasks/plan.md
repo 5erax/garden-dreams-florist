@@ -34,7 +34,7 @@ Scope: all 29 currently open issues (#10, #17–29, #31–45). Keep the transpar
 2. Storefront navigation and discovery: #26–29, #31–34, #40, #45. Compact consistent navigation, visible controls and filter chips, URL history, honest result counts, mobile detail layout and unavailable-product next steps. Preserve private favorite IDs outside shared URLs.
 3. Cart/checkout/account: #21, #35–39. Reopen details, reversible cart removal, summary at auth gates, accurate guest guidance, normalized phones and linked field errors, password requirements.
 4. Garden: #41–44. Search all original greeting suggestions, retain pagination/focus across navigation, copy messages and safely share public card URLs without session/query data.
-5. Admin/specifications/performance: #23–25. Dirty-form protection, editable public size descriptions with truthful empty states, deferred checkout/QR and a measured entry budget. Product facts require shop confirmation.
+5. Admin/specifications/performance: #23–25. Dirty-form protection, editable public size descriptions with normal seasonal bouquet copy, deferred checkout/QR and a measured entry budget. Owner waived confirmed measurements; do not invent exact stem counts or dimensions.
 6. Verification/release: full tests and build, browser checks at 320/390/1440 px, hosted HTTP/metadata and lab mobile metrics for #10. Merge/deploy with immutable evidence. Google Search Console/field CWV cannot be claimed without access/data.
 
-Close only issues whose acceptance criteria have evidence. Keep outstanding external confirmations explicit.
+Close only issues whose acceptance criteria have evidence. Owner chose technical SEO only for #10 on 19 October; Search Console/Google indexing is excluded. Lab measurements do not establish field CWV.
