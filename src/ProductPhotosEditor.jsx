@@ -50,6 +50,7 @@ export default function ProductPhotosEditor({ images, onChange, onBusyChange, al
   // shortcut: retain unreferenced uploads, add cleanup after order/memory image references are indexed.
   return (
     <section className="product-photos-editor" aria-label="Album ảnh bó hoa">
+      <input type="hidden" name="photoEditorState" value={JSON.stringify({images,alts})} readOnly />
       <h4>Album ảnh</h4>
       <p className="fineprint">Ảnh đầu tiên là ảnh bìa. Bỏ ảnh chỉ thay đổi album; ảnh trên đơn đã đặt được giữ lại.</p>
       {images.length > 0 && <ol className="product-photo-list">

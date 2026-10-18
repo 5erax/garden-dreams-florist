@@ -1,0 +1,23 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Controlled editor regression fixture</title><div id="root"></div>
+<script type="module">
+import React,{useRef,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import {StoreProvider} from '/src/Store.jsx';
+import {useUnsavedForms,markFormSaved} from '/src/unsaved-forms.js';
+import ProductPhotosEditor from '/src/ProductPhotosEditor.jsx';
+import AdminInventory from '/src/AdminInventory.jsx';
+const h=React.createElement;
+function Fixture(){
+ const root=useRef(null),[images,setImages]=useState(['/flowers/bouquet_1.webp','/flowers/bouquet_2.webp']),[alts,setAlts]=useState({});
+ const {confirmDiscard,hasChanges}=useUnsavedForms(root);
+ return h('main',{ref:root},h('h1',null,'Controlled editor fixture — synthetic inventory responses'),
+  h('p',{'data-test-status':true},hasChanges?'Dirty':'Clean'),
+  h('button',{onClick:()=>{if(confirmDiscard())document.querySelector('h1').textContent='Confirmed local action';}},'Confirm local action'),
+  h('button',{onClick:()=>root.current.querySelectorAll('form').forEach(markFormSaved)},'Reset fixture baselines'),
+  h('form',{className:'admin-edit-form',onSubmit:e=>{e.preventDefault();markFormSaved(e.currentTarget);}},
+   h('label',null,'Product name',h('input',{name:'name',defaultValue:'Fixture flower'})),
+   h(ProductPhotosEditor,{images,onChange:setImages,alts,onAltChange:setAlts,onBusyChange:()=>{}}),h('button',null,'Save fixture product')),
+  h(AdminInventory));
+}
+createRoot(document.getElementById('root')).render(h(StoreProvider,null,h(Fixture)));
+</script></html>

@@ -3,7 +3,8 @@ import BloomSelect from './BloomSelect.jsx';
 import { useState } from 'react';
 import { useStore } from './Store.jsx';
 import { money } from './catalog.js';
-import { subtotal,validateOrder,vietnamDate } from './order.js';
+import { subtotal,validateOrder,vietnamDate,cartKey,cartChoice } from './order.js';
+import Icon from './Icons.jsx';
 import { Modal } from './ShopDialogs.jsx';
 export function CheckoutDialog({ cart, onClose }) {
   const { products } = useStore();

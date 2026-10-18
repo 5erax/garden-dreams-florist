@@ -4,7 +4,7 @@ Scope: #10, #17–29, #31–45 (29 issues). Preserve the transparent initial nav
 
 ## Verification
 
-- `npm test`: 220/220 passed, no skipped tests, including a deployment-packaging regression added after the first Preview exposed an omitted build script. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
+- Final `npm test`: 222/222 passed, no skipped tests, including deployment-packaging, disconnected checkout and concurrent dirty-editor regressions. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
 - `npm run build`: SEO build contract and initial dependency budget passed. All static initial imports are counted once; dynamic checkout/QR modules are excluded because they load on demand.
 - Production dependency audit: zero known vulnerabilities (`npm audit --omit=dev`).
 - Chromium browser checks at 320 × 712, 390 × 844 and 1440 × 1000. No horizontal overflow at 320/390. Header is 88 px after scrolling, all occasion buttons visible. Desktop initial header background remains transparent; six decorative petals remain.
@@ -68,6 +68,8 @@ One cold-cache mobile lab run of the built local preview: Chromium, 390 × 844, 
 No live purchase, bank transfer, refund or real customer/admin write was performed. Synthetic checkout/admin responses are identified above. Google indexing and field CWV are not claimed. Bouquet measurements remain editable shop content; no exact measurements were invented. Existing shop receiving-order configuration was not changed.
 
 ## Production release verification
+
+Review follow-up: restored cart helper/icon imports in the disconnected checkout; named hidden snapshots now cover album order/alt text/uploads and the entire controlled inventory recipe. Confirming a local discard preserves the original baselines of surviving forms; saving one editor cannot clear another editor's dirty state. Inventory recipe save marks only its own form as saved. A real Chromium fixture exercised album reordering and quantity changes, confirmed dirty state survives a local action and saving another form, and blocked inventory writes. The disconnected checkout regression failed with `cartChoice is not defined` before the fix and now renders successfully. Final full suite: 222/222.
 
 [PR #47](https://github.com/5erax/garden-dreams-florist/pull/47) merged as `b79346800d050f3f9094b2154c8ab2d5c90f94ef`. [Production deployment](https://vercel.com/dhas-projects-901181f4/garden-dreams-florist/H4ZMU2KhTMK8cyBbmfF8MW3n18D7) reported success. Hosted checks completed at 19:27 UTC on 18 October (02:27 on 19 October in Vietnam).
 
