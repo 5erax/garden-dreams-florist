@@ -10,7 +10,7 @@ export function RememberGuest() {
       setRemember(event.target.checked);
       guestSessionStorage.setRemember(event.target.checked);
     }} />
-    <span>Giữ phiên khách trên thiết bị này để xem lại đơn. Không chọn nếu dùng máy chung; nếu không giữ, hãy tạo tài khoản trước khi rời trang.</span>
+    <span>Ghi nhớ để xem lại đơn trên thiết bị này<small>Không chọn trên máy dùng chung. Không ghi nhớ: bạn vẫn xem đơn trong Góc của tôi ở tab này; đóng tab có thể mất phiên. Để giữ lâu dài, gắn email và xác nhận tài khoản trước khi rời phiên.</small></span>
   </label>;
 }
 

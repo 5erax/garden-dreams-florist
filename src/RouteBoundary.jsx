@@ -2,6 +2,7 @@ import { Component, createRef, lazy, Suspense } from "react";
 import Icon from "./Icons.jsx";
 import BloomLoader from "./BloomLoader.jsx";
 import "./route-boundary.css";
+import { Modal } from './ShopDialogs.jsx';
 
 export default class RouteBoundary extends Component {
   state = { error: null, Page: lazy(this.props.load) };
@@ -22,7 +23,8 @@ export default class RouteBoundary extends Component {
 
   render() {
     const { title, pageProps } = this.props;
-    if (this.state.error) return (
+    const wrap = content => this.props.onClose ? <Modal title={title} onClose={this.props.onClose}>{content}</Modal> : content;
+    if (this.state.error) return wrap(
       <section className="route-state route-error" role="alert">
         <Icon name="flower" />
         <span className="eyebrow">{title}</span>
@@ -37,7 +39,7 @@ export default class RouteBoundary extends Component {
     const Page = this.state.Page;
     return (
       <Suspense fallback={
-        <BloomLoader label={title} />
+        wrap(<BloomLoader label={title} />)
       }>
         <Page {...pageProps} />
       </Suspense>

@@ -23,3 +23,18 @@ Backlog `BU-01` tới `BU-32` được bổ sung trong todo.md. Các việc chư
 Mốc phát hành: nền tảng/QA → A vận hành → B thiệp/khu vườn → C storefront/content/SEO/mobile. Giữ các quyết định về COD/VietQR thủ công, opt-in và một kỉ niệm/đơn đã giao/paid. Migration mới nối tiếp lịch sử hiện tại, không chạy lại setup.sql.
 
 Khi dashboard/SMTP chưa thao tác được, tiếp tục chuẩn bị mã nguồn BU-07–09 trên branch staging. BU-06 và các task phụ thuộc vẫn là điều kiện nghiệm thu/phát hành; không tick chỉ dựa vào SQL local hoặc build. Backend báo khả năng album/upload/quản lý cỡ/đặt cỡ để frontend mới tương thích với backend đang chạy. Production tiếp tục đóng nhận đơn.
+
+---
+
+# Remaining issues — 19 October 2026
+
+Scope: all 29 currently open issues (#10, #17–29, #31–45). Keep the transparent initial navigation and falling petals. No fabricated product specifications, customer records, payments or Google indexing claims.
+
+1. Payment/SEO/catalog correctness: #17–20, #22. Reuse server balances, canonical availability and owner-scoped storage. Test partial payments, robots lifecycle, variant prices, fallback copy and account changes.
+2. Storefront navigation and discovery: #26–29, #31–34, #40, #45. Compact consistent navigation, visible controls and filter chips, URL history, honest result counts, mobile detail layout and unavailable-product next steps. Preserve private favorite IDs outside shared URLs.
+3. Cart/checkout/account: #21, #35–39. Reopen details, reversible cart removal, summary at auth gates, accurate guest guidance, normalized phones and linked field errors, password requirements.
+4. Garden: #41–44. Search all original greeting suggestions, retain pagination/focus across navigation, copy messages and safely share public card URLs without session/query data.
+5. Admin/specifications/performance: #23–25. Dirty-form protection, editable public size descriptions with normal seasonal bouquet copy, deferred checkout/QR and a measured entry budget. Owner waived confirmed measurements; do not invent exact stem counts or dimensions.
+6. Verification/release: full tests and build, browser checks at 320/390/1440 px, hosted HTTP/metadata and lab mobile metrics for #10. Merge/deploy with immutable evidence. Google Search Console/field CWV cannot be claimed without access/data.
+
+Close only issues whose acceptance criteria have evidence. Owner chose technical SEO only for #10 on 19 October; Search Console/Google indexing is excluded. Lab measurements do not establish field CWV.

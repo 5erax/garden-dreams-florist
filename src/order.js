@@ -1,3 +1,4 @@
+import { normalizePhone } from './checkout-contacts.js';
 import { products } from "./catalog.js";
 
 export const vietnamDate = (now = new Date()) =>
@@ -72,7 +73,7 @@ export function validateOrder(input, now = new Date(), catalog = products) {
   const address = text("address", 10, 300);
   const message = text("message", 0, 500);
   const phone =
-    typeof input.phone === "string" ? input.phone.replace(/[\s().-]/g, "") : "";
+    normalizePhone(input.phone);
   if (!/^(?:0|\+84)[35789]\d{8}$/.test(phone))
     throw new Error("Số điện thoại Việt Nam chưa hợp lệ.");
   if (

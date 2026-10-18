@@ -278,3 +278,16 @@ Trạng thái: chuẩn bị lát cắt storefront theo các skill chủ shop g�
 
 - [ ] Storefront/content/SEO/mobile được nghiệm thu; URL và dữ liệu cũ tương thích.
 - [ ] Không còn lỗi nghiêm trọng về quyền/tiền/đơn/kỉ niệm; tài liệu, release note và hạn chế đã ghi rõ.
+
+---
+
+# Delivery ledger
+
+- [x] Payment, SEO, price and account-storage correctness
+- [x] Storefront navigation, filtering and mobile layouts
+- [x] Cart, checkout and authentication guidance
+- [x] Garden discovery, return state and sharing
+- [x] Admin dirty forms, specifications and performance
+- [ ] Full regression, browser audit, production deployment and issue evidence
+
+Scope confirmed by owner: normal editable bouquet descriptions without invented exact measurements (#24); technical SEO only for #10, excluding Search Console/Google indexing. Field Core Web Vitals cannot be inferred from lab measurements.

@@ -4,7 +4,8 @@ import {formatDateTime,isOverdue} from "./admin-ux.js";
 import { nextOrderStatus, OrderProgress, OrderTools } from "./OrderTools.jsx";
 import BloomSelect from "./BloomSelect.jsx";
 import { useEffect, useState } from "react";
-import QRCode from "qrcode";
+import { BankPayment } from "./BankPayment.jsx";
+export { BankPayment } from "./BankPayment.jsx";
 import {
   backend,
   call,
@@ -13,90 +14,11 @@ import {
   paymentStatuses,
 } from "./backend.js";
 import { money } from "./catalog.js";
-import { vietqrPayload } from "./vietqr.js";
+
 import { useStore } from "./Store.jsx";
 import OrderRequests from "./OrderRequests.jsx";
 import Reconciliation from "./Reconciliation.jsx";
 
-export function BankPayment({ order }) {
-  const [qr, setQr] = useState(""),
-    [error, setError] = useState("");
-  const [amount,setAmount]=useState(null);
-  const [copyNotice, setCopyNotice] = useState("");
-  useEffect(() => {
-    let active = true;
-    setQr("");
-    setAmount(null);setError("");
-    if (
-      order.payment_method !== "VIETQR" ||
-      !["UNPAID","PARTIAL"].includes(order.payment_status) ||
-      order.status === "CANCELLED"
-    )
-      return;
-    try {
-      Promise.resolve(order.payment_status==='PARTIAL'?call('gd_payment_balance',{p_order:order.id}):{receivable:Number(order.total)}).then(balance=>{if(!active)return null;if(!Number.isSafeInteger(balance.receivable)||balance.receivable<1)throw Error('Invalid balance');setAmount(balance.receivable);return QRCode.toDataURL(vietqrPayload(order.bank,balance.receivable,order.reference),{width:240,margin:2,errorCorrectionLevel:'M'});})
-        .then((src) => {
-          if (active) setQr(src);
-        })
-        .catch(() => {
-          if (active)
-            setError("Chưa tạo được QR. Dùng thông tin chuyển khoản bên dưới.");
-        });
-    } catch {
-      setError("Thông tin QR chưa hợp lệ. Liên hệ shop để xác nhận.");
-    }
-    return () => {
-      active = false;
-    };
-  }, [order]);
-  if (
-    order.payment_method !== "VIETQR" ||
-    order.payment_status !== "UNPAID" ||
-    order.status === "CANCELLED"
-  )
-    return null;
-  return (
-    <aside className="bank-payment">
-      <div>
-        {qr && (
-          <img
-            src={qr}
-            alt={`VietQR cho đơn ${order.reference}`}
-            width="240"
-            height="240"
-          />
-        )}
-        {error && <p role="alert">{error}</p>}
-      </div>
-      <div>
-        <span className="eyebrow">CHUYỂN KHOẢN VIETQR</span>
-        <h3>{amount===null?<BloomLoader compact label="Thông tin chuyển khoản"/>:money(amount)}</h3>
-        <p>
-          {order.bank.bankName}
-          <br />
-          <strong>{order.bank.accountName}</strong>
-          <br />
-          {order.bank.account}
-        </p>
-        <p>
-          Nội dung: <strong>{order.reference}</strong>
-        </p>
-        <div className="payment-tools">
-          {[['Sao chép số tài khoản', order.bank.account], ['Sao chép nội dung', order.reference]].map(([label, value]) => <button type="button" className="button outline" key={label} onClick={async () => {
-            try { await navigator.clipboard.writeText(value); setCopyNotice(`${label}: đã chép.`); }
-            catch { setCopyNotice("Chưa sao chép được. Bạn có thể chọn thông tin ở trên để chép thủ công."); }
-          }}>{label}</button>)}
-          {qr && <a className="text-link" href={qr} download={`${order.reference}-vietqr.png`}>Tải mã QR</a>}
-        </div>
-        {copyNotice && <p role="status">{copyNotice}</p>}
-        <small>
-          Kiểm tra đúng tên người nhận và số tiền trong ứng dụng ngân hàng.
-          Trạng thái chỉ đổi khi admin kiểm tra đã nhận tiền.
-        </small>
-      </div>
-    </aside>
-  );
-}
 export function MemorySharing({ memory, cardMessage, onChange }) {
   const [mode, setMode] = useState(
       memory.listed ? "GARDEN" : memory.share_token ? "LINK" : "PRIVATE",

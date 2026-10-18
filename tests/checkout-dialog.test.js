@@ -88,6 +88,7 @@ test("VietQR provides account/reference copy actions only for unpaid active bank
   const renderBank = changes => renderToStaticMarkup(createElement(BankPayment,{order:{...order,...changes}}));
   assert.match(renderBank({}),/Sao chép số tài khoản/);
   assert.match(renderBank({}),/Sao chép nội dung/);
+  assert.match(renderBank({payment_status:"PARTIAL"}),/CHUYỂN KHOẢN VIETQR/);
   assert.equal(renderBank({status:"CANCELLED"}), "");
   assert.equal(renderBank({payment_status:"PAID"}), "");
   assert.equal(renderBank({payment_method:"COD"}), "");

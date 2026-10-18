@@ -8,13 +8,15 @@ import { money } from "./catalog.js";
 import { subtotal, validateOrder, cartChoice, cartKey } from "./order.js";
 import { Modal } from "./ShopDialogs.jsx";
 import GuestCheckout, { RememberGuest } from "./GuestCheckout.jsx";
-import { BankPayment } from "./OrderDetail.jsx";
+import { BankPayment } from "./BankPayment.jsx";
 import { sendCheckout } from "./checkout-request.js";
 import { shopAddress } from "./shop-contact.js";
 import { AuthPanel } from "./PortalShell.jsx";
 import DeliveryPicker from "./DeliveryPicker.jsx";
+import CartSummary from './CartSummary.jsx';
+import { checkoutContacts, normalizePhone } from './checkout-contacts.js';
 
-export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
+export default function LiveCheckout({ cart, pending, onClose, onComplete, onEditCart = onClose }) {
   const {
     shop,
     products,
@@ -35,6 +37,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
   const [requestId] = useState(() => draft?.requestId || crypto.randomUUID());
   const [scheduleReady, setScheduleReady] = useState(!features.deliveryCalendar);
   const [scheduleRevision, setScheduleRevision] = useState(0);
+  const [fieldErrors, setFieldErrors] = useState({});
   useEffect(() => {
     if (!shipping.some((s) => s.id === shippingId))
       setShippingId(shipping[0]?.id || "");
@@ -52,7 +55,13 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
     if (busy) return;
     if (!scheduleReady) { setError("Kiểm tra và chọn ca giao khả dụng trước khi gửi."); return; }
     setError("");
-    const raw = Object.fromEntries(new FormData(event.currentTarget));
+    const {values:raw,errors} = checkoutContacts(Object.fromEntries(new FormData(event.currentTarget)));
+    setFieldErrors(errors);
+    if (Object.keys(errors).length) {
+      setError('Kiểm tra số điện thoại người đặt và người nhận bên dưới.');
+      event.currentTarget.elements.namedItem(Object.keys(errors)[0])?.focus();
+      return;
+    }
     try {
       validateOrder(
         { ...raw, requestId, items: cart, consent: raw.consent === "on" },
@@ -96,6 +105,7 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
         if (!busy) onClose();
       }}
     >
+      {!session && !receipt && <CartSummary cart={cart} products={products} onEdit={onEditCart} />}
       {!loading && !storeError && !shop.accepting_orders && !receipt && !pending.current ? (
         <div className="receipt">
           <span className="eyebrow">LIÊN HỆ GARDEN DREAMS</span>
@@ -158,7 +168,9 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               <a className="text-link" href="#account" onClick={onClose}>Kiểm tra lịch sử mua</a>
             </div>
           )}
-          <form onSubmit={submit} hidden={pending.current?.ownerId === session.user.id}>
+          <form onSubmit={submit} hidden={pending.current?.ownerId === session.user.id}
+            onInvalidCapture={event => { if(event.target.name) setFieldErrors(current => ({...current,[event.target.name]:event.target.validationMessage})); }}
+            onChange={event => { if(event.target.name) setFieldErrors(current => ({...current,[event.target.name]:undefined})); }}>
             <fieldset className="checkout-layout"
               disabled={
                 busy ||
@@ -178,7 +190,8 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
               {service && <p className="fineprint">{service.area}. Shop xác nhận địa chỉ và lịch giao trước khi nhận đơn.</p>}
               <DeliveryPicker shippingId={shippingId} calendar={features.deliveryCalendar} initialDate={draft?.deliveryDate} initialTime={draft?.deliveryTime}
                 onReady={setScheduleReady} revision={scheduleRevision} />
-              <h3>Người đặt để shop liên hệ</h3><div className="form-grid"><label>Tên người đặt<input name="buyerName" defaultValue={draft?.buyerName||''} minLength={2} maxLength={80} required autoComplete="name"/></label><label>Điện thoại người đặt<input name="buyerPhone" type="tel" defaultValue={draft?.buyerPhone||''} maxLength={20} pattern="(0|\+84)[35789][0-9]{8}" required autoComplete="tel"/></label></div>
+              <h3>Người đặt để shop liên hệ</h3><div className="form-grid"><label>Tên người đặt<input name="buyerName" defaultValue={draft?.buyerName||''} minLength={2} maxLength={80} required autoComplete="section-buyer name" aria-invalid={Boolean(fieldErrors.buyerName)} aria-describedby={fieldErrors.buyerName?'error-buyerName':undefined}/>{fieldErrors.buyerName && <small id="error-buyerName" className="form-error">{fieldErrors.buyerName}</small>}</label><label>Điện thoại người đặt<input name="buyerPhone" type="tel" defaultValue={draft?.buyerPhone||''} maxLength={24} inputMode="tel" onBlur={event=>{event.target.value=normalizePhone(event.target.value);}} required autoComplete="section-buyer tel" aria-invalid={Boolean(fieldErrors.buyerPhone)} aria-describedby={`checkout-phone-hint${fieldErrors.buyerPhone?' error-buyerPhone':''}`}/>{fieldErrors.buyerPhone && <small id="error-buyerPhone" className="form-error">{fieldErrors.buyerPhone}</small>}</label></div>
+              <p id="checkout-phone-hint" className="fineprint">Ví dụ 090 123 4567 hoặc +84 90 123 4567. Khoảng trắng, dấu chấm và gạch nối được bỏ khi kiểm tra.</p>
               <h3>Hoa gửi đến ai?</h3>
               <div className="form-grid">
                 <label>
@@ -189,8 +202,10 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                     required
                     minLength={2}
                     maxLength={80}
-                    autoComplete="name"
+                    autoComplete="section-recipient name"
+                    aria-invalid={Boolean(fieldErrors.name)} aria-describedby={fieldErrors.name?'error-name':undefined}
                   />
+                  {fieldErrors.name && <small id="error-name" className="form-error">{fieldErrors.name}</small>}
                 </label>
                 <label>
                   Số điện thoại
@@ -199,9 +214,12 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                     defaultValue={draft?.phone || ""}
                     type="tel"
                     required
-                    maxLength={20}
-                    autoComplete="tel"
+                    maxLength={24}
+                    autoComplete="section-recipient tel"
+                    inputMode="tel" onBlur={event=>{event.target.value=normalizePhone(event.target.value);}}
+                    aria-invalid={Boolean(fieldErrors.phone)} aria-describedby={`checkout-phone-hint${fieldErrors.phone?' error-phone':''}`}
                   />
+                  {fieldErrors.phone && <small id="error-phone" className="form-error">{fieldErrors.phone}</small>}
                 </label>
               </div>
               <label>
@@ -212,9 +230,11 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete }) {
                   required
                   minLength={10}
                   maxLength={300}
-                  autoComplete="street-address"
+                  autoComplete="section-recipient street-address"
+                  aria-invalid={Boolean(fieldErrors.address)} aria-describedby={fieldErrors.address?'error-address':undefined}
                   rows={2}
                 />
+                {fieldErrors.address && <small id="error-address" className="form-error">{fieldErrors.address}</small>}
               </label>
               <label>
                 Lời nhắn trên thiệp (giữ riêng)

@@ -1,0 +1,21 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Admin unsaved-change regression fixture</title><div id="root"></div>
+<script type="module">
+import React, {useRef,useState} from 'react';
+import {createRoot} from 'react-dom/client';
+import {useUnsavedForms,markFormSaved} from '/src/unsaved-forms.js';
+import AdminVariants from '/src/AdminVariants.jsx';
+const h=React.createElement;
+function Fixture(){
+  const root=useRef(null),[active,setActive]=useState(true),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
+  const {confirmDiscard,hasChanges}=useUnsavedForms(root);
+  return h('main',{ref:root},
+    h('h1',null,'Synthetic admin form fixture'),h('p',{role:'status'},hasChanges?'Chưa lưu':'Đã lưu'),
+    h('button',{onClick:()=>{if(confirmDiscard())setActive(false);}},'Chuyển mục'),
+    active&&h('form',{className:'admin-edit-form',onSubmit:event=>{event.preventDefault();markFormSaved(event.currentTarget);setNotice('Lưu thành công');}},
+      h('label',null,'Tên mẫu',h('input',{name:'name',defaultValue:'Bó hoa thử'})),
+      h('button',null,'Lưu'),h('button',{type:'button',onClick:()=>setNotice('Lưu thất bại')},'Giả lập lỗi lưu')),
+    active&&h(AdminVariants,{productId:1,disabled:false,onBusyChange:setBusy,onSaved:async()=>{},specificationsEnabled:true}),
+    h('p',null,notice),h('p',null,busy?'Đang tải':''));
+}
+createRoot(document.getElementById('root')).render(h(Fixture));
+</script></html>

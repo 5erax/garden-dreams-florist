@@ -72,7 +72,7 @@ export default function AdminDelivery() {
   return <section className="delivery-admin" aria-label="Quản lý lịch giao hoa">
     <div className="portal-section-heading">
       <div><h2>Khung giờ & sức chứa</h2><p>Khung giờ giao, sức chứa và ngày nghỉ theo từng khu vực.</p></div>
-      <button className="button outline" disabled={busy} onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại</button>
+      <button className="button outline" disabled={busy} data-discard-changes onClick={() => { setEdit(null); setHoliday(null); load(); }}>Tải lại</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
     {notice && <p className="portal-notice" role="status">{notice}</p>}
@@ -88,7 +88,7 @@ export default function AdminDelivery() {
     </div>}
     <div className="portal-section-heading">
       <h3>Các khung giờ giao</h3>
-      <button className="button outline" disabled={busy || !services.some(service=>service.active)} onClick={() => {
+      <button className="button outline" disabled={busy || !services.some(service=>service.active)} data-discard-changes onClick={() => {
         if(edit){setEdit(null);return;} setLeadHours(2);setRuleTime(deliveryTimes[0]);setHoliday(null); setNotice(""); setEdit({shipping_id: services.find(service=>service.active)?.id, delivery_time: deliveryTimes[0], weekdays:[1,2,3,4,5,6,7],capacity:10,lead_minutes:120,active:true});
       }}>{edit?"Đóng biểu mẫu":"Thêm khung giờ"}</button>
     </div>
@@ -110,7 +110,7 @@ export default function AdminDelivery() {
           {weekdays.map((name, index) => <label className="check-label" title={name} key={name}><input type="checkbox" name="weekday" value={index + 1} defaultChecked={edit.weekdays.includes(index + 1)} />{index===6?"CN":`T${index+2}`}</label>)}
         </fieldset>
         <label className="check-label"><input type="checkbox" name="active" defaultChecked={edit.active} />Đang hoạt động — nhận yêu cầu trong khung giờ này</label>
-        <div className="form-actions"><button className="button primary">Lưu khung giờ</button><button type="button" className="button outline" onClick={() => setEdit(null)}>Hủy sửa</button></div>
+        <div className="form-actions"><button className="button primary">Lưu khung giờ</button><button type="button" className="button outline" data-discard-changes onClick={() => setEdit(null)}>Hủy sửa</button></div>
       </fieldset>
     </form>}
     {!busy && !rules.length && !edit && <p className="portal-empty">Chưa có ca giao. Tạo ca theo năng lực thực tế của shop, rồi bật lịch khi đã kiểm tra.</p>}
@@ -122,17 +122,17 @@ export default function AdminDelivery() {
         <dl><div><dt>Sức chứa</dt><dd>{rule.capacity} đơn / ngày</dd></div>
           <div><dt>Đặt trước giờ bắt đầu</dt><dd>{rule.lead_minutes/60} giờ</dd></div></dl>
         <span className="status-badge">{rule.active ? "Đang áp dụng" : "Đã tắt"}</span>
-        <button className="text-button" disabled={busy} onClick={() => { setHoliday(null); setEdit(rule);setLeadHours(rule.lead_minutes/60);setRuleTime(rule.delivery_time); setNotice(""); }}>Chỉnh khung giờ</button>
+        <button className="text-button" disabled={busy} data-discard-changes onClick={() => { setHoliday(null); setEdit(rule);setLeadHours(rule.lead_minutes/60);setRuleTime(rule.delivery_time); setNotice(""); }}>Chỉnh khung giờ</button>
       </article>)}
     </div>
     <div className="portal-section-heading"><h3>Ngày nghỉ theo khu vực</h3>
-      <button className="button outline" disabled={busy || !services.length} onClick={() => { setEdit(null); setHoliday({shipping_id:services[0]?.id,delivery_date:"",reason:"",active:true}); setNotice(""); }}>Thêm ngày nghỉ</button>
+      <button className="button outline" disabled={busy || !services.length} data-discard-changes onClick={() => { setEdit(null); setHoliday({shipping_id:services[0]?.id,delivery_date:"",reason:"",active:true}); setNotice(""); }}>Thêm ngày nghỉ</button>
     </div>
     <ul className="delivery-holidays">
       {closures.map(closure => <li key={closure.id}><div>
         <strong>{new Intl.DateTimeFormat("vi-VN").format(new Date(`${closure.delivery_date}T12:00:00+07:00`))} · {serviceName(closure.shipping_id)}</strong>
         <p>{closure.reason || "Ngày nghỉ của cửa hàng"} · {closure.active ? "Đóng lịch" : "Đã mở lại"}</p>
-      </div><button className="text-button" disabled={busy} onClick={() => {setEdit(null);setHoliday(closure);setNotice("");}}>Chỉnh ngày nghỉ</button></li>)}
+      </div><button className="text-button" disabled={busy} data-discard-changes onClick={() => {setEdit(null);setHoliday(closure);setNotice("");}}>Chỉnh ngày nghỉ</button></li>)}
     </ul>
     {!busy && !closures.length && <p>Chưa có ngày nghỉ sắp tới. Danh sách hiển thị tối đa 100 ngày cấu hình.</p>}
     {holiday && <form className="admin-edit-form" key={`${holiday.id || "new"}-${holiday.version || 0}`} onSubmit={saveHoliday}>
@@ -147,7 +147,7 @@ export default function AdminDelivery() {
         {!holiday.id && <label>Đến ngày (tối đa 31 ngày)<BloomDate name="endDate" min={vietnamDate()} max={vietnamDate(new Date(Date.now()+365*86400000))} required/></label>}
         <label>Lý do nội bộ<input name="reason" placeholder="Ví dụ: nghỉ Tết, bảo trì hoặc thiếu nhân sự" minLength={5} required maxLength={200} defaultValue={holiday.reason} /></label>
         {holiday.id ? <label className="check-label"><input type="checkbox" name="active" defaultChecked={holiday.active} />Không nhận đơn mới ngày này (không tự hủy đơn đã đặt)</label> : <p>Toàn bộ khoảng ngày sẽ ngừng nhận đơn mới. Nếu ngày nào đã giữ chỗ cho đơn, thao tác sẽ dừng và không lưu một phần.</p>}
-        <div className="form-actions"><button className="button primary">Lưu ngày nghỉ</button><button type="button" className="button outline" onClick={() => setHoliday(null)}>Hủy sửa</button></div>
+        <div className="form-actions"><button className="button primary">Lưu ngày nghỉ</button><button type="button" className="button outline" data-discard-changes onClick={() => setHoliday(null)}>Hủy sửa</button></div>
       </fieldset>
     </form>}
   </section>;

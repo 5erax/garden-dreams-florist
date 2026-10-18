@@ -17,6 +17,8 @@ test('changing admin sections clears incompatible rows and detail before the nex
           return source.replace('from "react"', 'from "virtual:navigation-hooks"');
       },
       load(id) {
+        if (id.replaceAll('\\', '/').endsWith('/src/unsaved-forms.js'))
+          return 'export const useUnsavedForms=()=>({confirmDiscard:()=>globalThis.adminNavigationHarness.allowDiscard!==false,hasChanges:false});export const markFormSaved=()=>{};';
         if (id === 'virtual:navigation-hooks') return `
           export function useState(initial) {
             const h=globalThis.adminNavigationHarness, i=h.stateIndex++;
@@ -50,6 +52,10 @@ test('changing admin sections clears incompatible rows and detail before the nex
       const workspace = AdminPortal(); return workspace.type(workspace.props);
     };
     render();
+    harness.allowDiscard=false;
+    find(render(), 'AdminNavigation').props.onChange('products');
+    assert.equal(harness.states[0],'orders');
+    harness.allowDiscard=true;
     for (const previous of ['shop', 'products', 'shipping']) {
       harness.states[0] = previous;
       harness.states[1] = [{ id: 1, name: 'Old section, no delivery date' }];
@@ -63,7 +69,7 @@ test('changing admin sections clears incompatible rows and detail before the nex
     harness.states[0] = 'dashboard'; harness.states[1] = [{ id: 1 }];
     find(render(), 'BusinessDashboard').props.onNavigate('products', 1);
     assert.equal(harness.states[0], 'products'); assert.deepEqual(harness.states[1], []);
-    assert.equal(harness.refs[0].current, 1);
+    assert.equal(harness.refs[1].current, 1);
     const nodes = node => !node || typeof node !== 'object' ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
     harness.states[0] = 'products'; harness.states[1] = [];
     harness.states[2] = false; harness.states[3] = 'Lưu thất bại; giữ nội dung đang sửa.';

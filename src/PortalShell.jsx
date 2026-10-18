@@ -158,9 +158,11 @@ export function AuthPanel() {
                   mode === "signup" ? "new-password" : "current-password"
                 }
                 minLength={mode === "signup" ? 12 : 1}
+                aria-describedby={mode === 'signup' ? 'signup-password-hint' : undefined}
                 required
                 maxLength={128}
               />
+              {mode === 'signup' && <small id="signup-password-hint">Tối thiểu 12 ký tự. Bạn có thể dùng một cụm từ dễ nhớ.</small>}
             </label>
           )}
           {mode!=="reset" && <button type="button" className="text-button password-toggle" aria-pressed={showPassword} onClick={()=>setShowPassword(value=>!value)}>{showPassword?"Ẩn mật khẩu":"Hiện mật khẩu"}</button>}
@@ -211,9 +213,9 @@ export function AuthPanel() {
           </button>
         )}
       </div>
-      <small>
+      {mode !== 'reset' && <small>
         Phiên đăng nhập được giữ trong tab này để bạn quay lại sau khi mở ứng dụng ngân hàng hoặc tải lại trang. Đóng tab sẽ kết thúc việc lưu phiên trong tab; dùng thiết bị chung hãy đăng xuất khi xong. Mật khẩu không được lưu trên website.
-      </small>
+      </small>}
     </section>
   );
 }
