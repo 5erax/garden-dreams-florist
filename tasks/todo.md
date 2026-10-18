@@ -288,6 +288,6 @@ Trạng thái: chuẩn bị lát cắt storefront theo các skill chủ shop g�
 - [x] Cart, checkout and authentication guidance
 - [x] Garden discovery, return state and sharing
 - [x] Admin dirty forms, specifications and performance
-- [ ] Full regression, browser audit, production deployment and issue evidence
+- [x] Full regression, browser audit, production deployment and issue evidence — PR #47, production b793468; 220 tests and hosted technical SEO verified. Details: docs/issue-resolution-2026-10-19.md.
 
 Scope confirmed by owner: normal editable bouquet descriptions without invented exact measurements (#24); technical SEO only for #10, excluding Search Console/Google indexing. Field Core Web Vitals cannot be inferred from lab measurements.

@@ -4,7 +4,7 @@ Scope: #10, #17–29, #31–45 (29 issues). Preserve the transparent initial nav
 
 ## Verification
 
-- `npm test`: 219/219 passed, no skipped tests, plus a deployment-packaging regression added after the first Preview exposed an omitted build script. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
+- `npm test`: 220/220 passed, no skipped tests, including a deployment-packaging regression added after the first Preview exposed an omitted build script. Tests include PGlite migrations, server money/authorization checks, checkout retries and component regressions.
 - `npm run build`: SEO build contract and initial dependency budget passed. All static initial imports are counted once; dynamic checkout/QR modules are excluded because they load on demand.
 - Production dependency audit: zero known vulnerabilities (`npm audit --omit=dev`).
 - Chromium browser checks at 320 × 712, 390 × 844 and 1440 × 1000. No horizontal overflow at 320/390. Header is 88 px after scrolling, all occasion buttons visible. Desktop initial header background remains transparent; six decorative petals remain.
@@ -66,3 +66,30 @@ One cold-cache mobile lab run of the built local preview: Chromium, 390 × 844, 
 ## Limits
 
 No live purchase, bank transfer, refund or real customer/admin write was performed. Synthetic checkout/admin responses are identified above. Google indexing and field CWV are not claimed. Bouquet measurements remain editable shop content; no exact measurements were invented. Existing shop receiving-order configuration was not changed.
+
+## Production release verification
+
+[PR #47](https://github.com/5erax/garden-dreams-florist/pull/47) merged as `b79346800d050f3f9094b2154c8ab2d5c90f94ef`. [Production deployment](https://vercel.com/dhas-projects-901181f4/garden-dreams-florist/H4ZMU2KhTMK8cyBbmfF8MW3n18D7) reported success. Hosted checks completed at 19:27 UTC on 18 October (02:27 on 19 October in Vietnam).
+
+| HTTP path | Result |
+| --- | --- |
+| `/`, `/?nocache=20261019` | 200 HTML, H1, Florist JSON-LD, populated catalog, canonical domain root, live catalog response |
+| `/index.html` | 308 redirect to `/` |
+| `/robots.txt` | 200, correct sitemap reference |
+| `/sitemap.xml` | 200, 16 canonical URLs, excludes reference products |
+| `/hoa/nang-diu-1` | 200, correct product canonical and Product/Offer JSON-LD |
+| `/hoa/hoa-hong-sac-thuong-21` | 200, `noindex,follow` in HTML and HTTP header, no Offer JSON-LD, excluded from sitemap |
+| Referenced entry JS/CSS | 200 assets, correct non-HTML responses |
+
+Chromium after JavaScript: reference product → account → Back retains `noindex,follow` → `noindex,nofollow` → `noindex,follow`. Production entry asset changed to `index-Bd27W54y.js`, catalog shows `8/15` and six petals remain. Production mobile product geometry matches the local result, with the first ingredient fully visible above the footer. Production Garden loaded 40 suggestions, returned to card 30 at the exact same viewport top (271.97 px) and scrollY (13,918), and `cam on` matched seven messages.
+
+Same cold-cache hosted mobile lab conditions as above, one run per deployment:
+
+| Lab metric | Previous production | Released production |
+| --- | ---: | ---: |
+| TTFB | 60 ms | 60 ms |
+| FCP | 1,316 ms | 960 ms |
+| LCP | 9,484 ms | 6,728 ms |
+| CLS | 0.052 | 0.052 |
+
+These are synthetic single-run observations, not field CWV. Mobile LCP remains above 2.5 seconds in this throttled scenario despite the improvement; further image delivery/initial rendering work would be needed to meet that performance target. Technical SEO is verified; Google indexing remains outside the owner's chosen scope.
