@@ -1670,21 +1670,7 @@ grant execute on function public.gd_business_dashboard(date,date) to authenticat
 notify pgrst,'reload schema';
 commit;
 
--- Only on the new staging project tgvozhrkolcpszyyrgth, after migrations 001–005.
-begin;
-do $$
-begin
-  if exists(select 1 from gd_private.runtime where environment='staging' and project_ref='tgvozhrkolcpszyyrgth') then return; end if;
-  if exists(select 1 from public.gd_orders) or exists(select 1 from public.gd_admins) or exists(select 1 from auth.users) then raise exception 'STAGING_REQUIRES_EMPTY_PROJECT'; end if;
-  update gd_private.runtime set environment='staging',project_ref='tgvozhrkolcpszyyrgth' where id=1;
-  update public.gd_shop set accepting_orders=false;
-end;
-$$;
-select public.gd_environment() as runtime;
-commit;
-
-
--- Admin audit workflows, 2026-10-11.
+-- 20261011125320_admin_audit_workflows.sql
 begin;
 set local lock_timeout='10s';
 do $$ begin if public.gd_environment()->>'projectRef' not in ('ztzpipgptticvliotbsc','tgvozhrkolcpszyyrgth') or to_regclass('public.gd_recipes') is null then raise exception 'AUDIT_REQUIRES_KNOWN_SCHEMA'; end if; end $$;
@@ -1986,7 +1972,7 @@ end;
 $$;
 notify pgrst,'reload schema';commit;
 
--- Round three workflow fixes
+-- 20261011140822_round_three_workflow_fixes.sql
 begin;
 set local lock_timeout='10s';
 do $$ begin if to_regclass('public.gd_recipe_lines') is null or not exists(select 1 from information_schema.columns where table_schema='public' and table_name='gd_shop' and column_name='opens_at') then raise exception 'ROUND_THREE_REQUIRES_AUDIT';end if;end $$;
@@ -2441,7 +2427,7 @@ update public.gd_products p set slug=coalesce(nullif(gd_private.slug_name(p.name
 notify pgrst,'reload schema';
 commit;
 
--- Order notification outbox
+-- 20261011144628_order_email_notifications.sql
 begin;
 set local lock_timeout='10s';
 create table gd_private.order_notifications(
@@ -2471,3 +2457,28 @@ create function public.gd_order_notification_status() returns jsonb language plp
  return(select jsonb_build_object('pending',count(*) filter(where state in ('PENDING','SENDING') or state='FAILED' and attempts<5),'attention',count(*) filter(where state='UNKNOWN' or state='FAILED' and attempts>=5),'lastSentAt',max(sent_at)) from gd_private.order_notifications);end;$$;
 revoke execute on function public.gd_order_notification_status() from public,anon;grant execute on function public.gd_order_notification_status() to authenticated;
 notify pgrst,'reload schema';commit;
+
+-- 20261018185115_public_bouquet_specifications.sql
+begin;
+alter table public.gd_products add column specification text not null default '' check(char_length(specification)<=1200);
+alter table public.gd_product_variants add column specification text not null default '' check(char_length(specification)<=1200);
+create or replace function public.gd_environment() returns jsonb language sql stable security definer set search_path='' as $$
+  select jsonb_build_object('environment',environment,'projectRef',project_ref,
+    'features',jsonb_build_object('productAlbum',true,'productImageUpload',gd_private.product_uploads_ready(),
+      'productVariants',true,'variantOrders',true,'deliveryCalendar',true,'operationsDesk',true,'orderRequests',true,'reconciliationLedger',true,'inventory',true,'productPages',true,'bouquetSpecifications',true)) from gd_private.runtime where id=1;
+$$;
+notify pgrst,'reload schema';
+commit;
+
+-- Only on the new staging project tgvozhrkolcpszyyrgth, after migrations 001–005.
+begin;
+do $$
+begin
+  if exists(select 1 from gd_private.runtime where environment='staging' and project_ref='tgvozhrkolcpszyyrgth') then return; end if;
+  if exists(select 1 from public.gd_orders) or exists(select 1 from public.gd_admins) or exists(select 1 from auth.users) then raise exception 'STAGING_REQUIRES_EMPTY_PROJECT'; end if;
+  update gd_private.runtime set environment='staging',project_ref='tgvozhrkolcpszyyrgth' where id=1;
+  update public.gd_shop set accepting_orders=false;
+end;
+$$;
+select public.gd_environment() as runtime;
+commit;

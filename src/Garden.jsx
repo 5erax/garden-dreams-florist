@@ -1,12 +1,13 @@
+import { normalizeSearch } from './product-url.js';
 import BloomLoader from "./BloomLoader.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { call } from "./backend.js";
 import { useStore } from "./Store.jsx";
 import Icon from "./Icons.jsx";
 import sampleOrders from './garden-orders.json' with { type: 'json' };
 const greetingCards = sampleOrders.map(order => order.memory);
 
-export default function Garden() {
+export default function Garden({ active = true }) {
   const { connected } = useStore();
   const [memories, setMemories] = useState([]),
     [count, setCount] = useState(0),
@@ -14,8 +15,26 @@ export default function Garden() {
     [error, setError] = useState(""),
     [more, setMore] = useState(false);
   const [exampleLimit, setExampleLimit] = useState(24);
+  const [query,setQuery] = useState('');
+  const returnPoint = useRef(null);
+  useEffect(() => {
+    const previous = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    return () => { history.scrollRestoration = previous; };
+  }, []);
+  useEffect(() => {
+    if (!active) return;
+    const frame = requestAnimationFrame(() => {
+      const point = returnPoint.current;
+      const target = point && document.getElementById(`memory-${point.token}`);
+      target?.focus({preventScroll:true});
+      window.scrollTo({top:target ? window.scrollY + target.getBoundingClientRect().top - point.top : 0,behavior:'instant'});
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [active]);
   const examples = connected && !busy && !error && count === 0 && memories.length === 0;
-  const shown = examples ? greetingCards.slice(0, exampleLimit) : memories;
+  const matching = (examples ? greetingCards : memories).filter(card => normalizeSearch(`${card.message} ${card.flowerName}`).includes(normalizeSearch(query)));
+  const shown = examples ? matching.slice(0,exampleLimit) : matching;
   const total = examples ? greetingCards.length : count;
   async function load(append = false) {
     setBusy(true);
@@ -67,12 +86,18 @@ export default function Garden() {
           {examples ? 'Gợi ý được viết bởi Garden Dreams. Kỷ niệm từ đơn hoa chỉ được công khai khi người gửi đồng ý.' : 'Lời nhắn chỉ xuất hiện khi người gửi chọn chia sẻ. Những kỷ niệm riêng vẫn được giữ riêng.'}
         </small>
       </section>
+      <div className="garden-search section-shell"><label>Tìm lời nhắn<input type="search" value={query} maxLength={100} onChange={event=>{setQuery(event.target.value);setExampleLimit(24);}} placeholder="Sinh nhật, cảm ơn, động viên…" /></label>
+        <p role="status">{examples ? `${matching.length} gợi ý phù hợp · đang xem ${shown.length}` : `Tìm trong ${memories.length} kỷ niệm đã tải · ${shown.length} phù hợp`}</p>
+        {query && <button className="text-button" onClick={()=>setQuery('')}>Xóa tìm lời nhắn</button>}
+      </div>
       <section
         className="memory-garden"
         aria-label={examples ? 'Gợi ý lời nhắn cho thiệp hoa' : 'Những thông điệp được khách chia sẻ'}
       >
         {shown.map((m, i) => (
           <a
+            id={`memory-${m.token}`}
+            onClick={event=>{returnPoint.current={token:m.token,top:event.currentTarget.getBoundingClientRect().top};}}
             className={`memory-flower flower-tone-${i % 4}`}
             href={"#memory/" + m.token}
             key={m.id}
@@ -92,11 +117,12 @@ export default function Garden() {
           </a>
         ))}
       </section>
-      {(more || (examples && exampleLimit < greetingCards.length)) && (
+      {!busy && !shown.length && query && <p className="garden-empty-status" role="status">Chưa có lời nhắn phù hợp. Thử một từ khóa khác.</p>}
+      {(more || (examples && exampleLimit < matching.length)) && (
         <button
           className="button outline garden-more"
           disabled={busy}
-          onClick={() => examples ? setExampleLimit(limit => Math.min(limit + 24, greetingCards.length)) : load(true)}
+          onClick={() => examples ? setExampleLimit(limit => Math.min(limit + 24, matching.length)) : load(true)}
         >
           Gặp thêm những lời thương
         </button>
@@ -111,6 +137,8 @@ export default function Garden() {
   );
 }
 export function SharedMemory({ token }) {
+  const [notice,setNotice] = useState('');
+  const quote = useRef(null);
   const { connected, shop } = useStore();
   const example = greetingCards.find(card => card.token === token);
   const [memory, setMemory] = useState(example || null),
@@ -171,7 +199,7 @@ export function SharedMemory({ token }) {
       <div className="shared-flower">
         <img src={memory.flowerImage} alt={memory.flowerName} />
       </div>
-      <blockquote>{memory.message}</blockquote>
+      <blockquote ref={quote} tabIndex={0}>{memory.message}</blockquote>
       <p className="shared-signature">
         {memory.signature
           ? "— " + memory.signature
@@ -188,6 +216,22 @@ export function SharedMemory({ token }) {
           }).format(new Date(memory.createdAt))}
         </p>
       </div>
+      <div className="shared-card-actions">
+        <button className="button primary" onClick={async()=>{
+          try {await navigator.clipboard.writeText(memory.message);setNotice('Đã sao chép lời nhắn.');}
+          catch {quote.current?.focus();window.getSelection()?.selectAllChildren(quote.current);setNotice('Lời nhắn đã được chọn. Bạn có thể sao chép thủ công.');}
+        }}>Sao chép lời nhắn</button>
+        <button className="button outline" onClick={async()=>{
+          const url = location.origin + '/#memory/' + encodeURIComponent(token);
+          try {
+            if(navigator.share) await navigator.share({title:'Một lời thương · Garden Dreams',url});
+            else {await navigator.clipboard.writeText(url);setNotice('Đã sao chép liên kết tấm thiệp.');}
+          } catch(error) {if(error.name!=='AbortError') setNotice('Chưa chia sẻ được. Hãy sao chép liên kết tấm thiệp bên dưới.');}
+        }}>Chia sẻ tấm thiệp</button>
+        <button className="text-button" onClick={async()=>{try{await navigator.clipboard.writeText(location.origin+'/#memory/'+encodeURIComponent(token));setNotice('Đã sao chép liên kết tấm thiệp.');}catch{setNotice('Nhấn giữ đường dẫn tấm thiệp bên dưới để sao chép.');}}}>Sao chép liên kết</button>
+        <a className="text-link" href={`/#memory/${encodeURIComponent(token)}`}>Đường dẫn tấm thiệp</a>
+      </div>
+      {notice && <p role="status">{notice}</p>}
       <a className="text-link" href="#garden">
         Gặp những lời thương khác →
       </a>

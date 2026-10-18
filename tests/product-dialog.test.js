@@ -44,7 +44,8 @@ test("reference products disclose proposed pricing and cannot enter checkout", (
   const html = render({ ...products[0], active: false, reference_only: true });
   assert.match(html, /Mẫu tham khảo/);
   assert.match(html, /Giá dự kiến/);
-  assert.match(html, /class="button primary" disabled=""/);
+  assert.match(html, /Xem hoa đang nhận đặt/);
+  assert.doesNotMatch(html, /Thêm vào giỏ hoa|Đặt ngay|class="quantity"/);
   assert.doesNotMatch(html, /Cỡ này đã ngừng/);
 });
 
@@ -63,7 +64,8 @@ test("unavailable product shows no fallback price or subtotal and cannot be adde
   assert.doesNotMatch(html, /Tạm tính/);
   assert.ok(!html.includes(money(products[0].price)));
   assert.match(html, /role="alert"/);
-  assert.match(html, /class="button primary" disabled=""/);
+  assert.match(html, /Xem hoa đang nhận đặt/);
+  assert.doesNotMatch(html, /Thêm vào giỏ hoa|Đặt ngay|class="quantity"/);
 });
 
 test("additional sizes keep Standard selected in the accessible size control", () => {

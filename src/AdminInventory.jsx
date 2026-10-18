@@ -1,3 +1,4 @@
+import { markFormSaved } from './unsaved-forms.js';
 import BloomDate from "./BloomDate.jsx";
 import BloomSelect from "./BloomSelect.jsx";
 import BloomLoader from "./BloomLoader.jsx";
@@ -33,7 +34,7 @@ export default function AdminInventory() {
     setBusy(true); setError(''); setNotice('');
     try {
       await sendCheckout(pending, session.user.id, {p_id:crypto.randomUUID(),p_action:action,p_body:body}, request => call('gd_inventory_command',request));
-      if (mounted.current) { setNotice('Đã lưu. Kho và công thức đã cập nhật.'); form?.reset(); await load(); }
+      if (mounted.current) { setNotice('Đã lưu. Kho và công thức đã cập nhật.'); form?.reset(); markFormSaved(form); await load(); }
     } catch (failure) {
       if (failure.cause?.code === '23505') pending.current = null;
       if (mounted.current) setError(failure.cause?.code === '23505' ? 'Nguyên liệu đã tồn tại hoặc công thức có dòng trùng. Kiểm tra và sửa lựa chọn.' : failure.message);

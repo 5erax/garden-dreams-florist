@@ -1,5 +1,11 @@
+import { cartChoice } from './order.js';
+export function startingPrice(product) {
+  const prices = [cartChoice({ id: product.id }, [product]), ...(product.variants || []).map(v => cartChoice({ id: product.id, variantId: v.id }, [product]))]
+    .filter(Boolean).map(choice => choice.price).filter(price => Number.isSafeInteger(price) && price > 0);
+  return prices.length ? Math.min(...prices) : product.price;
+}
 export function withinBudget(product, ceiling, saleOnly) {
-  return (!ceiling || product.price <= ceiling) && (!saleOnly || (product.active !== false && !product.reference_only));
+  return (!ceiling || startingPrice(product) <= ceiling) && (!saleOnly || (product.active !== false && !product.reference_only));
 }
 export function toggleComparison(ids, id) {
   if (ids.includes(id)) return ids.filter(value => value !== id);

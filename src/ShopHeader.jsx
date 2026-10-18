@@ -23,8 +23,8 @@ export default function ShopHeader({ route, cartCount, onCart, onFavorites, only
       <a href={`${prefix}#garden`} aria-label="Vườn kỷ niệm" aria-current={route === '#garden' || route.startsWith('#memory/') ? 'page' : undefined} onPointerEnter={preloadGarden} onFocus={preloadGarden}><span className="nav-wide">Vườn kỷ niệm</span><span className="nav-short">Kỷ niệm</span></a>
     </nav>
     <div className="header-actions">
-      <a href={`${prefix}#account`} className="icon-button account-link" aria-label={session ? 'Góc kỷ niệm của tôi' : 'Tài khoản & lịch sử mua'} aria-current={route === '#account' ? 'page' : undefined} onPointerEnter={preloadAccount} onFocus={preloadAccount}><Icon name="user" /></a>
-      <button className={`icon-button ${onlyFavorites ? 'is-favorite' : ''}`} aria-label="Xem hoa yêu thích" aria-pressed={onlyFavorites} onClick={onFavorites}><Icon name="heart" /></button>
+      <a href={`${prefix}#account`} className="icon-button account-link" aria-label={session ? 'Góc kỷ niệm của tôi' : 'Tài khoản & lịch sử mua'} aria-current={route === '#account' ? 'page' : undefined} onPointerEnter={preloadAccount} onFocus={preloadAccount}><Icon name="user" /><span className="action-label">Tài khoản</span></a>
+      <button className={`icon-button ${onlyFavorites ? 'is-favorite' : ''}`} aria-label="Xem hoa yêu thích" aria-pressed={onlyFavorites} onClick={onFavorites}><Icon name="heart" /><span className="action-label">Đã lưu</span></button>
       <button className={`cart-trigger ${notice ? 'has-new-items' : ''}`} onClick={onCart} aria-label={`Mở giỏ hoa, ${cartCount} bó`}><Icon name="bag" /><span className="cart-label">Giỏ hoa</span><span className="cart-count">{cartCount}</span></button>
     </div>
   </header>;

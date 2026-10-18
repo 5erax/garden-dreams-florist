@@ -1,9 +1,10 @@
+import { markFormSaved } from './unsaved-forms.js';
 import { useEffect, useRef, useState } from "react";
 import { backend, result } from "./backend.js";
 import { money } from "./catalog.js";
 
 const newVariant = { sku: "", size_name: "", price: 390000, active: true };
-export default function AdminVariants({ productId, disabled, onBusyChange, onSaved }) {
+export default function AdminVariants({ productId, disabled, onBusyChange, onSaved, specificationsEnabled = false }) {
   const [rows, setRows] = useState([]);
   const [edit, setEdit] = useState(null);
   const [busy, setBusy] = useState(true);
@@ -27,8 +28,9 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
   }, [productId]);
   async function save(event) {
     event.preventDefault();
+    const savedForm = event.currentTarget;
     const fields = Object.fromEntries(new FormData(event.currentTarget));
-    const values = { sku: fields.sku.trim().toUpperCase(), size_name: fields.size_name.trim(), price: Number(fields.price), active: fields.active === "on" };
+    const values = { sku: fields.sku.trim().toUpperCase(), size_name: fields.size_name.trim(), price: Number(fields.price), active: fields.active === "on", ...(specificationsEnabled ? {specification:fields.specification.trim()} : {}) };
     setBusy(true);
     onBusyChange(true);
     setError("");
@@ -38,6 +40,7 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
         .eq("product_id", productId).eq("id", edit.id).eq("version", edit.version).select("*").maybeSingle()) :
         await result(backend.from("gd_product_variants").insert({ ...values, product_id: productId }).select("*").single());
       if (!row) throw new Error("Cỡ bó đã được sửa ở nơi khác. Tải lại trước khi cập nhật.");
+      markFormSaved(savedForm);
       setEdit(null);
       await onSaved();
       await load();
@@ -50,7 +53,7 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
     <p className="fineprint">Giá trên sản phẩm là cỡ Tiêu chuẩn. Thêm cỡ khác tại đây; tắt cỡ chỉ ngừng các đơn đặt mới.</p>
     <div className="form-actions">
       <button className="button outline" disabled={busy || disabled} onClick={() => { setEdit({ ...newVariant }); setNotice(""); }}>Thêm cỡ bó</button>
-      <button className="text-button" disabled={busy || disabled} onClick={() => { setEdit(null); load(); }}>Tải lại cỡ bó</button>
+      <button className="text-button" disabled={busy || disabled} data-discard-changes onClick={() => { setEdit(null); load(); }}>Tải lại cỡ bó</button>
     </div>
     {error && <p className="form-error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
@@ -70,9 +73,10 @@ export default function AdminVariants({ productId, disabled, onBusyChange, onSav
           <label>Giá (VNĐ)<input name="price" type="number" min={1000} max={100000000} step={1} defaultValue={edit.price} required /></label>
         </div>
         <label className="check-label"><input type="checkbox" name="active" defaultChecked={edit.active} />Cho phép đặt cỡ này</label>
+        {specificationsEnabled && <label>Quy cách riêng cho cỡ này<textarea name="specification" defaultValue={edit.specification || ''} maxLength={1200} rows={4} placeholder="Mô tả điểm khác với cỡ tiêu chuẩn: loại hoa, độ đầy, cách gói. Chỉ ghi số cành hoặc kích thước khi có thể cam kết." /></label>}
         <div className="form-actions">
           <button className="button primary">Lưu cỡ</button>
-          <button type="button" className="button outline" onClick={() => setEdit(null)}>Hủy sửa cỡ</button>
+          <button type="button" className="button outline" data-discard-changes onClick={() => setEdit(null)}>Hủy sửa cỡ</button>
         </div>
       </fieldset>
     </form>}

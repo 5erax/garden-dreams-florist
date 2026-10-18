@@ -33,6 +33,7 @@ test('server HTML exposes actual catalog price, canonical and escaped Product/Fl
   assert.equal(graph[0]['@type'],'Florist');assert.equal(graph[1].offers.price,890000);
   assert.ok(!Object.hasOwn(graph[1].offers,'availability'));
   assert.ok(!html.includes('garden-dreams-hero.webp" as="image"'));
+  assert.doesNotMatch(html,/Miễn phí giao trong Long Thành/);
 });
 test('homepage has crawlable products and hero preload; previews are noindex',()=>{
   const html=renderStorefront({template,shop,products:[product],preview:true});

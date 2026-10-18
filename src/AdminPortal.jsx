@@ -1,4 +1,5 @@
 import AdminNavigation from './AdminNavigation.jsx';
+import { useUnsavedForms, markFormSaved } from './unsaved-forms.js';
 import ShopPolicy from './ShopPolicy.jsx';
 import BloomTime from './BloomTime.jsx';
 import BloomMoney from "./BloomMoney.jsx";
@@ -32,6 +33,7 @@ const newProduct = {
   price: "",
   stems: "",
   description: "",
+  specification: "",
   image: "",
   images: [],
   active: false,
@@ -43,6 +45,8 @@ export default function AdminPortal() {
   return <AdminWorkspace key={`${store.session?.user.id || "signed-out"}:${Boolean(store.isAdmin)}:${Boolean(store.connected)}`} store={store} />;
 }
 function AdminWorkspace({ store }) {
+  const workspace = useRef(null);
+  const {confirmDiscard,hasChanges} = useUnsavedForms(workspace);
   const [tab, setTab] = useState(() => {
     try { return readAdminTab(store.session?.user.id, store.features, globalThis.sessionStorage); }
     catch { return 'orders'; }
@@ -60,6 +64,7 @@ function AdminWorkspace({ store }) {
   const [search,setSearch]=useState('');
   function changeTab(next) {
     if (next === tab) return;
+    if (!confirmDiscard()) return;
     // Clear the old section before rendering the next table or form.
     requestSequence.current++;
     setRows([]); setEdit(null); setSelected(null); setMore(false);
@@ -139,6 +144,7 @@ function AdminWorkspace({ store }) {
     );
   async function save(event) {
     event.preventDefault();
+    const savedForm = event.currentTarget;
     setBusy(true);
     setError("");
     setNotice("");
@@ -155,6 +161,7 @@ function AdminWorkspace({ store }) {
           price: Number(f.price),
           stems: f.stems.trim(),
           description: f.description.trim(),
+          ...(store.features.bouquetSpecifications ? {specification:f.specification.trim()} : {}),
           image: f.image.trim() || "/flowers/flower-pending.svg",
           active: f.active === "on",
           featured: f.featured === "on",
@@ -201,6 +208,7 @@ function AdminWorkspace({ store }) {
         row = await result(
           backend.from(table).insert(fields).select("*").single(),
         );
+      markFormSaved(savedForm);
       setEdit(null);
       await load();
       await store.refresh();
@@ -221,7 +229,8 @@ function AdminWorkspace({ store }) {
   const item = tab === "shop" ? rows[0] : edit;
   const photoSource = tab === 'products' && item?.image?.endsWith('-pending.svg') && !item.images?.length ? shopPhotoSources[item.name] : null;
   return (
-    <div className="admin-workspace">
+    <div ref={workspace} className="admin-workspace">
+      {hasChanges && <p className="unsaved-notice" role="status">Bạn có chỉnh sửa chưa lưu.</p>}
       <div className="portal-title">
         <span className="eyebrow">BÀN CHĂM CỬA HÀNG</span>
         <h1>
@@ -494,6 +503,7 @@ function AdminWorkspace({ store }) {
                 </label>
               </>
             )}
+            {tab === 'products' && store.features.bouquetSpecifications && <label>Quy cách cỡ tiêu chuẩn<textarea name="specification" defaultValue={item.specification || ''} maxLength={1200} rows={4} placeholder="Loại hoa, độ đầy, cách gói và những thông số cửa hàng có thể cam kết." /></label>}
             {tab === "shipping" && (
               <>
                 <h3>{edit.id ? "Chỉnh sửa dịch vụ" : "Thêm dịch vụ giao"}</h3>
@@ -621,7 +631,7 @@ function AdminWorkspace({ store }) {
                 <button
                   className="button outline"
                   type="button"
-                  onClick={() => setEdit(null)}
+                  data-discard-changes onClick={() => setEdit(null)}
                 >
                   Hủy
                 </button>
@@ -631,7 +641,7 @@ function AdminWorkspace({ store }) {
         </form>
       )}
       {tab === "products" && edit?.id && store.features.productVariants && <AdminVariants
-        key={edit.id} productId={edit.id} disabled={busy} onBusyChange={setBusy} onSaved={store.refresh}
+        key={edit.id} specificationsEnabled={store.features.bouquetSpecifications} productId={edit.id} disabled={busy} onBusyChange={setBusy} onSaved={store.refresh}
       />}
       <p className="fineprint">
         Chỉ nhân viên được phân quyền mới thay đổi cấu hình. Giá và phí mới chỉ

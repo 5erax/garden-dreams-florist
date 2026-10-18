@@ -28,6 +28,7 @@ test('both catalog reset buttons recover empty results and restore purchasable d
           };`;
         if (id.replaceAll('\\', '/').endsWith('/src/Store.jsx')) return 'export const useStore=()=>globalThis.gdFilterHarness.store;';
         if (id.replaceAll('\\', '/').endsWith('/src/customer-cart.js')) return 'export const useCustomerCart=()=>[[],()=>{}];';
+        if (id.replaceAll('\\', '/').endsWith('/src/customer-favorites.js')) return 'export const useCustomerFavorites=()=>[[],()=>{}];';
       },
     }, react()],
     define: { 'import.meta.env.VITE_APP_ENV': '"demo"', 'import.meta.env.VITE_SUPABASE_URL': '""', 'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': '""' },

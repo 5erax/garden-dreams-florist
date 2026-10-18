@@ -1,13 +1,14 @@
-import BloomDate from "./BloomDate.jsx";
+
 import BloomSelect from "./BloomSelect.jsx";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { money } from "./catalog.js";
-import { subtotal, validateOrder, vietnamDate, cartChoice, cartKey } from "./order.js";
+import { subtotal, cartChoice, cartKey } from "./order.js";
 import Icon from "./Icons.jsx";
 import { useStore } from "./Store.jsx";
 import ProductGallery from "./ProductGallery.jsx";
 import { productUrl, productTitle } from './product-url.js';
 import { deliveryCopy } from './delivery-copy.js';
+import { bouquetSpecification } from './bouquet-specification.js';
 
 export function Modal({ title, children, onClose, className = "" }) {
   const dialog = useRef(null);
@@ -61,9 +62,10 @@ export function ProductDialog({
   inline = false,
   shipping = [],
   readOnly = false,
+  initialVariantId = null,
 }) {
   const [quantity, setQuantity] = useState(1);
-  const [variantId, setVariantId] = useState(null);
+  const [variantId, setVariantId] = useState(initialVariantId);
   const [shareNotice, setShareNotice] = useState('');
   const choice = cartChoice({ id: product.id, variantId }, [product]);
   const Wrapper = inline ? 'section' : Modal;
@@ -92,7 +94,7 @@ export function ProductDialog({
         <dl>
           <dt>Trong bó hoa</dt>
           <dd>{product.stems?.replace(/hoa phụ/gi, 'hoa nhỏ phối cùng')}</dd>
-          <dt>Quy cách</dt><dd>Số cành, chiều cao và giấy gói được shop xác nhận trước khi thực hiện.</dd>
+          <dt>Quy cách{choice?.sizeName ? ` · ${choice.sizeName}` : ''}</dt><dd aria-live="polite">{bouquetSpecification(product,variantId)}</dd>
           <dt>Lời nhắn</dt>
           <dd>Thêm lời nhắn của bạn khi đặt hoa</dd>
         </dl>
@@ -125,7 +127,7 @@ export function ProductDialog({
           <span>{quantity} bó · {choice.sizeName || "Tiêu chuẩn"}</span>
           <small>Chưa gồm phí giao hoa</small>
         </div>}
-        <div className="detail-actions" id={inline ? "buy" : undefined}>
+        {choice ? <div className="detail-actions" id={inline ? "buy" : undefined}>
           <Quantity
             value={quantity}
             onChange={setQuantity}
@@ -144,7 +146,7 @@ export function ProductDialog({
           <button className="button primary" disabled={!choice} onClick={() => onBuy(product.id, quantity, variantId)}>
             Đặt ngay <Icon name="arrow" />
           </button>
-        </div>
+        </div> : <div className="unavailable-actions"><p>Tìm một bó hoa sẵn sàng cho ngày bạn muốn gửi.</p><a className="button primary" href="/#collection">Xem hoa đang nhận đặt <Icon name="arrow" /></a></div>}
       </div>}
     </Wrapper>
   );
@@ -172,8 +174,15 @@ function Quantity({ value, onChange, name }) {
   );
 }
 
-export function CartDialog({ cart, onClose, onChange, onCheckout }) {
+export function CartDialog({ cart, onClose, onChange, onCheckout, onView, focusKey }) {
   const { products } = useStore();
+  const [removed, setRemoved] = useState(null);
+  const [undoNotice, setUndoNotice] = useState('');
+  useEffect(() => {
+    if (!focusKey) return;
+    const frame = requestAnimationFrame(() => document.getElementById(`cart-view-${focusKey}`)?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [focusKey]);
   const count = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <Modal title="Giỏ hoa của bạn" onClose={onClose} className="cart-dialog">
@@ -182,6 +191,13 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
         Giỏ hoa <em>của bạn.</em>
       </h2>
       <p className="muted">{count} bó hoa · một lời thương đang chờ gửi</p>
+      {removed && <div className="cart-undo" role="status"><span>Đã bỏ {products.find(p=>p.id===removed.id)?.name} khỏi giỏ.</span><button className="text-button" onClick={() => {
+        const existing = cart.find(line=>cartKey(line)===cartKey(removed));
+        if (!cartChoice(removed, products)) { setUndoNotice('Mẫu này hiện chưa nhận đặt. Chọn một bó hoa khác.'); return; }
+        if (!existing && cart.length >= 20) { setUndoNotice('Giỏ đã đủ 20 mẫu. Bỏ một mẫu trước khi hoàn tác.'); return; }
+        onChange(removed.id, Math.max(existing?.quantity || 0, removed.quantity), removed.variantId); setRemoved(null);setUndoNotice('Đã khôi phục bó hoa.');
+      }}>Hoàn tác</button></div>}
+      {undoNotice && <p role="status">{undoNotice}</p>}
       {!cart.length ? (
         <div className="empty-state">
           <Icon name="bag" />
@@ -201,7 +217,7 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
                   <img src={product.image} alt={product.name} />
                   <div>
                     <span className="eyebrow">{product.occasion}</span>
-                    <h3>{product.name}</h3>
+                  <h3><button id={`cart-view-${cartKey(line)}`} className="text-button cart-product-link" onClick={() => onView?.(products.find(p=>p.id===line.id), line)}>{product.name}</button></h3>
                     {product.sizeName && <p>Cỡ {product.sizeName}</p>}
                     <p>{money(product.price)}</p>
                     <Quantity
@@ -212,7 +228,7 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
                   </div>
                   <button
                     className="text-button remove"
-                    onClick={() => onChange(line.id, 0, line.variantId)}
+                    onClick={() => { setRemoved({...line}); setUndoNotice(''); onChange(line.id, 0, line.variantId); }}
                     aria-label={`Xóa ${product.name}${product.sizeName ? ` · ${product.sizeName}` : ""}`}
                   >
                     Xóa
@@ -243,285 +259,4 @@ export function CartDialog({ cart, onClose, onChange, onCheckout }) {
   );
 }
 
-export function CheckoutDialog({ cart, onClose }) {
-  const { products } = useStore();
-  const [state, setState] = useState("form");
-  const [error, setError] = useState("");
-  const [receipt, setReceipt] = useState(null);
-  const [requestId] = useState(() => crypto.randomUUID());
-  const busy = false;
-  const [copyStatus, setCopyStatus] = useState("");
-  async function copyOrder() {
-    const summary = [
-      "Garden Dreams — yêu cầu đặt hoa",
-      ...receipt.items.map(
-        (item) =>
-          `${item.name}${item.sizeName ? ` · ${item.sizeName}` : ""} × ${item.quantity}: ${money(item.price * item.quantity)}`,
-      ),
-      `Tạm tính: ${money(receipt.subtotal)} (chưa gồm phí giao)`,
-      `Người nhận: ${receipt.name}`,
-      `Điện thoại: ${receipt.phone}`,
-      `Địa chỉ: ${receipt.address}`,
-      `Ngày nhận: ${receipt.deliveryDate} — ${receipt.deliveryTime}`,
-      `Lời nhắn: ${receipt.message || "(không có)"}`,
-      "Nhờ cửa hàng xác nhận hoa, giá và phí giao trước khi thực hiện.",
-    ].join("\n");
-    try {
-      await navigator.clipboard.writeText(summary);
-      setCopyStatus("Đã sao chép. Bạn có thể dán nội dung khi mở Zalo.");
-    } catch {
-      setCopyStatus(
-        "Trình duyệt không cho phép sao chép. Bạn có thể liên hệ cửa hàng qua số 0832 345 780.",
-      );
-    }
-  }
-  async function submit(e) {
-    e.preventDefault();
-    if (busy) return;
-    setError("");
-    const fields = Object.fromEntries(new FormData(e.currentTarget));
-    let order;
-    try {
-      order = validateOrder(
-        {
-          ...fields,
-          requestId,
-          items: cart,
-          consent: fields.consent === "on",
-        },
-        new Date(),
-        products,
-      );
-    } catch (err) {
-      setError(err.message);
-      return;
-    }
-    setReceipt(order);
-    setState("preview");
-  }
-  return (
-    <Modal
-      title="Chuẩn bị đơn hoa"
-      onClose={() => {
-        if (!busy) onClose();
-      }}
-      className="checkout-dialog"
-    >
-      {state === "form" ? (
-        <>
-          <span className="eyebrow">Một chút chăm chút cuối cùng</span>
-          <h2>
-            Gửi hoa, <em>gửi thương.</em>
-          </h2>
-          {
-            <p className="demo-note">
-              Bản trải nghiệm · bạn có thể xem trước đơn hoa. Thông tin chưa
-              được gửi đến cửa hàng.
-            </p>
-          }
-          <form onSubmit={submit} aria-busy={busy}>
-            <fieldset disabled={busy}>
-              <div className="form-grid">
-                <label>
-                  Tên người nhận
-                  <input
-                    name="name"
-                    autoComplete="name"
-                    required
-                    minLength={2}
-                    maxLength={80}
-                    defaultValue={receipt?.name}
-                    placeholder="Người bạn muốn gửi hoa"
-                  />
-                </label>
-                <label>
-                  Số điện thoại
-                  <input
-                    name="phone"
-                    autoComplete="tel"
-                    type="tel"
-                    required
-                    maxLength={20}
-                    defaultValue={receipt?.phone}
-                    placeholder="09xx xxx xxx"
-                  />
-                </label>
-              </div>
-              <label>
-                Địa chỉ nhận hoa
-                <textarea
-                  name="address"
-                  autoComplete="street-address"
-                  required
-                  minLength={10}
-                  maxLength={300}
-                  defaultValue={receipt?.address}
-                  rows={2}
-                  placeholder="Số nhà, đường, phường/xã, tỉnh/thành"
-                />
-              </label>
-              <div className="form-grid">
-                <label>
-                  Ngày mong muốn
-                  <BloomDate
-                    name="deliveryDate"
 
-                    min={vietnamDate()}
-                    max={vietnamDate(new Date(Date.now() + 90 * 86400000))}
-                    defaultValue={receipt?.deliveryDate}
-                    required
-                  />
-                </label>
-                <label>
-                  Khung giờ
-                  <BloomSelect
-                    name="deliveryTime"
-                    required
-                    defaultValue={receipt?.deliveryTime || "Chiều · 13–17h"}
-                  >
-                    <option>Sáng · 9–12h</option>
-                    <option>Chiều · 13–17h</option>
-                    <option>Tối · 18–20h</option>
-                  </BloomSelect>
-                </label>
-              </div>
-              <label>
-                Lời nhắn trên thiệp{" "}
-                <span className="optional">(không bắt buộc)</span>
-                <textarea
-                  name="message"
-                  rows={3}
-                  maxLength={500}
-                  defaultValue={receipt?.message}
-                  placeholder="Có những lời, để hoa nói giúp…"
-                />
-              </label>
-              <label className="honeypot" aria-hidden="true">
-                Website
-                <input name="website" tabIndex={-1} autoComplete="off" />
-              </label>
-              <div className="checkout-summary">
-                {cart.map((line) => (
-                  <p key={cartKey(line)}>
-                    <span>
-                      {products.find((p) => p.id === line.id).name} ×{" "}
-                      {line.quantity}
-                      {cartChoice(line, products)?.sizeName && ` · ${cartChoice(line, products).sizeName}`}
-                    </span>
-                    <span>
-                      {money(
-                        cartChoice(line, products).price *
-                          line.quantity,
-                      )}
-                    </span>
-                  </p>
-                ))}
-                <div className="cart-total">
-                  <span>Tạm tính</span>
-                  <strong>{money(subtotal(cart, products))}</strong>
-                </div>
-                <small>Thanh toán khi nhận · phí giao xác nhận sau</small>
-              </div>
-              <label className="consent">
-                <input
-                  name="consent"
-                  type="checkbox"
-                  defaultChecked={Boolean(receipt)}
-                  required
-                />{" "}
-                <span>
-                  Tôi đồng ý để cửa hàng dùng thông tin trên nhằm liên hệ và xử
-                  lý yêu cầu đặt hoa.
-                </span>
-              </label>
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
-              <button className="button primary checkout-button" type="submit">
-                Xem trước đơn hoa
-                <Icon name="arrow" />
-              </button>
-              <p className="fineprint">
-                Yêu cầu chỉ trở thành đơn giao hoa sau khi cửa hàng xác nhận
-                tình trạng hoa, giá và phí giao.
-              </p>
-            </fieldset>
-          </form>
-        </>
-      ) : (
-        <div className="receipt">
-          <span className="receipt-icon">
-            <Icon name={state === "preview" ? "flower" : "check"} />
-          </span>
-          <span className="eyebrow">
-            {state === "preview" ? "Yêu cầu mẫu · chưa gửi" : "Đã lưu yêu cầu"}
-          </span>
-          <h2>
-            {state === "preview" ? (
-              <>
-                Món quà <em>đã sẵn sàng.</em>
-              </>
-            ) : (
-              <>
-                Lời thương <em>đã đến.</em>
-              </>
-            )}
-          </h2>
-          <p>
-            {state === "preview"
-              ? "Đây là bản xem trước. Cửa hàng chưa nhận đơn và chưa thu tiền; giỏ hoa của bạn vẫn được giữ."
-              : "Cửa hàng đã nhận yêu cầu và sẽ liên hệ để xác nhận. Bạn chưa bị thu tiền."}
-          </p>
-          {receipt.reference && (
-            <p className="order-reference">{receipt.reference}</p>
-          )}
-          <div className="receipt-details">
-            <p>
-              <span>Người nhận</span>
-              <strong>{receipt.name}</strong>
-            </p>
-            <p>
-              <span>Ngày nhận</span>
-              <strong>
-                {new Intl.DateTimeFormat("vi-VN").format(
-                  new Date(`${receipt.deliveryDate}T12:00:00+07:00`),
-                )}
-              </strong>
-            </p>
-            <p>
-              <span>Tạm tính</span>
-              <strong>{money(receipt.subtotal)}</strong>
-            </p>
-          </div>
-          <div className="receipt-contact">
-            <button className="button outline" onClick={copyOrder}>
-              Sao chép nội dung
-            </button>
-            <a
-              className="text-link"
-              href="https://zalo.me/0832345780"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Mở Zalo cửa hàng <Icon name="arrow" />
-            </a>
-            <p className="fineprint" role="status">
-              {copyStatus ||
-                "Sao chép nội dung và tự gửi qua Zalo khi muốn trao đổi. Website chưa tự gửi tin nhắn."}
-            </p>
-          </div>
-          {state === "preview" && (
-            <button className="text-button" onClick={() => setState("form")}>
-              Chỉnh lại thông tin
-            </button>
-          )}
-          <button className="button primary" onClick={onClose}>
-            Tiếp tục khám phá <Icon name="arrow" />
-          </button>
-        </div>
-      )}
-    </Modal>
-  );
-}

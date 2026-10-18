@@ -278,3 +278,16 @@ Trạng thái: chuẩn bị lát cắt storefront theo các skill chủ shop g�
 
 - [ ] Storefront/content/SEO/mobile được nghiệm thu; URL và dữ liệu cũ tương thích.
 - [ ] Không còn lỗi nghiêm trọng về quyền/tiền/đơn/kỉ niệm; tài liệu, release note và hạn chế đã ghi rõ.
+
+---
+
+# Delivery ledger
+
+- [ ] Payment, SEO, price and account-storage correctness
+- [ ] Storefront navigation, filtering and mobile layouts
+- [ ] Cart, checkout and authentication guidance
+- [ ] Garden discovery, return state and sharing
+- [ ] Admin dirty forms, specifications and performance
+- [ ] Full regression, browser audit, production deployment and issue evidence
+
+External confirmation: actual product/size specifications (#24); Search Console indexing and field Core Web Vitals (#10).

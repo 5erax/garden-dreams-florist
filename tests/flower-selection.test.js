@@ -15,3 +15,8 @@ test('comparison caps at three and deselects before adding another without mutat
   assert.deepEqual(toggleComparison(toggleComparison(ids,2),4),[1,3,4]);
   assert.deepEqual(ids,[1,2,3]);
 });
+test('budget uses the cheapest active size shown on the card', () => {
+  const product={id:1,price:600000,active:true,image:'/flowers/real.webp',variants:[{id:2,active:true,price:300000},{id:3,active:false,price:100000}]};
+  assert.equal(withinBudget(product,350000,true),true);
+  assert.equal(withinBudget(product,250000,true),false);
+});
