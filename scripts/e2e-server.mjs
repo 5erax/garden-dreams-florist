@@ -80,34 +80,15 @@ await db.exec(
   "update public.gd_shop set accepting_orders=true,transfer_enabled=true,bank_bin='970436',bank_account='000000000000',bank_name='Ngân hàng kiểm thử — KHÔNG CHUYỂN TIỀN',account_name='TEST ONLY'; update public.gd_shipping set name='Giao hoa nội thành',area='Khu vực giả để kiểm thử',active=true,fee=30000;",
 );
 let queue = Promise.resolve();
-const tables = new Set([
-  "gd_shop",
-  "gd_products",
-  "gd_product_variants",
-  "gd_shipping",
-  "gd_admins",
-  "gd_orders",
-  "gd_order_events",
-  "gd_memories",
-  "gd_admin_audit",
-]);
-const functions = {
-  gd_business_dashboard: ["p_from", "p_to"],
-  gd_environment: [],
-  gd_create_order: ["p_request"],
-  gd_update_order: ["p_id", "p_version", "p_status", "p_payment", "p_note"],
-  gd_share_memory: ["p_id", "p_visibility", "p_signature"],
-  gd_public_memory: ["p_token"],
-  gd_garden: ["p_before", "p_before_id", "p_limit"],
-  gd_memory_count: [],
-};
+const tables = new Set((await db.query("select tablename from pg_tables where schemaname='public' and tablename like 'gd_%'")).rows.map(row=>row.tablename));
 const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5175");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "authorization,apikey,content-type,x-client-info,x-supabase-api-version,prefer",
+    "authorization,apikey,content-type,content-profile,accept-profile,range,x-client-info,x-supabase-api-version,prefer",
   );
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
+  res.setHeader("Access-Control-Expose-Headers", "Content-Range");
   res.setHeader("Content-Type", "application/json");
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -141,6 +122,10 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(status);
     res.end(JSON.stringify(value));
   };
+  if (url.pathname === "/auth/v1/settings") {
+    send({anonymous_users_enabled:false,disable_signup:true,external:{email:true}});
+    return;
+  }
   if (url.pathname === "/auth/v1/token") {
     const u = users[body.email];
     if (!u || body.password !== "Garden-test-only-2026") {
@@ -192,14 +177,13 @@ const server = http.createServer(async (req, res) => {
     try {
       const resource = url.pathname.slice("/rest/v1/".length);
       if (resource.startsWith("rpc/")) {
-        const name = resource.slice(4),
-          keys = functions[name];
-        if (!keys) throw new Error("Unknown function");
+        const name = resource.slice(4), keys = Object.keys(body);
+        if (!/^gd_[a-z_]+$/.test(name) || keys.some(key=>!/^p_[a-z_]+$/.test(key))) throw new Error("Invalid RPC identifier");
         const args = keys.map((k) => body[k] ?? null);
         send(
           (
             await db.query(
-              `select public.${name}(${args.map((_, i) => "$" + (i + 1)).join(",")}) value`,
+              `select public.${name}(${keys.map((key, i) => key + " => $" + (i + 1)).join(",")}) value`,
               args,
             )
           ).rows[0].value,
@@ -214,10 +198,11 @@ const server = http.createServer(async (req, res) => {
         if (!/^[a-z_]+$/.test(key)) throw new Error("Invalid column");
         const op = value.slice(0, value.indexOf(".")),
           v = value.slice(value.indexOf(".") + 1);
-        if (!["eq", "lt", "gt"].includes(op)) throw new Error("Invalid filter");
+        const operator={eq:'=',lt:'<',gt:'>',gte:'>=',lte:'<='}[op];
+        if (!operator) throw new Error("Invalid filter");
         args.push(v);
         where.push(
-          `"${key}" ${op === "eq" ? "=" : op === "lt" ? "<" : ">"} $${args.length}`,
+          `"${key}" ${operator} $${args.length}`,
         );
       }
       const cursor = url.searchParams.get("or");
@@ -249,12 +234,13 @@ const server = http.createServer(async (req, res) => {
           1000,
           Number(url.searchParams.get("limit")) || 1000,
         );
-        rows = (
-          await db.query(
+        const queryResult = await db.query(
             `select ${columns} from public.${resource}${clause}${ordering.length ? " order by " + ordering.join(",") : ""} limit ${limit}`,
             args,
-          )
-        ).rows;
+          );
+        rows=queryResult.rows;
+        for(const field of queryResult.fields.filter(field=>field.dataTypeID===1082))
+          for(const row of rows)if(row[field.name] instanceof Date)row[field.name]=row[field.name].toISOString().slice(0,10);
       } else if (["POST", "PATCH"].includes(req.method)) {
         const fields = Object.keys(body);
         if (!fields.length || fields.some((k) => !/^[a-z_]+$/.test(k)))

@@ -41,6 +41,15 @@ test('disconnected checkout renders cart choices and controls without a backend'
   assert.match(html,/Nắng dịu/);assert.match(html,/name="deliveryDate"/);
   assert.doesNotMatch(html,/route-error/);
 });
+
+test('empty account cart cannot show a shipping-only order form, but an unresolved request remains recoverable',()=>{
+  render({});
+  const props={cart:[],pending:{current:null},onClose(){},onComplete(){}};
+  const empty=renderToStaticMarkup(createElement(Checkout,props));
+  assert.match(empty,/Giỏ hoa đang trống/);assert.doesNotMatch(empty,/name="address"|Đặt hoa ·/);
+  const pending=renderToStaticMarkup(createElement(Checkout,{...props,pending:{current:{ownerId:'alice',request:{expectedTotal:420000}}}}));
+  assert.match(pending,/Thử lại yêu cầu vừa gửi/);
+});
 test("closed checkout offers the real shop contact before requesting customer signup", () => {
   const html=render({shop:{name:"Garden Dreams",phone:"0832345780",accepting_orders:false},session:null,shipping:[]});
   assert.match(html,/tel:0832345780/);
