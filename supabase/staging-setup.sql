@@ -2470,6 +2470,21 @@ $$;
 notify pgrst,'reload schema';
 commit;
 
+-- 20261019011311_allow_authenticated_slug_normalization.sql
+begin;
+-- Pure text normalization is called by the invoker product trigger; product writes still require admin RLS.
+grant execute on function gd_private.slug_name(text) to authenticated;
+commit;
+
+-- 20261019011608_repair_product_identity_sequence.sql
+begin;
+set local lock_timeout='10s';
+lock table public.gd_products in share row exclusive mode;
+select setval(pg_get_serial_sequence('public.gd_products','id'),
+  greatest(coalesce(max(id),1),coalesce(pg_sequence_last_value(pg_get_serial_sequence('public.gd_products','id')::regclass),1)),true)
+from public.gd_products;
+commit;
+
 -- Only on the new staging project tgvozhrkolcpszyyrgth, after migrations 001–005.
 begin;
 do $$

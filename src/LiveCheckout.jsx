@@ -106,7 +106,9 @@ export default function LiveCheckout({ cart, pending, onClose, onComplete, onEdi
       }}
     >
       {!session && !receipt && <CartSummary cart={cart} products={products} onEdit={onEditCart} />}
-      {!loading && !storeError && !shop.accepting_orders && !receipt && !pending.current ? (
+      {!cart.length && !receipt && !(pending.current && pending.current.ownerId === session?.user.id) ? (
+        <div className="receipt"><h2>Giỏ hoa đang trống.</h2><p>Giỏ hoa được giữ riêng cho từng tài khoản. Chọn một bó hoa trước khi tiếp tục đặt.</p><a className="button primary" href="/#collection" onClick={onClose}>Chọn một bó hoa</a></div>
+      ) : !loading && !storeError && !shop.accepting_orders && !receipt && !pending.current ? (
         <div className="receipt">
           <span className="eyebrow">LIÊN HỆ GARDEN DREAMS</span>
           <h2>Bó hoa bạn chọn,<br /><em>cửa hàng sẽ tư vấn.</em></h2>

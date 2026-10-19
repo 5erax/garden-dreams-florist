@@ -4,6 +4,30 @@ import {randomUUID} from 'node:crypto';
 import {database,actors} from './helpers/database.js';
 import {isOverdue,inventoryChecklist} from '../src/admin-ux.js';
 import {cartChoice,vietnamDate} from '../src/order.js';
+import {readFile} from 'node:fs/promises';
+
+test('identity repair follows explicitly seeded ids without rewinding an allocated sequence',async()=>{
+ const f=await database();
+ try{
+  const next=(await f.db.query("select last_value+1 id from gd_products_id_seq")).rows[0].id;
+  for(const id of [next,5000])await f.db.query("insert into gd_products(id,name,occasion,price,stems,description,image,active) values($1,'Seeded fixture','Sinh nhật',390000,'Hồng','Fixture','/flowers/bouquet_1.webp',false)",[id]);
+  const insert=()=>f.db.query("insert into gd_products(name,occasion,price,stems,description,image,active) values('New fixture','Sinh nhật',390000,'Hồng','Fixture','/flowers/bouquet_1.webp',false) returning id");
+  await assert.rejects(f.as(actors.admin,insert),/duplicate key/);
+  const repair=await readFile(new URL('../supabase/migrations/20261019011608_repair_product_identity_sequence.sql',import.meta.url),'utf8');
+  await f.db.exec(repair);assert.equal((await f.as(actors.admin,insert)).rows[0].id,5001);
+  await f.db.exec("select setval('gd_products_id_seq',6000,true)");await f.db.exec(repair);
+  assert.equal((await f.as(actors.admin,insert)).rows[0].id,6001);
+ }finally{await f.close();}
+});
+
+test('admin product creation derives Vietnamese slugs while customers remain denied',async()=>{
+ const f=await database();
+ const insert=()=>f.db.query("insert into gd_products(name,occasion,price,stems,description,image,active) values('Đóa Hồng E2E','Sinh nhật',390000,'Hồng đỏ','Bó hoa thử','/flowers/bouquet_1.webp',true) returning id,slug");
+ try{
+  const {rows:[product]}=await f.as(actors.admin,insert);assert.equal(product.slug,`doa-hong-e2e-${product.id}`);
+  await assert.rejects(f.as(actors.alice,insert),/row-level security/);
+ }finally{await f.close();}
+});
 
 test('partial receipts/refunds preserve bounds, identity, privacy and report balances',async()=>{
  const f=await database();const admin=(name,args)=>f.as(actors.admin,()=>f.rpc(name,args));

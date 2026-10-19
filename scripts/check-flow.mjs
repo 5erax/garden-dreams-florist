@@ -14,10 +14,13 @@ const alice = client(),
   bob = client(),
   admin = client(),
   anonymous = client();
+const preflight=await fetch('http://127.0.0.1:54321/rest/v1/rpc/gd_environment',{method:'OPTIONS'});
+assert.match(preflight.headers.get('access-control-allow-headers'),/content-profile/);
+assert.equal((await fetch('http://127.0.0.1:54321/auth/v1/settings')).status,200);
 assert.deepEqual(await ok(anonymous.rpc("gd_environment")), {
   environment: "local",
   projectRef: null,
-  features: { productAlbum: true, productImageUpload: false, productVariants: true, variantOrders: true },
+  features: { productAlbum:true, productImageUpload:false, productVariants:true, variantOrders:true, deliveryCalendar:true, operationsDesk:true, orderRequests:true, reconciliationLedger:true, inventory:true, productPages:true, bouquetSpecifications:true },
 });
 for (const [c, email] of [
   [alice, "alice@example.test"],
@@ -56,6 +59,7 @@ const request = {
 let order = await ok(alice.rpc("gd_create_order", { p_request: request }));
 assert.equal(order.is_test, true);
 assert.equal(order.total, request.expectedTotal);
+assert.match((await ok(alice.from('gd_orders').select('delivery_date').eq('id',id).single())).delivery_date,/^\d{4}-\d{2}-\d{2}$/);
 assert.equal(order.bank.account, shop.bank_account);
 const sizedRequest = { ...request, requestId: randomUUID(), expectedTotal: 2 * size.price + catalog[0].price + shipping[0].fee,
   items: [{ id: catalog[0].id, variantId: size.id, quantity: 2, price: 1 }, { id: catalog[0].id, quantity: 1 }] };
@@ -110,11 +114,12 @@ for (const status of ["CONFIRMED", "PREPARING", "SHIPPING", "DELIVERED"])
       p_id: id,
       p_version: order.version,
       p_status: status,
-      p_payment: status === "DELIVERED" ? "PAID" : "UNPAID",
+      p_payment: "UNPAID",
       p_note:
         status === "DELIVERED" ? "Đã đối soát thử, KHÔNG chuyển tiền" : "",
     }),
   );
+order = (await ok(admin.rpc('gd_reconcile_payment', {p_id:randomUUID(),p_order:id,p_version:order.version,p_action:'RECEIPT',p_evidence:'Local synthetic receipt — no transfer',p_reference:'LOCAL-TEST'}))).order;
 const events = await ok(
   alice
     .from("gd_order_events")
@@ -122,7 +127,7 @@ const events = await ok(
     .eq("order_id", id)
     .order("id"),
 );
-assert.equal(events.length, 5);
+assert.equal(events.length, 6);
 const memory = await ok(
   alice.from("gd_memories").select("*").eq("order_id", id).maybeSingle(),
 );

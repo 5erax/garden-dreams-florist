@@ -250,8 +250,8 @@ export default function OrderDetail({ order, admin = false, onUpdated }) {
         </section>
       </div>
       {!admin && <BankPayment order={order} />}
-      {features.reconciliationLedger && <Reconciliation key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
-      {features.orderRequests && <OrderRequests key={order.id} order={order} admin={admin} onUpdated={onUpdated} />}
+      {features.reconciliationLedger && <Reconciliation order={order} admin={admin} onUpdated={onUpdated} />}
+      {features.orderRequests && <OrderRequests order={order} admin={admin} onUpdated={onUpdated} />}
       <section className="order-timeline">
         <h3>Hành trình của bó hoa</h3>
         <ol>
